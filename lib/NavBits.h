@@ -15,57 +15,57 @@ namespace bnav
 template<int dim> class NavBits
 {
 protected:
-	std::bitset<dim> m_bitset;
-	std::size_t m_bitpos;
+    std::bitset<dim> m_bitset;
+    std::size_t m_bitpos;
 
 public:
-	NavBits()
-		: m_bitpos(0)
-	{
-	}
+    NavBits()
+        : m_bitpos(0)
+    {
+    }
 
     NavBits(const int val)
-		: m_bitpos(0)
-	{
+        : m_bitpos(0)
+    {
         // negative values work, but not the conversion back to long or string
         assert(val >= 0);
         // warn if value won't fit dim, otherwise bits get lost
         assert(val < std::pow(2, dim));
-		m_bitset = std::bitset<dim>(val);
-	}
+        m_bitset = std::bitset<dim>(val);
+    }
 
-	NavBits(const std::string & string)
-		: m_bitpos(0)
-	{
+    NavBits(const std::string & string)
+        : m_bitpos(0)
+    {
         // warn if string won't fit dim, otherwise bits get lost
         assert(string.length() <= dim);
-		m_bitset = std::bitset<dim>(string);
-	}
-	~NavBits() {};
+        m_bitset = std::bitset<dim>(string);
+    }
+    ~NavBits() {};
 
     /** Access from right - LSB is [0] **/
-	bool operator[](std::size_t index) const
-	{
-		return m_bitset[index];
-	}
+    bool operator[](std::size_t index) const
+    {
+        return m_bitset[index];
+    }
 
-	/// access as reference
-	typename std::bitset<dim>::reference operator[](std::size_t index)
-	{
-		return m_bitset[index];
-	}
+    /// access as reference
+    typename std::bitset<dim>::reference operator[](std::size_t index)
+    {
+        return m_bitset[index];
+    }
 
     /** Access from left - MSB is [0] **/
-	bool atLeft(std::size_t index) const
-	{
-		return m_bitset[m_bitset.size() - 1 - index];
-	}
+    bool atLeft(std::size_t index) const
+    {
+        return m_bitset[m_bitset.size() - 1 - index];
+    }
 
-	/// access as reference
-	typename std::bitset<dim>::reference atLeft(std::size_t index)
-	{
-		return m_bitset[m_bitset.size() - 1 - index];
-	}
+    /// access as reference
+    typename std::bitset<dim>::reference atLeft(std::size_t index)
+    {
+        return m_bitset[m_bitset.size() - 1 - index];
+    }
 
     typename std::bitset<dim>& operator<<=(std::size_t shift)
     {
@@ -75,25 +75,25 @@ public:
 
 #if 0
     void setLeft(std::size_t index)
-	{
-		m_bitset.set(m_bitset.size() - 1 - index);
-	}
+    {
+        m_bitset.set(m_bitset.size() - 1 - index);
+    }
 
     void setLeft(std::size_t index, bool value)
-	{
-		m_bitset.set(m_bitset.size() - 1 - index, value);
-	}
+    {
+        m_bitset.set(m_bitset.size() - 1 - index, value);
+    }
 #endif
 
-	std::size_t size()
-	{
-		return m_bitset.size();
-	}
+    std::size_t size()
+    {
+        return m_bitset.size();
+    }
 
-	std::bitset<dim> get() const
-	{
-		return m_bitset;
-	}
+    std::bitset<dim> get() const
+    {
+        return m_bitset;
+    }
 
     /// optional: get as reference
     typename std::bitset<dim>::reference get()
@@ -130,43 +130,43 @@ public:
 #endif
 
 #if 0
-	void begin()
-	{
-		m_bitpos = 0;
-	}
+    void begin()
+    {
+        m_bitpos = 0;
+    }
 
-	// getNext<11>()
-	// getNext<15>()
-	template <int length>
-	NavBits<length> getNext()
-	{
-		NavBits<length> nextbits;
-		std::size_t start = m_bitpos;
-		std::size_t end = m_bitpos + length;
+    // getNext<11>()
+    // getNext<15>()
+    template <int length>
+    NavBits<length> getNext()
+    {
+        NavBits<length> nextbits;
+        std::size_t start = m_bitpos;
+        std::size_t end = m_bitpos + length;
 
 std::cout << "m_bitpos:" << m_bitpos << " start:" << start << " end:" << end << std::endl;
-		// ensure it is within bitset bounds
-		//assert(end <= m_bitset.size());
+        // ensure it is within bitset bounds
+        //assert(end <= m_bitset.size());
 
-		// get bits from m_bitpos till m_bitpos + length
-		while (m_bitpos < end)
-		{
-			//FIXME: +1 and -1, this seems crazy
-			std::cout << "nextbits:" << m_bitpos - start
-				<< " m_bitset:" << m_bitset.size() - m_bitpos
-				<< " value:" << m_bitset[m_bitset.size() -1 - m_bitpos]
-				<< std::endl;
-			nextbits[m_bitpos - start + 1] = m_bitset[m_bitset.size() - 1 - m_bitpos];
-			++m_bitpos;
-		}
+        // get bits from m_bitpos till m_bitpos + length
+        while (m_bitpos < end)
+        {
+            //FIXME: +1 and -1, this seems crazy
+            std::cout << "nextbits:" << m_bitpos - start
+                << " m_bitset:" << m_bitset.size() - m_bitpos
+                << " value:" << m_bitset[m_bitset.size() -1 - m_bitpos]
+                << std::endl;
+            nextbits[m_bitpos - start + 1] = m_bitset[m_bitset.size() - 1 - m_bitpos];
+            ++m_bitpos;
+        }
 
-		return nextbits;
-	}
+        return nextbits;
+    }
 
-	void end()
-	{
-		m_bitpos = m_bitset.length();
-	}
+    void end()
+    {
+        m_bitpos = m_bitset.length();
+    }
 #endif
 
     /**
@@ -194,10 +194,10 @@ typedef NavBits<15> NavSubWord;
 // hat nichts mit der klasse an sich zu tun!
 template<int dim>
 std::ostream & operator<<(std::ostream & out, const NavBits<dim> & rhs)
-	{
-		out << rhs.get();
-		return out;
-	}
+    {
+        out << rhs.get();
+        return out;
+    }
 
 }
 
