@@ -3,6 +3,7 @@
 
 #include <bitset>
 #include <cassert>
+#include <cmath>
 #include <iostream> // debug
 #include <string>
 
@@ -23,15 +24,21 @@ public:
 	{
 	}
 
-	NavBits(const int val)
+    NavBits(const int val)
 		: m_bitpos(0)
 	{
+        // negative values work, but not the conversion back to long or string
+        assert(val >= 0);
+        // warn if value won't fit dim, otherwise bits get lost
+        assert(val < std::pow(2, dim));
 		m_bitset = std::bitset<dim>(val);
 	}
 
 	NavBits(const std::string & string)
 		: m_bitpos(0)
 	{
+        // warn if string won't fit dim, otherwise bits get lost
+        assert(string.length() <= dim);
 		m_bitset = std::bitset<dim>(string);
 	}
 	~NavBits() {};
@@ -66,15 +73,17 @@ public:
         return m_bitset;
     }
 
-	void set(std::size_t index)
+#if 0
+    void setLeft(std::size_t index)
 	{
 		m_bitset.set(m_bitset.size() - 1 - index);
 	}
 
-	void set(std::size_t index, bool value)
+    void setLeft(std::size_t index, bool value)
 	{
 		m_bitset.set(m_bitset.size() - 1 - index, value);
 	}
+#endif
 
 	std::size_t size()
 	{
@@ -86,31 +95,32 @@ public:
 		return m_bitset;
 	}
 
+    /// optional: get as reference
+    typename std::bitset<dim>::reference get()
+    {
+        return m_bitset;
+    }
+
     /**
      * Get a bitslice, index starting from left.
      *
      * getLeft<0,10>() will return the 10 most significant bits
      */
-    template<int start, int end>
-    NavBits<end - start> getLeft() const
+    template<int start, int len>
+    NavBits<len> getLeft() const
     {
-        assert(end - start > 0);
-        assert(end - start <= dim);
+        assert(start >= 0);
+        assert(len >= 0);
+        assert(start + len <= dim);
 
-        NavBits<end - start> bTest;
-        for (std::size_t i = start; i < end; ++i)
+        NavBits<len> bTest;
+        for (std::size_t i = start; i < start + len; ++i)
         {
             // save first bit into bTest[0]:
             bTest.atLeft(i - start) = atLeft(i);
         }
         return bTest;
     }
-
-	/// optional: get as reference
-	typename std::bitset<dim>::reference get()
-	{
-		return m_bitset;
-	}
 
 #if 0
     uint8_t as_uint8_t(uint8_t start, uint8_t end)
@@ -119,6 +129,7 @@ public:
     }
 #endif
 
+#if 0
 	void begin()
 	{
 		m_bitpos = 0;
@@ -156,7 +167,7 @@ std::cout << "m_bitpos:" << m_bitpos << " start:" << start << " end:" << end << 
 	{
 		m_bitpos = m_bitset.length();
 	}
-
+#endif
 
     /**
      * Conversion
@@ -166,12 +177,17 @@ std::cout << "m_bitpos:" << m_bitpos << " start:" << start << " end:" << end << 
      {
          return m_bitset.to_ulong();
      }
+
+     std::string to_string() const
+     {
+         return m_bitset.to_string();
+     }
 };
 
-
+#if 0
 typedef NavBits<30> NavWord;
 typedef NavBits<15> NavSubWord;
-
+#endif
 
 // non-member functions
 

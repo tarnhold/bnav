@@ -5,8 +5,9 @@
 TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
-CONFIG -= qt
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    testNavBits.cpp \
+    testAsciiReader.cpp
 
 LIBS += -lunittest++ -L../lib -lbnav

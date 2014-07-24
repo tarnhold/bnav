@@ -151,15 +151,8 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
     }
 
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
-    NavBits<20> lastblock(navbits320.getLeft<300, 320>());
+    NavBits<20> lastblock(navbits320.getLeft<300, 20>());
     assert(lastblock.to_ulong() == 0);
-
-#if UNITTEST
-NavBits<6> bTest("111001");
-    std::cout << "0,6: " << bTest.getLeft<0, 6>() << std::endl;
-    std::cout << "1,6: " << bTest.getLeft<1, 6>() << std::endl;
-    std::cout << "2,6: " << bTest.getLeft<2, 6>() << std::endl;
-#endif
 
     m_bits = navbits320.getLeft<0, 300>();
 
