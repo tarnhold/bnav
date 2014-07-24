@@ -194,6 +194,7 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
 
     // parse tow and prn fields
     m_tow = std::stoi(splitline[0]);
+    // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
     m_prn = std::stoi(splitline[2]) - 140;
 
     DEBUG("tow: " << m_tow);
@@ -209,7 +210,7 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
     NavBits<320> navbits320;
     for (std::vector<std::string>::iterator it = splitbits.begin(); it < splitbits.end(); ++it)
     {
-        const int val = std::stoul(*it);
+        const unsigned long val = std::stoul(*it);
         const std::size_t bsize = 32;
         NavBits<bsize> bitblock(val);
 

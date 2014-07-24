@@ -4,6 +4,7 @@
 #include <bitset>
 #include <cassert>
 #include <cmath>
+#include <cstring>
 #include <iostream> // debug
 #include <string>
 
@@ -24,16 +25,6 @@ public:
     {
     }
 
-    NavBits(const int val)
-        : m_bitpos(0)
-    {
-        // negative values work, but not the conversion back to long or string
-        assert(val >= 0);
-        // warn if value won't fit dim, otherwise bits get lost
-        assert(val < std::pow(2, dim));
-        m_bitset = std::bitset<dim>(val);
-    }
-
     NavBits(const std::string & string)
         : m_bitpos(0)
     {
@@ -41,6 +32,26 @@ public:
         assert(string.length() <= dim);
         m_bitset = std::bitset<dim>(string);
     }
+
+    NavBits(const char* cstr)
+        : m_bitpos(0)
+    {
+        // warn if string won't fit dim, otherwise bits get lost
+        assert(std::strlen(cstr) <= dim);
+        m_bitset = std::bitset<dim>(cstr);
+    }
+
+    template <typename T>
+    NavBits(const T val)
+        : m_bitpos(0)
+    {
+        // negative values work, but not the conversion back to long or string, so ignore them now
+        assert(val >= 0);
+        // warn if value won't fit dim, otherwise bits get lost
+        assert(val < std::pow(2, dim));
+        m_bitset = std::bitset<dim>(val);
+    }
+
     ~NavBits() {};
 
     /** Access from right - LSB is [0] **/
