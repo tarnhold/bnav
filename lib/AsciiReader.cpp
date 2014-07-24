@@ -243,7 +243,7 @@ AsciiReader::AsciiReader()
 {
 }
 
-AsciiReader::AsciiReader(const char *filename, const std::string &filetype)
+AsciiReader::AsciiReader(const char *filename, const AsciiReaderType &filetype)
     : m_infile()
     , m_filetype(filetype)
     , m_eof(false)
@@ -292,9 +292,9 @@ bool AsciiReader::readLine(ReaderNavEntry &data)
 
     DEBUG("line: " << line);
 
-    if (m_filetype == "jps")
+    if (m_filetype == AsciiReaderType::TEXT_CONVERTED_JPS)
         data = ReaderNavEntryJPS(line);
-    else if (m_filetype == "sbf")
+    else if (m_filetype == AsciiReaderType::TEXT_CONVERTED_SBF)
         data = ReaderNavEntrySBF(line);
 
     if (m_infile.eof())

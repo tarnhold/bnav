@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     }
 
     // Open file and parse lines
-    bnav::AsciiReader reader(argv[1], "sbf");
+    bnav::AsciiReader reader(argv[1], bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
     if (!reader.isOpen())
     {
         std::cerr << "Could not open file: " << argv[1] << std::endl;

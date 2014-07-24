@@ -12,6 +12,12 @@
 namespace bnav
 {
 
+enum AsciiReaderType
+{
+    TEXT_CONVERTED_JPS,
+    TEXT_CONVERTED_SBF
+};
+
 /// Base type for line element
 class ReaderNavEntry
 {
@@ -58,16 +64,16 @@ class AsciiReader : private boost::noncopyable
 {
 private:
     std::ifstream m_infile; //< Input file stream
-    std::string m_filetype; //< Type of source file (sbf, jps)
+    AsciiReaderType m_filetype; //< Type of source file (sbf, jps)
     bool m_eof; //< State if EOF is reached
 
 public:
     AsciiReader();
-    AsciiReader(const char *filename, const std::string &filetype);
+    AsciiReader(const char *filename, const AsciiReaderType &filetype);
     ~AsciiReader();
 
     void open(const std::string &filename);
-    //void open(const std::string &filename, const std::string &filetype);
+    //void open(const std::string &filename, const AsciiReaderType &filetype);
     bool isOpen();
     /// Read current line, return data by reference
     bool readLine(ReaderNavEntry &data);
