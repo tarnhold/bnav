@@ -3,6 +3,8 @@
 }
 
 TEMPLATE = app
+TARGET = bapp
+
 CONFIG += console
 CONFIG -= app_bundle
 
