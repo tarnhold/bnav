@@ -17,10 +17,10 @@ namespace
  * [1] Table 5-2 ROM table list for error correction
  */
 static const std::vector< uint16_t > cROMTable = {
-	0x0000, 0x0001, 0x0002, 0x0010, // 0 - 3
-	0x0004, 0x0100, 0x0020, 0x0400, // 4 - 7
-	0x0008, 0x4000, 0x0200, 0x0080, // 8 - 11
-	0x0040, 0x2000, 0x0800, 0x1000  // 12 - 15
+    0x0000, 0x0001, 0x0002, 0x0010, // 0 - 3
+    0x0004, 0x0100, 0x0020, 0x0400, // 4 - 7
+    0x0008, 0x4000, 0x0200, 0x0080, // 8 - 11
+    0x0040, 0x2000, 0x0800, 0x1000  // 12 - 15
 };
 
 
@@ -39,22 +39,22 @@ static const std::vector< uint16_t > cROMTable = {
  */
 std::size_t decodeBCH(const subword &message)
 {
-	// default state of shift registers is zero
-	bool d0 = false, d1 = false, d2 = false, d3 = false;
+    // default state of shift registers is zero
+    bool d0 = false, d1 = false, d2 = false, d3 = false;
 
-	for (std::size_t i = message.size(); i > 0; --i)
-	{
-		// save old d3 state
-		bool buf = d3;
+    for (std::size_t i = message.size(); i > 0; --i)
+    {
+        // save old d3 state
+        bool buf = d3;
 
-		d3 = d2;
-		d2 = d1;
-		d1 = d0 xor buf;
-		d0 = message[i-1] xor buf;
-	}
+        d3 = d2;
+        d2 = d1;
+        d1 = d0 xor buf;
+        d0 = message[i-1] xor buf;
+    }
 
-	// put all together
-	return d0 + (d1 << 1) + (d2 << 2) + (d3 << 3);
+    // put all together
+    return d0 + (d1 << 1) + (d2 << 2) + (d3 << 3);
 }
 
 /*!
@@ -67,22 +67,22 @@ std::size_t decodeBCH(const subword &message)
 // just write parity bits into them
 uint8_t encodeBCH(const std::bitset<11> &information)
 {
-	// default state of shift registers is zero
-	bool d0 = false, d1 = false, d2 = false, d3 = false;
+    // default state of shift registers is zero
+    bool d0 = false, d1 = false, d2 = false, d3 = false;
 
-	for (std::size_t i = information.size(); i > 0; --i)
-	{
-		// save old d3 state
-		bool buf = d3 xor information[i-1];
+    for (std::size_t i = information.size(); i > 0; --i)
+    {
+        // save old d3 state
+        bool buf = d3 xor information[i-1];
 
-		d3 = d2;
-		d2 = d1;
-		d1 = d0 xor buf;
-		d0 = buf;
-	}
+        d3 = d2;
+        d2 = d1;
+        d1 = d0 xor buf;
+        d0 = buf;
+    }
 
     //subword ret = information;
-	return d0 + (d1 << 1) + (d2 << 2) + (d3 << 3);
+    return d0 + (d1 << 1) + (d2 << 2) + (d3 << 3);
 }
 
 }
@@ -166,8 +166,8 @@ template <std::size_t len>
     //std::cout << "complete:" << messagestr.length() << std::endl;
 
     m_msglist.resize(num);
-	for (std::size_t i = 0; i < num; ++i)
-	{
+    for (std::size_t i = 0; i < num; ++i)
+    {
         std::size_t startinfo = 11*i;
         std::size_t startpar = 11*num + 4*i;
 
@@ -195,14 +195,14 @@ template <std::size_t len>
   //      std::cout << submessage << std::endl;
 
 /* subword mit substr - fuer unittest nehmen
-		subword submessage(
+        subword submessage(
               messagestr.substr(11*i, 11)
             + messagestr.substr(11*num + 4*i, 4));
 */
 
         m_msglist[i] = submessage;
 
-		//std::cout << i << ":" << submessage << std::endl;
+        //std::cout << i << ":" << submessage << std::endl;
     }
 
     //return m_msglist;
@@ -241,21 +241,21 @@ std::string NavBitsECC<len>::mergeMessage(/*std::vector< subword > msglist*/)
 template <std::size_t len>
 bool NavBitsECC<len>::checkAndFix(subword *message)
 {
-	std::size_t idx = decodeBCH(*message);
+    std::size_t idx = decodeBCH(*message);
 
     // fix parity
-	if (idx > 0)
-	{
+    if (idx > 0)
+    {
         subword fixed(*message xor std::bitset<15>(cROMTable[idx]));
         ++m_counter;
         
-		std::cout << "parity check failed" << std::endl;
-		std::cout << "old: " << *message << std::endl;
-		std::cout << "new: " << fixed << std::endl;
-		std::cout << std::setw(3) << idx << ": " << std::bitset<15>(cROMTable[idx]) << std::endl;
+        std::cout << "parity check failed" << std::endl;
+        std::cout << "old: " << *message << std::endl;
+        std::cout << "new: " << fixed << std::endl;
+        std::cout << std::setw(3) << idx << ": " << std::bitset<15>(cROMTable[idx]) << std::endl;
         
         return false;
-	}
+    }
     
     return true;
 }
@@ -272,7 +272,7 @@ bool NavBitsECC<len>::checkAndFixAll(/*const std::bitset<len> &message*/)
     for (std::size_t i = 0; i < m_msglist.size(); ++i)
         checkAndFix(&m_msglist[i]);
 /*
-	// 11+11+...+4+4+...
+    // 11+11+...+4+4+...
     std::vector< subword > vlist = splitMessage(message);
     
     // @TODO use returned value and save it into vlist[i]
