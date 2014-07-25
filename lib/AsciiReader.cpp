@@ -238,12 +238,21 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
 
 AsciiReader::AsciiReader()
     : m_infile()
-    , m_filetype()
+    , m_filetype(AsciiReaderType::NONE)
     , m_eof(false)
 {
 }
 
 AsciiReader::AsciiReader(const char *filename, const AsciiReaderType &filetype)
+    : m_infile()
+    , m_filetype(filetype)
+    , m_eof(false)
+{
+    //FIXME: check if filename is empty?
+    open(filename);
+}
+
+AsciiReader::AsciiReader(const std::string &filename, const AsciiReaderType &filetype)
     : m_infile()
     , m_filetype(filetype)
     , m_eof(false)
@@ -264,13 +273,33 @@ bool AsciiReader::isOpen()
     return m_infile.is_open();
 }
 
-void AsciiReader::open(const std::string &filename)
+void AsciiReader::open(const char *filename)
 {
     // ensure there is no open file stream
     assert(!isOpen());
 
-    // @TODO: check if file could be opened
+    // ensure filetype is set
+    assert(m_filetype != AsciiReaderType::NONE);
+
+    // TODO: check if file exists
+    // TODO: check if file could be opened
+    // would be better to handle exceptions
     m_infile.open(filename);
+}
+
+void AsciiReader::open(const std::string &filename)
+{
+    open(filename.c_str());
+}
+
+void AsciiReader::setType(const AsciiReaderType &filetype)
+{
+    m_filetype = filetype;
+}
+
+AsciiReaderType AsciiReader::getType()
+{
+    return m_filetype;
 }
 
 /**

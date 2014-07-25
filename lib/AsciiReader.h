@@ -15,7 +15,8 @@ namespace bnav
 enum AsciiReaderType
 {
     TEXT_CONVERTED_JPS,
-    TEXT_CONVERTED_SBF
+    TEXT_CONVERTED_SBF,
+    NONE
 };
 
 /// Base type for line element
@@ -70,11 +71,17 @@ private:
 public:
     AsciiReader();
     AsciiReader(const char *filename, const AsciiReaderType &filetype);
+    AsciiReader(const std::string &filename, const AsciiReaderType &filetype);
     ~AsciiReader();
 
+    void open(const char *filename);
     void open(const std::string &filename);
     //void open(const std::string &filename, const AsciiReaderType &filetype);
     bool isOpen();
+
+    void setType(const AsciiReaderType &filetype);
+    AsciiReaderType getType();
+
     /// Read current line, return data by reference
     bool readLine(ReaderNavEntry &data);
     bool isEof();
