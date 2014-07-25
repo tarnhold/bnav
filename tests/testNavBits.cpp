@@ -11,18 +11,18 @@ TEST(testNavBitsConstructor)
     {
         // empty constructor
         {
-            bnav::NavBits<10> bits;
+            const bnav::NavBits<10> bits;
             CHECK(bits.size() == 10);
             CHECK(bits.to_string() == "0000000000");
         }
 
         // numeric constructor
         {
-            bnav::NavBits<10> bits2(8);
+            const bnav::NavBits<10> bits2(8);
             CHECK(bits2.size() == 10);
             CHECK(bits2.to_ulong() == 8);
 
-            bnav::NavBits<10> bits3(1023);
+            const bnav::NavBits<10> bits3(1023);
             CHECK(bits3.size() == 10);
             CHECK(bits3.to_string() == "1111111111");
         }
@@ -30,11 +30,11 @@ TEST(testNavBitsConstructor)
         // string costructor
         {
             // we reserve 10 bits, but only set the 6 lsb bits
-            bnav::NavBits<10> bits3("101000");
+            const bnav::NavBits<10> bits3("101000");
             CHECK(bits3.size() == 10);
             CHECK(bits3.to_string() == "0000101000");
 
-            bnav::NavBits<5> bits4("10100");
+            const bnav::NavBits<5> bits4("10100");
             CHECK(bits4.size() == 5);
             CHECK(bits4.to_string() == "10100");
         }
@@ -99,7 +99,7 @@ TEST(testNavBitsSlice)
 {
     // Get bit slice from left (msb is index 0)
     {
-        bnav::NavBits<6> bTest("111001");
+        const bnav::NavBits<6> bTest("111001");
 
         std::string ret = bTest.getLeft<0, 6>().to_string();
         CHECK(ret == "111001");

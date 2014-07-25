@@ -96,7 +96,7 @@ public:
     }
 #endif
 
-    std::size_t size()
+    std::size_t size() const
     {
         return m_bitset.size();
     }
