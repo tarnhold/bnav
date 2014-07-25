@@ -5,7 +5,7 @@
 #include <bitset>
 #include <vector>
 
-#include <iostream> // debug
+#include <iostream>
 #include <iomanip>
 
 typedef std::bitset<15> subword;
@@ -24,10 +24,6 @@ static const std::vector< uint16_t > cROMTable = {
 };
 
 
-// @TODO: test this
-// take 110110010010101
-// and change a single bit for every position and check if it repairs correctly!
-
 /*!
  * BCH(15,11,1) decoding
  *
@@ -37,7 +33,7 @@ static const std::vector< uint16_t > cROMTable = {
  * @return Index value of the ROM table
  *
  */
-std::size_t decodeBCH(const subword &message)
+static inline std::size_t decodeBCH(const subword &message)
 {
     // default state of shift registers is zero
     bool d0 = false, d1 = false, d2 = false, d3 = false;
@@ -65,6 +61,7 @@ std::size_t decodeBCH(const subword &message)
  */
 // @TODO: change this to take 15 bits, and ignore last 4 bits,
 // just write parity bits into them
+#if 0
 uint8_t encodeBCH(const std::bitset<11> &information)
 {
     // default state of shift registers is zero
@@ -84,6 +81,7 @@ uint8_t encodeBCH(const std::bitset<11> &information)
     //subword ret = information;
     return d0 + (d1 << 1) + (d2 << 2) + (d3 << 3);
 }
+#endif
 
 }
 
@@ -108,9 +106,11 @@ public:
     /*std::vector< subword >*/void splitMessage();
     std::string mergeMessage(/*std::vector< subword > msglist*/);
 
-    bool checkAndFix(subword *pair);
+    bool checkAndFix(subword &message);
     //bool checkAndFixParity(const std::bitset<len> &message);
     bool checkAndFixAll();
+
+    std::bitset<len> getBits();
     
     bool isModified();
 
@@ -135,8 +135,8 @@ NavBitsECC<len>::NavBitsECC(const std::bitset<len> &bits)
     , m_counter(0)
 {
     // ensure we use only valid templates
-    static_assert(len == 30 || len == 90 || len == 150 || len == 250,
-        "invalid bitset size");
+    static_assert(len == 15 || len == 30 || len == 90 || len == 150
+                  || len == 250, "invalid bitset size");
         
     checkAndFixAll();
 }
@@ -239,20 +239,22 @@ std::string NavBitsECC<len>::mergeMessage(/*std::vector< subword > msglist*/)
  * Check parity for one single subword (11+4)
  */
 template <std::size_t len>
-bool NavBitsECC<len>::checkAndFix(subword *message)
+bool NavBitsECC<len>::checkAndFix(subword &message)
 {
-    std::size_t idx = decodeBCH(*message);
+    std::size_t idx = decodeBCH(message);
 
     // fix parity
     if (idx > 0)
     {
-        subword fixed(*message xor std::bitset<15>(cROMTable[idx]));
+        subword fixed(message xor std::bitset<15>(cROMTable[idx]));
         ++m_counter;
         
         std::cout << "parity check failed" << std::endl;
-        std::cout << "old: " << *message << std::endl;
+        std::cout << "old: " << message << std::endl;
         std::cout << "new: " << fixed << std::endl;
         std::cout << std::setw(3) << idx << ": " << std::bitset<15>(cROMTable[idx]) << std::endl;
+
+        message = fixed;
         
         return false;
     }
@@ -270,7 +272,7 @@ bool NavBitsECC<len>::checkAndFixAll(/*const std::bitset<len> &message*/)
     //for (std::vector< subword >::iterator it = m_msglist.begin(); it != m_msglist.end(); ++it)
     //     checkAndFix(&(*it));
     for (std::size_t i = 0; i < m_msglist.size(); ++i)
-        checkAndFix(&m_msglist[i]);
+        checkAndFix(m_msglist[i]);
 /*
     // 11+11+...+4+4+...
     std::vector< subword > vlist = splitMessage(message);
@@ -286,6 +288,16 @@ bool NavBitsECC<len>::checkAndFixAll(/*const std::bitset<len> &message*/)
    return true;
 }
 
+template <std::size_t len>
+std::bitset<len> NavBitsECC<len>::getBits()
+{
+    //std::cout << m_counter << std::endl;
+    std::string merge;
+    merge = mergeMessage();
+
+    return std::bitset<len>(merge);
+}
+
 /*!
  * If the message was modified by fixing at least one subword this returns true.
  *
@@ -294,6 +306,7 @@ bool NavBitsECC<len>::checkAndFixAll(/*const std::bitset<len> &message*/)
 template <std::size_t len>
 bool NavBitsECC<len>::isModified()
 {
+    std::cout << m_counter << std::endl;
     return m_counter > 0;
 }
 

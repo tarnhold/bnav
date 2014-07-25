@@ -42,13 +42,16 @@ bool Subframe::fixParityWordOne()
     NavBitsECC<30> ecc(bset);
     ecc.checkAndFixAll();
 
-    return false; //TODO
+    // TODO
+    m_isParityWordOneFixed = false;
+    return m_isParityWordOneFixed;
 }
 
 bool Subframe::fixParityAll()
 {
     // TODO
-    return false;
+    m_isParityAllFixed = false;
+    return m_isParityAllFixed;
 }
 
 } // namespace bnav

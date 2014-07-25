@@ -9,14 +9,14 @@ SOURCES += \
     AsciiReader.cpp \
     NavBits.cpp \
     Subframe.cpp \
-    NavBitsECC.cpp \
-    AsciiReaderNavEntry.cpp
+    AsciiReaderNavEntry.cpp \
+    NavBitsECC.cpp
 
 HEADERS += \
     AsciiReader.h \
     Debug.h \
     NavBits.h \
     Subframe.h \
-    NavBitsECC.h \
-    AsciiReaderNavEntry.h
+    AsciiReaderNavEntry.h \
+    NavBitsECC.h
 

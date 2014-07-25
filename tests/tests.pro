@@ -8,6 +8,7 @@ CONFIG -= app_bundle
 
 SOURCES += main.cpp \
     testNavBits.cpp \
-    testAsciiReader.cpp
+    testAsciiReader.cpp \
+    testNavBitsECC.cpp
 
 LIBS += -lunittest++ -L../lib -lbnav
