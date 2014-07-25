@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     bnav::ReaderNavEntry data;
     while (reader.readLine(data))
     {
-        std::cout << "prn: " << data.getPRN() << " tow: " << data.getTOW() << std::endl;
+        //std::cout << "prn: " << data.getPRN() << " tow: " << data.getTOW() << std::endl;
     }
     reader.close();
 

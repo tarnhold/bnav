@@ -84,16 +84,10 @@ void ReaderNavEntry::readLine(const std::string &)
  * Returns a bitset of the raw navigation message
  */
 ReaderNavEntryJPS::ReaderNavEntryJPS()
-/*    : m_prn(0)
-    , m_tow(0)
-    , m_bits()*/
 {
 }
 
 ReaderNavEntryJPS::ReaderNavEntryJPS(const std::string &line)
-/*    : m_prn(0)
-    , m_tow(0)
-    , m_bits()*/
 {
     readLine(line);
 }
@@ -112,8 +106,8 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
         exit(1);
     }
 
-    DEBUG("tow:" << m_tow);
-    DEBUG("prn:" << m_prn);
+    //DEBUG("tow:" << m_tow);
+    //DEBUG("prn:" << m_prn);
 
     // get data field
     const std::string strdata("data ");
@@ -166,16 +160,10 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
  * Returns a bitset of the raw navigation message
  */
 ReaderNavEntrySBF::ReaderNavEntrySBF()
-/*    : m_prn(0)
-    , m_tow(0)
-    , m_bits()*/
 {
 }
 
 ReaderNavEntrySBF::ReaderNavEntrySBF(const std::string &line)
-/*    : m_prn(0)
-    , m_tow(0)
-    , m_bits()*/
 {
     readLine(line);
 }
@@ -197,8 +185,8 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
     // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
     m_prn = std::stoi(splitline[2]) - 140;
 
-    DEBUG("tow: " << m_tow);
-    DEBUG("prn: " << m_prn);
+    //DEBUG("tow: " << m_tow);
+    //DEBUG("prn: " << m_prn);
 
     // parse last field, which contains 10 numeric values, separated by whitespace
     std::vector<std::string> splitbits;
@@ -319,7 +307,7 @@ bool AsciiReader::readLine(ReaderNavEntry &data)
     if (line.empty())
         return false;
 
-    DEBUG("line: " << line);
+    //DEBUG("line: " << line);
 
     if (m_filetype == AsciiReaderType::TEXT_CONVERTED_JPS)
         data = ReaderNavEntryJPS(line);
