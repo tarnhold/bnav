@@ -14,5 +14,5 @@ NavBits::~NavBits()
 */
 
 
-}
+} // namespace bnav
 

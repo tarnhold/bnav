@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
-#include <iostream> // debug
+#include <iostream>
 #include <string>
 
 namespace bnav
@@ -101,16 +101,18 @@ public:
         return m_bitset.size();
     }
 
-    std::bitset<dim> get() const
+    std::bitset<dim> getBits() const
     {
         return m_bitset;
     }
 
+#if 0
     /// optional: get as reference
     typename std::bitset<dim>::reference get()
     {
         return m_bitset;
     }
+#endif
 
     /**
      * Get a bitslice, index starting from left.
@@ -205,12 +207,12 @@ typedef NavBits<15> NavSubWord;
 // hat nichts mit der klasse an sich zu tun!
 template<int dim>
 std::ostream & operator<<(std::ostream & out, const NavBits<dim> & rhs)
-    {
-        out << rhs.get();
-        return out;
-    }
-
+{
+    out << rhs.get();
+    return out;
 }
+
+} // namespace bnav
 
 
 
