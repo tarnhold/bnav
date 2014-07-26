@@ -12,7 +12,7 @@
 namespace bnav
 {
 
-enum AsciiReaderType
+enum class AsciiReaderType
 {
     TEXT_CONVERTED_JPS,
     TEXT_CONVERTED_SBF,

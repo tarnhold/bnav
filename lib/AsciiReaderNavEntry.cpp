@@ -172,6 +172,8 @@ ReaderNavEntrySBF::ReaderNavEntrySBF(const std::string &line)
 
 void ReaderNavEntrySBF::readLine(const std::string &line)
 {
+    static const int SBF_SVID_OFFSET_BEIDOU = 140;
+
     // one line looks like:
     // 345605000,1801,145,1,28,3795932449 2099070704 0 0 0 0 0 0 0 1
 
@@ -185,7 +187,7 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
     // parse tow and prn fields
     m_tow = std::stoi(splitline[0]);
     // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
-    m_prn = std::stoi(splitline[2]) - 140;
+    m_prn = std::stoi(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
 
     //DEBUG("tow: " << m_tow);
     //DEBUG("prn: " << m_prn);
