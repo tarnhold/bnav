@@ -98,11 +98,10 @@ public:
         return *this;
     }
 
-    // TODO: change to NavBits return type
-    typename std::bitset<dim>& operator<<=(std::size_t shift)
+    NavBits<dim>& operator<<=(std::size_t shift)
     {
         m_bitset <<= shift;
-        return m_bitset;
+        return *this;
     }
 
 #if 0
