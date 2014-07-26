@@ -58,7 +58,9 @@ public:
         m_bitset = std::bitset<dim>(val);
     }
 
-    ~NavBits() {};
+    ~NavBits()
+    {
+    }
 
     /** Access from right - LSB is [0] **/
     bool operator[](std::size_t index) const
@@ -90,6 +92,12 @@ public:
         return m_bitset ^ rhs.getBits();
     }
 
+    NavBits<dim>& operator^=(const NavBits<dim> &rhs)
+    {
+        m_bitset = m_bitset ^ rhs.getBits();
+        return *this;
+    }
+
     // TODO: change to NavBits return type
     typename std::bitset<dim>& operator<<=(std::size_t shift)
     {
@@ -112,6 +120,11 @@ public:
     void flip(std::size_t index)
     {
         m_bitset.flip(index);
+    }
+
+    void flipLeft(std::size_t index)
+    {
+        m_bitset.flip(m_bitset.size() - 1 - index);
     }
 
     std::size_t size() const

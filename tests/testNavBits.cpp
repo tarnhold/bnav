@@ -38,6 +38,19 @@ TEST(testNavBitsConstructor)
             CHECK(bits4.size() == 5);
             CHECK(bits4.to_string() == "10100");
         }
+
+        // bitest constructor
+        {
+            const std::bitset<10> bitset1("1111100001");
+            const bnav::NavBits<10> bits2(bitset1);
+            CHECK(bits2.size() == 10);
+            CHECK(bits2.to_string() == "1111100001");
+
+            const std::bitset<10> bitset2(1023);
+            const bnav::NavBits<10> bits3(bitset2);
+            CHECK(bits3.size() == 10);
+            CHECK(bits3.to_string() == "1111111111");
+        }
     }
 }
 
@@ -80,6 +93,54 @@ TEST(testNavBitsAccess)
         CHECK(bits2.atLeft(1) == true);
         CHECK(bits2.atLeft(2) == true);
         CHECK(bits2.to_string() == "011");
+    }
+}
+
+TEST(testNavBitsFlip)
+{
+    // flip single bits
+    {
+        bnav::NavBits<4> bits("0001");
+        bits.flip(0);
+        CHECK(bits.to_string() == "0000");
+        bits.flip(2);
+        CHECK(bits.to_string() == "0100");
+    }
+
+    // flip from left
+    {
+        bnav::NavBits<4> bits("0001");
+        bits.flipLeft(0);
+        CHECK(bits.to_string() == "1001");
+        bits.flipLeft(1);
+        CHECK(bits.to_string() == "1101");
+    }
+}
+
+TEST(testNavBitsXor)
+{
+    // operator^
+    {
+        bnav::NavBits<4> bits("0000");
+        const bnav::NavBits<4> bits2("1100");
+        bits = bits ^ bits2;
+        CHECK(bits.to_string() == "1100");
+        bits.flip(0);
+        CHECK(bits.to_string() == "1101");
+        bits = bits ^ bits2;
+        CHECK(bits.to_string() == "0001");
+    }
+
+    // operator^=
+    {
+        bnav::NavBits<4> bits("0000");
+        const bnav::NavBits<4> bits2("1100");
+        bits ^= bits2;
+        CHECK(bits.to_string() == "1100");
+        bits.flip(0);
+        CHECK(bits.to_string() == "1101");
+        bits ^= bits2;
+        CHECK(bits.to_string() == "0001");
     }
 }
 
