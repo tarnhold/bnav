@@ -36,10 +36,7 @@ int Subframe::getPageNum()
 bool Subframe::fixParityWordOne()
 {
     NavBits<30> wordone = m_bits.getLeft<0, 30>();
-    // HACK: process with raw bitset:
-#include <bitset>
-    std::bitset<30> bset = wordone.getBits();
-    NavBitsECC<30> ecc(bset);
+    NavBitsECC<30> ecc(wordone);
     ecc.checkAndFixAll();
 
     // TODO

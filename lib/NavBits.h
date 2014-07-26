@@ -41,6 +41,12 @@ public:
         m_bitset = std::bitset<dim>(cstr);
     }
 
+    NavBits(const std::bitset<dim> & bitset)
+        : m_bitpos(0)
+    {
+        m_bitset = bitset;
+    }
+
     template <typename T>
     NavBits(const T val)
         : m_bitpos(0)
@@ -72,12 +78,19 @@ public:
         return m_bitset[m_bitset.size() - 1 - index];
     }
 
+    // TODO: change to NavBits return type
     /// access as reference
     typename std::bitset<dim>::reference atLeft(std::size_t index)
     {
         return m_bitset[m_bitset.size() - 1 - index];
     }
 
+    NavBits<dim> operator^(const NavBits<dim> &rhs)
+    {
+        return m_bitset ^ rhs.getBits();
+    }
+
+    // TODO: change to NavBits return type
     typename std::bitset<dim>& operator<<=(std::size_t shift)
     {
         m_bitset <<= shift;
@@ -95,6 +108,11 @@ public:
         m_bitset.set(m_bitset.size() - 1 - index, value);
     }
 #endif
+
+    void flip(std::size_t index)
+    {
+        m_bitset.flip(index);
+    }
 
     std::size_t size() const
     {
@@ -208,7 +226,7 @@ typedef NavBits<15> NavSubWord;
 template<int dim>
 std::ostream & operator<<(std::ostream & out, const NavBits<dim> & rhs)
 {
-    out << rhs.get();
+    out << rhs.getBits();
     return out;
 }
 

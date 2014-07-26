@@ -1,14 +1,16 @@
 #ifndef NAVBITSECC_H
 #define NAVBITSECC_H
 
+#include "NavBits.h"
+
 #include <cstdint>
-#include <bitset>
+//#include <bitset>
 #include <vector>
 
 #include <iostream>
 #include <iomanip>
 
-typedef std::bitset<15> subword;
+typedef bnav::NavBits<15> subword;
 
 namespace
 {
@@ -62,7 +64,7 @@ static inline std::size_t decodeBCH(const subword &message)
 // @TODO: change this to take 15 bits, and ignore last 4 bits,
 // just write parity bits into them
 #if 0
-uint8_t encodeBCH(const std::bitset<11> &information)
+uint8_t encodeBCH(const NavBits<11> &information)
 {
     // default state of shift registers is zero
     bool d0 = false, d1 = false, d2 = false, d3 = false;
@@ -95,22 +97,22 @@ template <std::size_t len>
 class NavBitsECC
 {
 private:
-    std::bitset<len> m_bits;                          //< raw message bits
+    NavBits<len> m_bits;                          //< raw message bits
     std::vector< subword > m_msglist;     //< bit split into 15 bit parts
     std::size_t m_counter; //< how many subwords got fixed
 
 public:
-    NavBitsECC(const std::bitset<len> &bits);
+    NavBitsECC(const NavBits<len> &bits);
     ~NavBitsECC();
 
     /*std::vector< subword >*/void splitMessage();
     std::string mergeMessage(/*std::vector< subword > msglist*/);
 
     bool checkAndFix(subword &message);
-    //bool checkAndFixParity(const std::bitset<len> &message);
+    //bool checkAndFixParity(const NavBits<len> &message);
     bool checkAndFixAll();
 
-    std::bitset<len> getBits();
+    NavBits<len> getBits();
     
     bool isModified();
 
@@ -130,13 +132,13 @@ public:
  *
  */
 template <std::size_t len>
-NavBitsECC<len>::NavBitsECC(const std::bitset<len> &bits)
+NavBitsECC<len>::NavBitsECC(const NavBits<len> &bits)
     : m_bits(bits)
     , m_counter(0)
 {
     // ensure we use only valid templates
     static_assert(len == 15 || len == 30 || len == 90 || len == 150
-                  || len == 250, "invalid bitset size");
+                  || len == 250, "invalid NavBits size");
         
     checkAndFixAll();
 }
@@ -159,8 +161,8 @@ template <std::size_t len>
 {
     //assert(messagestr.length() % 15 == 0);
 
-    // @TODO: Sonderfall, len=15 (bitset<15>), dann braucht der quark unten nicht gemacht werden, einfach
-    // direkt das eingabebitset in m_msglist packen.
+    // @TODO: Sonderfall, len=15 (NavBits<15>), dann braucht der quark unten nicht gemacht werden, einfach
+    // direkt das eingabe bitset in m_msglist packen.
     const std::size_t num = len / 15;
 
     //std::cout << "complete:" << messagestr.length() << std::endl;
@@ -171,7 +173,7 @@ template <std::size_t len>
         std::size_t startinfo = 11*i;
         std::size_t startpar = 11*num + 4*i;
 
-        std::bitset<15> submessage;
+        NavBits<15> submessage;
 //std::cerr << "startinfo:" << startinfo << " num: " << num << std::endl;
 /* CASE mirrored message
  * frisst etwas zeit, das mirroring
@@ -246,13 +248,13 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
     // fix parity
     if (idx > 0)
     {
-        subword fixed(message xor std::bitset<15>(cROMTable[idx]));
+        subword fixed(message xor NavBits<15>(cROMTable[idx]));
         ++m_counter;
         
         std::cout << "parity check failed" << std::endl;
         std::cout << "old: " << message << std::endl;
         std::cout << "new: " << fixed << std::endl;
-        std::cout << std::setw(3) << idx << ": " << std::bitset<15>(cROMTable[idx]) << std::endl;
+        std::cout << std::setw(3) << idx << ": " << NavBits<15>(cROMTable[idx]) << std::endl;
 
         message = fixed;
         
@@ -265,7 +267,7 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
 
 
 template <std::size_t len>
-bool NavBitsECC<len>::checkAndFixAll(/*const std::bitset<len> &message*/)
+bool NavBitsECC<len>::checkAndFixAll(/*const NavBits<len> &message*/)
 {
     splitMessage();
     
@@ -289,13 +291,13 @@ bool NavBitsECC<len>::checkAndFixAll(/*const std::bitset<len> &message*/)
 }
 
 template <std::size_t len>
-std::bitset<len> NavBitsECC<len>::getBits()
+NavBits<len> NavBitsECC<len>::getBits()
 {
     //std::cout << m_counter << std::endl;
     std::string merge;
     merge = mergeMessage();
 
-    return std::bitset<len>(merge);
+    return NavBits<len>(merge);
 }
 
 /*!

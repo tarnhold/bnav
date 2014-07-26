@@ -3,7 +3,6 @@
 #include "NavBits.h"
 #include "NavBitsECC.h"
 
-#include <bitset> //temp!
 #include <iostream>
 
 #if 0
@@ -31,7 +30,7 @@ std::bitset<len> mirror(const std::bitset<len> &rhs)
 TEST(testNavBitsECC)
 {
     //std::bitset<30> bTest("100110010010011101111101010111");
-    std::bitset<30> bTest(  "101111111110000000000011110000");
+    bnav::NavBits<30> bTest(  "101111111110000000000011110000");
 
 #if 0
     std::bitset<30> bTestM = mirror(bTest);
@@ -39,9 +38,9 @@ TEST(testNavBitsECC)
     std::cout << "mirror:" << bTestM << " :" << bTestM[29 - 4] << std::endl;
 #endif
 
-    std::bitset<90> bTest2("111111111110000000000011111111111000000000001111111111100000000000111100001111000011110000");
+    bnav::NavBits<90> bTest2("111111111110000000000011111111111000000000001111111111100000000000111100001111000011110000");
 
-    std::bitset<150> bTest3("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111000011110000111100001111000011110000");
+    bnav::NavBits<150> bTest3("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111000011110000111100001111000011110000");
 
     //checkAndFixParity(bTest);
 
@@ -67,7 +66,7 @@ TEST(testNavBitsECC)
 TEST(testNavBitsECCParity15)
 {
     // set an arbitrary bit message, which parity check would succeed
-    std::bitset<15> bits("110110010010101");
+    bnav::NavBits<15> bits("110110010010101");
     const unsigned long initialbitval = bits.to_ulong();
 
     bnav::NavBitsECC<15> ecc(bits);
