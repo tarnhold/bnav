@@ -80,13 +80,6 @@ public:
         return m_bitset[m_bitset.size() - 1 - index];
     }
 
-    // TODO: change to NavBits return type
-    /// access as reference
-    typename std::bitset<dim>::reference atLeft(std::size_t index)
-    {
-        return m_bitset[m_bitset.size() - 1 - index];
-    }
-
     NavBits<dim> operator^(const NavBits<dim> &rhs)
     {
         return m_bitset ^ rhs.getBits();
@@ -104,7 +97,6 @@ public:
         return *this;
     }
 
-#if 0
     void setLeft(std::size_t index)
     {
         m_bitset.set(m_bitset.size() - 1 - index);
@@ -114,7 +106,6 @@ public:
     {
         m_bitset.set(m_bitset.size() - 1 - index, value);
     }
-#endif
 
     void flip(std::size_t index)
     {
@@ -160,7 +151,7 @@ public:
         for (std::size_t i = start; i < start + len; ++i)
         {
             // save first bit into bTest[0]:
-            bTest.atLeft(i - start) = atLeft(i);
+            bTest.setLeft(i - start, atLeft(i));
         }
         return bTest;
     }

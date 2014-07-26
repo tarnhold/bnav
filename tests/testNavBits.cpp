@@ -79,7 +79,7 @@ TEST(testNavBitsAccess)
     // atLeft and &atLeft
     {
         bnav::NavBits<3> bits;
-        bits.atLeft(0) = true;
+        bits.setLeft(0, true);
         CHECK(bits.size() == 3);
         CHECK(bits.atLeft(0) == true);
         CHECK(bits.atLeft(1) == false);
@@ -87,8 +87,9 @@ TEST(testNavBitsAccess)
         CHECK(bits.to_string() == "100");
 
         bnav::NavBits<3> bits2;
-        bits2.atLeft(1) = true;
-        bits2.atLeft(2) = true;
+        bits2.setLeft(0, false);
+        bits2.setLeft(1, true);
+        bits2.setLeft(2);
         CHECK(bits2.atLeft(0) == false);
         CHECK(bits2.atLeft(1) == true);
         CHECK(bits2.atLeft(2) == true);
