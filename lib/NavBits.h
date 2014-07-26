@@ -11,8 +11,6 @@
 namespace bnav
 {
 
-//typedef NavBits<11> NavSubWordInformation;
-
 template<std::size_t dim> class NavBits
 {
 protected:
@@ -218,14 +216,7 @@ std::cout << "m_bitpos:" << m_bitpos << " start:" << start << " end:" << end << 
      }
 };
 
-#if 0
-typedef NavBits<30> NavWord;
-typedef NavBits<15> NavSubWord;
-#endif
-
-// non-member functions
-
-// hat nichts mit der klasse an sich zu tun!
+// non-members
 template<std::size_t dim>
 std::ostream & operator<<(std::ostream & out, const NavBits<dim> & rhs)
 {
@@ -234,8 +225,5 @@ std::ostream & operator<<(std::ostream & out, const NavBits<dim> & rhs)
 }
 
 } // namespace bnav
-
-
-
 
 #endif // NAVBITS_H
