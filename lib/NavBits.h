@@ -13,7 +13,7 @@ namespace bnav
 
 //typedef NavBits<11> NavSubWordInformation;
 
-template<int dim> class NavBits
+template<std::size_t dim> class NavBits
 {
 protected:
     std::bitset<dim> m_bitset;
@@ -236,7 +236,7 @@ typedef NavBits<15> NavSubWord;
 // non-member functions
 
 // hat nichts mit der klasse an sich zu tun!
-template<int dim>
+template<std::size_t dim>
 std::ostream & operator<<(std::ostream & out, const NavBits<dim> & rhs)
 {
     out << rhs.getBits();

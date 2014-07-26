@@ -188,6 +188,7 @@ template <std::size_t len>
         }
 */
 
+        // note: this is accessed from right
         for (std::size_t k = 0; k < 12; ++k)
             submessage[15 - k - 1] = m_bits[len-1 - startinfo - k];
 
