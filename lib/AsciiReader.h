@@ -38,14 +38,14 @@ public:
     void open(const char *filename);
     void open(const std::string &filename);
     //void open(const std::string &filename, const AsciiReaderType &filetype);
-    bool isOpen();
+    bool isOpen() const;
 
     void setType(const AsciiReaderType &filetype);
-    AsciiReaderType getType();
+    AsciiReaderType getType() const;
 
     /// Read current line, return data by reference
     bool readLine(ReaderNavEntry &data);
-    bool isEof();
+    bool isEof() const;
     void close();
 };
 

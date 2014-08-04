@@ -46,7 +46,7 @@ AsciiReader::~AsciiReader()
         m_infile.close();
 }
 
-bool AsciiReader::isOpen()
+bool AsciiReader::isOpen() const
 {
     return m_infile.is_open();
 }
@@ -75,7 +75,7 @@ void AsciiReader::setType(const AsciiReaderType &filetype)
     m_filetype = filetype;
 }
 
-AsciiReaderType AsciiReader::getType()
+AsciiReaderType AsciiReader::getType() const
 {
     return m_filetype;
 }
@@ -110,7 +110,7 @@ bool AsciiReader::readLine(ReaderNavEntry &data)
     return true;
 }
 
-bool AsciiReader::isEof()
+bool AsciiReader::isEof() const
 {
     return m_eof;
 }

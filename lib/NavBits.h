@@ -78,7 +78,7 @@ public:
         return m_bitset[m_bitset.size() - 1 - index];
     }
 
-    NavBits<dim> operator^(const NavBits<dim> &rhs)
+    NavBits<dim> operator^(const NavBits<dim> &rhs) const
     {
         return m_bitset ^ rhs.getBits();
     }

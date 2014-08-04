@@ -114,7 +114,7 @@ public:
 
     NavBits<len> getBits();
     
-    bool isModified();
+    bool isModified() const;
 
 };
 
@@ -307,7 +307,7 @@ NavBits<len> NavBitsECC<len>::getBits()
  * @return true if at least one subword was fixed. false if nothing was changed.
  */
 template <std::size_t len>
-bool NavBitsECC<len>::isModified()
+bool NavBitsECC<len>::isModified() const
 {
     std::cout << m_counter << std::endl;
     return m_counter > 0;
