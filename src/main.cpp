@@ -2,27 +2,47 @@
 
 static void usage()
 {
-    std::cout << "usage: bnav [FILENAME]" << std::endl;
+    std::cout
+            << "\n"
+            << "usage: bapp [OPTION] [FILENAME]\n\n"
+            << "\t-jps\tRead file as converted Javad file\n"
+            << "\t-sbf\tRead file as converted Septentrio file\n"
+            << std::endl;
 }
 
 int main(int argc, char **argv)
 {
-    // require at least one parameter
-    if (argc != 2)
+    // require at least two parameters
+    if (argc != 3)
     {
         usage();
         return 1;
     }
 
+    // parse first argument
+    std::string arg = argv[1];
+    bnav::AsciiReaderType filetype(bnav::AsciiReaderType::NONE);
+    if (arg == "-jps")
+        filetype = bnav::AsciiReaderType::TEXT_CONVERTED_JPS;
+    else if (arg == "-sbf")
+        filetype = bnav::AsciiReaderType::TEXT_CONVERTED_SBF;
+    else
+    {
+        std::cerr << "Warning: Unknown argument: " << arg << std::endl;
+        usage();
+        return 1;
+    }
+
     // Open file and parse lines
-    bnav::AsciiReader reader(argv[1], bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+    std::string filename = argv[2];
+    bnav::AsciiReader reader(filename, filetype);
     if (!reader.isOpen())
-        std::cerr << "Warning: Could not open file: " << argv[1] << std::endl;
+        std::cerr << "Warning: Could not open file: " << filename << std::endl;
 
     bnav::ReaderNavEntry data;
     while (reader.readLine(data))
     {
-        //std::cout << "prn: " << data.getPRN() << " tow: " << data.getTOW() << std::endl;
+        std::cout << "prn: " << data.getPRN() << " tow: " << data.getTOW() << std::endl;
     }
     reader.close();
 
