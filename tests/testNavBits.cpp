@@ -25,9 +25,15 @@ TEST(testNavBitsConstructor)
             const bnav::NavBits<10> bits3(1023);
             CHECK(bits3.size() == 10);
             CHECK(bits3.to_string() == "1111111111");
+
+            // fill leading pos with zeros
+            const bnav::NavBits<5> bits5(31);
+            const bnav::NavBits<10> bits6(bits5);
+            CHECK(bits6.size() == 10);
+            CHECK(bits6.to_string() == "0000011111");
         }
 
-        // string costructor
+        // string constructor
         {
             // we reserve 10 bits, but only set the 6 lsb bits
             const bnav::NavBits<10> bits3("101000");
@@ -37,6 +43,14 @@ TEST(testNavBitsConstructor)
             const bnav::NavBits<5> bits4("10100");
             CHECK(bits4.size() == 5);
             CHECK(bits4.to_string() == "10100");
+        }
+
+        // bitset constructor, same size
+        {
+            const std::bitset<5> bitset4(31);
+            const bnav::NavBits<10> bits5(bitset4);
+            CHECK(bits5.size() == 10);
+            CHECK(bits5.to_string() == "0000011111");
         }
 
         // bitest constructor
@@ -50,6 +64,34 @@ TEST(testNavBitsConstructor)
             const bnav::NavBits<10> bits3(bitset2);
             CHECK(bits3.size() == 10);
             CHECK(bits3.to_string() == "1111111111");
+        }
+
+        // NavBits constructor, same size
+        {
+            const bnav::NavBits<10> bits1("1111100001");
+            const bnav::NavBits<10> bits2(bits1);
+            CHECK(bits2.size() == 10);
+            CHECK(bits2.to_string() == "1111100001");
+
+            const bnav::NavBits<10> bits3(1023);
+            const bnav::NavBits<10> bits4(bits3);
+            CHECK(bits4.size() == 10);
+            CHECK(bits4.to_string() == "1111111111");
+        }
+
+        // NavBits constructor
+        {
+            // init with smaller NavBits dim
+            const bnav::NavBits<5> bits7("11111");
+            const bnav::NavBits<10> bits8(bits7);
+            CHECK(bits8.size() == 10);
+            CHECK(bits8.to_string() == "0000011111");
+
+            // init with empty NavBits
+            const bnav::NavBits<5> bits9;
+            const bnav::NavBits<10> bits10(bits9);
+            CHECK(bits10.size() == 10);
+            CHECK(bits10.to_ulong() == 0);
         }
     }
 }
@@ -154,6 +196,16 @@ TEST(testNavBitsShift)
         CHECK(bits.to_string() == "1000");
         bits <<= 1;
         CHECK(bits.to_string() == "0000");
+    }
+}
+
+TEST(testNavBitsEquality)
+{
+    // Equality, operator==
+    {
+        bnav::NavBits<4> bits1("0001");
+        bnav::NavBits<4> bits2("0001");
+        CHECK(bits1 == bits2);
     }
 }
 

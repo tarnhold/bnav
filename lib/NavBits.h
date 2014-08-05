@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -39,10 +40,50 @@ public:
         m_bitset = std::bitset<dim>(cstr);
     }
 
+    /**
+     * @brief NavBits Constructor for std::bitset with same dim as NavBits.
+     * @param bitset bitset with same dimension as NavBits.
+     */
     NavBits(const std::bitset<dim> & bitset)
         : m_bitpos(0)
     {
         m_bitset = bitset;
+    }
+
+    /**
+     * @brief NavBits Constructor for std::bitset with smaller size than NavBits.
+     * @param bitset bitset with a smaller dimension as NavBits.
+     */
+    template <std::size_t len>
+    NavBits(const std::bitset<len> & bitset)
+        : m_bitpos(0)
+    {
+        m_bitset = std::bitset<dim>(bitset.to_string());
+    }
+
+    /**
+     * @brief NavBits Constructor for NavBits with same size.
+     * @param bits NavBits with the same size.
+     */
+    NavBits(const NavBits<dim> & bits)
+        : m_bitpos(0)
+    {
+        m_bitset = bits.getBits();
+    }
+
+    /**
+     * Constructor for NavBits<len> parameter.
+     *
+     * Parameter bitset can have another len than the dimension of
+     * this class bitset. Smaller sizes get a null padding at the MSB.
+     */
+    template <std::size_t len>
+    NavBits(const NavBits<len> & bits)
+        : m_bitpos(0)
+    {
+        // warn if bits won't fit dim, otherwise bits get lost
+        assert(len <= dim);
+        m_bitset = std::bitset<dim>(bits.to_string());
     }
 
     template <typename T>
@@ -95,15 +136,48 @@ public:
         return *this;
     }
 
+    /**
+     * @brief operator == Check for equality of two NavBits<dim>.
+     * @param rhs NavBits<dim> to compare to.
+     * @return true if equal, false if unequal.
+     */
+    bool operator==(const NavBits<dim> &rhs)
+    {
+        return m_bitset == rhs.getBits();
+    }
+
+    /**
+     * @brief setLeft Set bit at position index starting from the left to true.
+     * @param index index of the bit starting from the left.
+     */
     void setLeft(std::size_t index)
     {
         m_bitset.set(m_bitset.size() - 1 - index);
     }
 
+    /**
+     * @brief setLeft Set bit at position index starting from the left to value.
+     * @param index index of the bit starting from the left.
+     * @param value boolean to which the bit should be changed.
+     */
     void setLeft(std::size_t index, bool value)
     {
         m_bitset.set(m_bitset.size() - 1 - index, value);
     }
+
+#if 0
+    template<int len>
+    void setLeft(std::size_t index, const NavBits<len> &bits)
+    {
+        assert(index + len <= dim);
+
+        for (std::size_t i = index; i < index + len; ++i)
+        {
+            // save first bit into [0]:
+            setLeft(i - index, bits.atLeft(i));
+        }
+    }
+#endif
 
     void flip(std::size_t index)
     {
@@ -152,6 +226,23 @@ public:
             bTest.setLeft(i - start, atLeft(i));
         }
         return bTest;
+    }
+
+    // debug stuff
+    /**
+     * @brief differenceBits Debugging member to get the difference of two NavBits<dim>.
+     * @param rhs NavBits<dim> to compare to.
+     */
+    void dumpDifferingBits(const NavBits<dim> &rhs)
+    {
+        for (std::size_t i = 0; i < rhs.size(); ++i)
+        {
+            if (atLeft(i) != rhs.atLeft(i))
+                std::cout << std::setw(3) << i << ": " << atLeft(i) << ":" << rhs.atLeft(i) << std::endl;
+            // save first bit into bTest[0]:
+            //bTest.setLeft(i - start, atLeft(i));
+        }
+        //return bTest;
     }
 
 #if 0
