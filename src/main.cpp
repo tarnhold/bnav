@@ -1,6 +1,7 @@
 #include "AsciiReader.h"
 #include "BDSCommon.h"
 #include "Subframe.h"
+#include "SvID.h"
 
 static void usage()
 {
@@ -48,11 +49,12 @@ int main(int argc, char **argv)
         if (data.getSignalType() != bnav::SignalType::BDS_B1)
             continue;
 
-        bool isGeo = data.getPRN() <= 5;
-        bnav::Subframe sf(data.getTOW(), data.getBits(), isGeo);
+        bnav::SvID sv(data.getPRN());
+
+        bnav::Subframe sf(data.getTOW(), data.getBits(), sv.isGeo());
 
         sf.getFrameID();
-        std::cout << "prn: " << data.getPRN() << " tow: " << data.getTOW() << std::endl;
+        std::cout << "prn: " << data.getPRN() << " tow: " << data.getTOW() << " sow: " << sf.getSOW() << std::endl;
     }
     reader.close();
 
