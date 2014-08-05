@@ -1,5 +1,6 @@
 #include "AsciiReader.h"
 #include "AsciiReaderNavEntry.h"
+#include "BDSCommon.h"
 
 #include "Debug.h"
 
@@ -14,6 +15,14 @@
 
 namespace
 {
+
+/*
+ * References
+ *
+ * [1] Septentrio SBF Reference Guide v1.15.3
+ * [2] Septentrio RxTools User Manual v1.10.0
+ *
+ */
 
 /*
  * extract data by keyword from line
@@ -46,6 +55,7 @@ namespace bnav
 ReaderNavEntry::ReaderNavEntry()
     : m_prn(0)
     , m_tow(0)
+    , m_sigtype(SignalType::NONE)
     , m_bits()
 {
 }
@@ -53,6 +63,7 @@ ReaderNavEntry::ReaderNavEntry()
 ReaderNavEntry::ReaderNavEntry(const std::string &/*line*/)
     : m_prn(0)
     , m_tow(0)
+    , m_sigtype(SignalType::NONE)
     , m_bits()
 {
 }
@@ -65,6 +76,11 @@ int ReaderNavEntry::getTOW() const
 int ReaderNavEntry::getPRN() const
 {
     return m_prn;
+}
+
+SignalType ReaderNavEntry::getSignalType() const
+{
+    return m_sigtype;
 }
 
 NavBits<300> ReaderNavEntry::getBits() const
@@ -110,6 +126,9 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
 
     //DEBUG("tow:" << m_tow);
     //DEBUG("prn:" << m_prn);
+
+    // assume JPS is only B1 signal
+    m_sigtype = SignalType::BDS_B1;
 
     // get data field
     const std::string strdata("data ");
@@ -176,6 +195,16 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
 
     // one line looks like:
     // 345605000,1801,145,1,28,3795932449 2099070704 0 0 0 0 0 0 0 1
+    // which is
+    // TOW [0.001 s], WNc [w], SVID, CRCPassed, signalType, NAVBits
+    //
+    // Reference: [1] 3.2 Navigation Page blocks
+
+    // signalType
+    // 28=CMP_B1
+    // 29=CMP_B2
+    //
+    // Reference: [2] 11.9 sbf2ismr
 
     // split fields, delimited by comma
     std::vector<std::string> splitline;
@@ -191,6 +220,14 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
 
     //DEBUG("tow: " << m_tow);
     //DEBUG("prn: " << m_prn);
+
+    // determine signal type - yes, Septentrio saves both B1 and B2
+    int sigtype = std::stoi(splitline[4]);
+
+    if (sigtype == 28)
+        m_sigtype = SignalType::BDS_B1;
+    else if (sigtype == 29)
+        m_sigtype = SignalType::BDS_B2;
 
     // parse last field, which contains 10 numeric values, separated by whitespace
     std::vector<std::string> splitbits;

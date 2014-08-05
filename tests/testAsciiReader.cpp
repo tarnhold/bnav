@@ -2,6 +2,8 @@
 
 #include "AsciiReader.h"
 
+#include "BDSCommon.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -36,6 +38,7 @@ TEST(testAsciiReaderSimple) {
     }
 }
 
+// process all sbf entries
 TEST(testAsciiReaderSBF) {
     std::stringstream ssfile;
     ssfile << PATH_TESTDATA << "sbf/CUT12014071724.sbf_SBF_CMPRaw-snip.txt";
@@ -54,6 +57,7 @@ TEST(testAsciiReaderSBF) {
                                345605600,345605600,345605600,345605600,
                                345606200,345606200,345606200,345606200,
                                345606200,345606200,345606200,345606200};
+
         int i = 0;
         bnav::ReaderNavEntry entry;
         while (reader.readLine(entry))
@@ -68,6 +72,51 @@ TEST(testAsciiReaderSBF) {
         }
         // ensure we have all elements
         CHECK(i == 20);
+
+        // FIXME: check at least bits of the last entry, until we use a proper compare file
+        CHECK(entry.getBits().to_string() == "111000100100000010010101000011010111110111001000111101010101111111111110000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111100000111111111100001110111011111011010011100010111111111011100100100");
+
+        reader.close();
+        CHECK(!reader.isOpen());
+    }
+}
+
+// process only B1 signal messages
+TEST(testAsciiReaderSBFB1) {
+    std::stringstream ssfile;
+    ssfile << PATH_TESTDATA << "sbf/CUT12014071724.sbf_SBF_CMPRaw-snip.txt";
+
+    // read a simple sbf file
+    {
+        bnav::AsciiReader reader;
+        reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+        CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+        reader.open(ssfile.str());
+        CHECK(reader.isOpen());
+
+        // we process only B1 entries
+        const int prnlist[] = {3,5,1,4,2,5,3,1,4,2,5};
+        const int towlist[] = {345600200,345605000,345605600,345605600,
+                               345605600,345605600,345606200,345606200,
+                               345606200,345606200,345606200};
+
+        int i = 0;
+        bnav::ReaderNavEntry entry;
+        while (reader.readLine(entry))
+        {
+            if (entry.getSignalType() != bnav::SignalType::BDS_B1)
+                continue;
+
+            CHECK(entry.getPRN() == prnlist[i]);
+            CHECK(entry.getTOW() == towlist[i]);
+
+            // TODO: write data into file and compare to already converted file
+            // TestWriter.write(), TestFile.isEqual(filename)...
+            //std::cout << entry.getPRN() << " " << entry.getTOW() << " " << entry.getBits() << std::endl;
+            ++i;
+        }
+        // ensure we have all elements
+        CHECK(i == 11);
 
         // FIXME: check at least bits of the last entry, until we use a proper compare file
         CHECK(entry.getBits().to_string() == "111000100100000010010101000011010111110111001000111101010101111111111110000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111100000111111111100001110111011111011010011100010111111111011100100100");

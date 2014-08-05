@@ -2,6 +2,7 @@
 #define ASCIIREADERNAVENTRY_H
 
 #include "AsciiReader.h"
+#include "BDSCommon.h"
 #include "NavBits.h"
 
 namespace bnav
@@ -13,6 +14,7 @@ class ReaderNavEntry
 protected:
     int m_prn;
     int m_tow;
+    SignalType m_sigtype;
     NavBits<300> m_bits;
 
 public:
@@ -23,6 +25,7 @@ public:
 
     int getTOW() const;
     int getPRN() const;
+    SignalType getSignalType() const;
     NavBits<300> getBits() const;
 };
 

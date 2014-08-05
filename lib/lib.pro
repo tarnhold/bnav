@@ -18,5 +18,6 @@ HEADERS += \
     NavBits.h \
     Subframe.h \
     AsciiReaderNavEntry.h \
-    NavBitsECC.h
+    NavBitsECC.h \
+    BDSCommon.h
 
