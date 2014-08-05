@@ -109,7 +109,7 @@ public:
 
     bool checkAndFix(subword &message);
     //bool checkAndFixParity(const NavBits<len> &message);
-    bool checkAndFixAll();
+    void checkAndFixAll();
 
     NavBits<len> getBits();
     
@@ -139,7 +139,7 @@ NavBitsECC<len>::NavBitsECC(const NavBits<len> &bits)
     static_assert(len == 15 || len == 30 || len == 90 || len == 150
                   || len == 250, "invalid NavBits size");
         
-    checkAndFixAll();
+    //checkAndFixAll();
 }
     
 template <std::size_t len>
@@ -160,13 +160,20 @@ template <std::size_t len>
 {
     //assert(messagestr.length() % 15 == 0);
 
-    // @TODO: Sonderfall, len=15 (NavBits<15>), dann braucht der quark unten nicht gemacht werden, einfach
-    // direkt das eingabe bitset in m_msglist packen.
     const std::size_t num = len / 15;
+    m_msglist.resize(num);
+
+    // special case, if argument is NavBits<15>, we could just skip all the
+    // splitting and save the bits directly into the list.
+    if (num == 1)
+    {
+        m_msglist[0] = m_bits;
+        return;
+    }
 
     //std::cout << "complete:" << messagestr.length() << std::endl;
 
-    m_msglist.resize(num);
+
     for (std::size_t i = 0; i < num; ++i)
     {
         std::size_t startinfo = 11*i;
@@ -251,12 +258,12 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
         subword fixed(message xor NavBits<15>(cROMTable[idx]));
         ++m_counter;
 
-#if 0
+//#if 0
         std::cout << "parity check failed" << std::endl;
         std::cout << "old: " << message << std::endl;
         std::cout << "new: " << fixed << std::endl;
         std::cout << std::setw(3) << idx << ": " << NavBits<15>(cROMTable[idx]) << std::endl;
-#endif
+//#endif
 
         message = fixed;
         
@@ -269,7 +276,7 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
 
 
 template <std::size_t len>
-bool NavBitsECC<len>::checkAndFixAll(/*const NavBits<len> &message*/)
+void NavBitsECC<len>::checkAndFixAll(/*const NavBits<len> &message*/)
 {
     splitMessage();
     
@@ -277,6 +284,7 @@ bool NavBitsECC<len>::checkAndFixAll(/*const NavBits<len> &message*/)
     //     checkAndFix(&(*it));
     for (std::size_t i = 0; i < m_msglist.size(); ++i)
         checkAndFix(m_msglist[i]);
+
 /*
     // 11+11+...+4+4+...
     std::vector< subword > vlist = splitMessage(message);
@@ -288,8 +296,6 @@ bool NavBitsECC<len>::checkAndFixAll(/*const NavBits<len> &message*/)
 */    
    // std::cout << "orig :" << message << std::endl;
    // std::cout << "merge:" << mergeMessage(/*vlist*/) << std::endl;
- 
-   return true;
 }
 
 template <std::size_t len>

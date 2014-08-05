@@ -10,22 +10,39 @@ class Subframe
 {
     NavBits<300> m_bits;
     int m_tow;
+    int m_sow;
     int m_frameID;
     int m_pageNum;
+    bool m_isGeo;
 
     bool m_isParityWordOneFixed;
     bool m_isParityAllFixed;
 
 public:
     Subframe();
+    Subframe(const int tow, const NavBits<300> &bits, const bool isGeo = false);
 
-    NavBits<300> getBits();
-    int getTOW();
-    int getFrameID();
-    int getPageNum();
+    void setBits(const NavBits<300> &bits, const bool isGeo);
+    NavBits<300> getBits() const;
+    void setTOW(const int tow);
+    int getTOW() const;
 
-    bool fixParityWordOne();
+    int getSOW() const;
+    int getFrameID() const;
+    int getPageNum() const;
+
+    bool checkAndFixParityWordOne();
     bool fixParityAll();
+
+    bool operator==(const Subframe &rhs);
+
+private:
+    void initialize();
+    bool isPreambleOk() const;
+    void parseSOW();
+    void parseFrameID();
+    void parsePageNumD1();
+    void parsePageNumD2();
 };
 
 } // namespace bnav
