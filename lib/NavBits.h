@@ -16,16 +16,13 @@ template<std::size_t dim> class NavBits
 {
 protected:
     std::bitset<dim> m_bitset;
-    std::size_t m_bitpos;
 
 public:
     NavBits()
-        : m_bitpos(0)
     {
     }
 
     NavBits(const std::string & string)
-        : m_bitpos(0)
     {
         // warn if string won't fit dim, otherwise bits get lost
         assert(string.length() <= dim);
@@ -33,7 +30,6 @@ public:
     }
 
     NavBits(const char* cstr)
-        : m_bitpos(0)
     {
         // warn if string won't fit dim, otherwise bits get lost
         assert(std::strlen(cstr) <= dim);
@@ -45,7 +41,6 @@ public:
      * @param bitset bitset with same dimension as NavBits.
      */
     NavBits(const std::bitset<dim> & bitset)
-        : m_bitpos(0)
     {
         m_bitset = bitset;
     }
@@ -56,7 +51,6 @@ public:
      */
     template <std::size_t len>
     NavBits(const std::bitset<len> & bitset)
-        : m_bitpos(0)
     {
         m_bitset = std::bitset<dim>(bitset.to_string());
     }
@@ -66,7 +60,6 @@ public:
      * @param bits NavBits with the same size.
      */
     NavBits(const NavBits<dim> & bits)
-        : m_bitpos(0)
     {
         m_bitset = bits.getBits();
     }
@@ -79,7 +72,6 @@ public:
      */
     template <std::size_t len>
     NavBits(const NavBits<len> & bits)
-        : m_bitpos(0)
     {
         // warn if bits won't fit dim, otherwise bits get lost
         assert(len <= dim);
@@ -88,7 +80,6 @@ public:
 
     template <typename T>
     NavBits(const T val)
-        : m_bitpos(0)
     {
         // negative values work, but not the conversion back to long or string, so ignore them now
         assert(val >= 0);
@@ -249,46 +240,6 @@ public:
     uint8_t as_uint8_t(uint8_t start, uint8_t end)
     {
 
-    }
-#endif
-
-#if 0
-    void begin()
-    {
-        m_bitpos = 0;
-    }
-
-    // getNext<11>()
-    // getNext<15>()
-    template <int length>
-    NavBits<length> getNext()
-    {
-        NavBits<length> nextbits;
-        std::size_t start = m_bitpos;
-        std::size_t end = m_bitpos + length;
-
-std::cout << "m_bitpos:" << m_bitpos << " start:" << start << " end:" << end << std::endl;
-        // ensure it is within bitset bounds
-        //assert(end <= m_bitset.size());
-
-        // get bits from m_bitpos till m_bitpos + length
-        while (m_bitpos < end)
-        {
-            //FIXME: +1 and -1, this seems crazy
-            std::cout << "nextbits:" << m_bitpos - start
-                << " m_bitset:" << m_bitset.size() - m_bitpos
-                << " value:" << m_bitset[m_bitset.size() -1 - m_bitpos]
-                << std::endl;
-            nextbits[m_bitpos - start + 1] = m_bitset[m_bitset.size() - 1 - m_bitpos];
-            ++m_bitpos;
-        }
-
-        return nextbits;
-    }
-
-    void end()
-    {
-        m_bitpos = m_bitset.length();
     }
 #endif
 
