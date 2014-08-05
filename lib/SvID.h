@@ -1,11 +1,13 @@
 #ifndef SVID_H
 #define SVID_H
 
+#include <cstdint>
+
 namespace bnav
 {
 
-static const int BDS_MAX_PRN = 37;
-static const int BDS_MAX_PRN_GEO = 5;
+static const uint32_t BDS_MAX_PRN = 37;
+static const uint32_t BDS_MAX_PRN_GEO = 5;
 
 /**
  * @brief The SvID class
@@ -14,14 +16,14 @@ static const int BDS_MAX_PRN_GEO = 5;
  */
 class SvID
 {
-    int m_prn;
+    uint32_t m_prn;
 
 public:
     SvID();
-    SvID(const int prn);
+    SvID(const uint32_t prn);
 
-    void setPRN(const int prn);
-    int getPRN() const;
+    void setPRN(const uint32_t prn);
+    uint32_t getPRN() const;
 
     bool isGeo() const;
     // maybe implement:

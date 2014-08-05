@@ -67,7 +67,7 @@ TEST(testNavBitsECCParity15)
 {
     // set an arbitrary bit message, which parity check would succeed
     bnav::NavBits<15> bits("110110010010101");
-    const unsigned long initialbitval = bits.to_ulong();
+    const uint32_t initialbitval = bits.to_ulong();
 
     bnav::NavBitsECC<15> ecc(bits);
     ecc.checkAndFixAll();

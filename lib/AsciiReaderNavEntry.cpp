@@ -68,12 +68,12 @@ ReaderNavEntry::ReaderNavEntry(const std::string &/*line*/)
 {
 }
 
-int ReaderNavEntry::getTOW() const
+uint32_t ReaderNavEntry::getTOW() const
 {
     return m_tow;
 }
 
-int ReaderNavEntry::getPRN() const
+uint32_t ReaderNavEntry::getPRN() const
 {
     return m_prn;
 }
@@ -115,8 +115,8 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
     // parse tow and prn fields
     try
     {
-        m_tow = std::stoi(extractData(line, "tow "));
-        m_prn = std::stoi(extractData(line, "PRN "));
+        m_tow = std::stoul(extractData(line, "tow "));
+        m_prn = std::stoul(extractData(line, "PRN "));
     }
     catch (std::invalid_argument)
     {
@@ -153,7 +153,7 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
     NavBits<320> navbits320;
     for (std::size_t i = 0; i <= hexdata.length() - 2; i=i+2)
     {
-        const int hexval = std::stoi(hexdata.substr(i, 2), nullptr, 16);
+        const uint32_t hexval = std::stoul(hexdata.substr(i, 2), nullptr, 16);
         const std::size_t bsize = 8;
         NavBits<bsize> bitblock(hexval);
 
@@ -232,15 +232,15 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
      * D1: 20s
      * D2: 14.4s + frameID * 0.6s
      */
-    m_tow = std::stoi(splitline[0]);
+    m_tow = std::stoul(splitline[0]);
     // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
-    m_prn = std::stoi(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
+    m_prn = std::stoul(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
 
     //DEBUG("tow: " << m_tow);
     //DEBUG("prn: " << m_prn);
 
     // determine signal type - yes, Septentrio saves both B1 and B2
-    int sigtype = std::stoi(splitline[4]);
+    int sigtype = std::stoul(splitline[4]);
 
     if (sigtype == 28)
         m_sigtype = SignalType::BDS_B1;
@@ -257,7 +257,7 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
     NavBits<320> navbits320;
     for (std::vector<std::string>::iterator it = splitbits.begin(); it < splitbits.end(); ++it)
     {
-        const unsigned long val = std::stoul(*it);
+        const uint32_t val = std::stoul(*it);
         const std::size_t bsize = 32;
         NavBits<bsize> bitblock(val);
 

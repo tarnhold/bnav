@@ -21,7 +21,7 @@ Subframe::Subframe()
 {
 }
 
-Subframe::Subframe(const int tow, const NavBits<300> &bits, const bool isGeo)
+Subframe::Subframe(const uint32_t tow, const NavBits<300> &bits, const bool isGeo)
     : m_tow(tow)
     , m_sow(0)
     , m_frameID(0)
@@ -31,14 +31,6 @@ Subframe::Subframe(const int tow, const NavBits<300> &bits, const bool isGeo)
     , m_isParityAllFixed(false)
 {
     m_bits = bits;
-
-    initialize();
-}
-
-void Subframe::setBits(const NavBits<300> &bits, const bool isGeo)
-{
-    m_bits = bits;
-    m_isGeo = isGeo;
 
     initialize();
 }
@@ -75,32 +67,40 @@ void Subframe::initialize()
         parsePageNumD1();
 }
 
+void Subframe::setBits(const NavBits<300> &bits, const bool isGeo)
+{
+    m_bits = bits;
+    m_isGeo = isGeo;
+
+    initialize();
+}
+
 NavBits<300> Subframe::getBits() const
 {
     return m_bits;
 }
 
-void Subframe::setTOW(const int tow)
+void Subframe::setTOW(const uint32_t tow)
 {
     m_tow = tow;
 }
 
-int Subframe::getTOW() const
+uint32_t Subframe::getTOW() const
 {
     return m_tow;
 }
 
-int Subframe::getSOW() const
+uint32_t Subframe::getSOW() const
 {
     return m_sow;
 }
 
-int Subframe::getFrameID() const
+uint32_t Subframe::getFrameID() const
 {
     return m_frameID;
 }
 
-int Subframe::getPageNum() const
+uint32_t Subframe::getPageNum() const
 {
     return m_pageNum;
 }
@@ -125,7 +125,7 @@ bool Subframe::checkAndFixParityWordOne()
     return m_isParityWordOneFixed;
 }
 
-bool Subframe::fixParityAll()
+bool Subframe::checkAndFixParityAll()
 {
     // TODO
     m_isParityAllFixed = false;
@@ -134,7 +134,7 @@ bool Subframe::fixParityAll()
 
 /**
  * @brief operator == Check for equality of two Subframes.
- * @return true if equal, false if unequal.
+ * @return true if TOW and NavBits are equal, false if unequal.
  */
 bool Subframe::operator==(const Subframe &rhs)
 {
@@ -233,6 +233,8 @@ void Subframe::parsePageNumD2()
         assert(m_pageNum > 0 && m_pageNum <= 10);
     }
     // frameID 3 and 4 have no Pnum, they use that from FrameID 2
+    // as those frames only contain integrity information, which is
+    // not handled by this program, we ignore this detail.
     else if (m_frameID == 2)
     {
         // Pnum2

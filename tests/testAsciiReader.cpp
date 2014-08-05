@@ -51,14 +51,14 @@ TEST(testAsciiReaderSBF) {
         reader.open(ssfile.str());
         CHECK(reader.isOpen());
 
-        const int prnlist[] = {3,3,2,5,1,1,4,2,2,5,5,4,3,3,1,1,4,2,2,5};
-        const int towlist[] = {345600200,345600200,345605000,345605000,
+        const uint32_t prnlist[] = {3,3,2,5,1,1,4,2,2,5,5,4,3,3,1,1,4,2,2,5};
+        const uint32_t towlist[] = {345600200,345600200,345605000,345605000,
                                345605600,345605600,345605600,345605600,
                                345605600,345605600,345605600,345605600,
                                345606200,345606200,345606200,345606200,
                                345606200,345606200,345606200,345606200};
 
-        int i = 0;
+        std::size_t i = 0;
         bnav::ReaderNavEntry entry;
         while (reader.readLine(entry))
         {
@@ -95,12 +95,12 @@ TEST(testAsciiReaderSBFB1) {
         CHECK(reader.isOpen());
 
         // we process only B1 entries
-        const int prnlist[] = {3,5,1,4,2,5,3,1,4,2,5};
-        const int towlist[] = {345600200,345605000,345605600,345605600,
+        const uint32_t prnlist[] = {3,5,1,4,2,5,3,1,4,2,5};
+        const uint32_t towlist[] = {345600200,345605000,345605600,345605600,
                                345605600,345605600,345606200,345606200,
                                345606200,345606200,345606200};
 
-        int i = 0;
+        std::size_t i = 0;
         bnav::ReaderNavEntry entry;
         while (reader.readLine(entry))
         {
@@ -138,14 +138,14 @@ TEST(TestAsciiReaderJPS) {
         reader.open(ssfile.str());
         CHECK(reader.isOpen());
 
-        const int towlist[] = {310190,310190,310191,310192,310192,310193,
+        const uint32_t towlist[] = {310190,310190,310191,310192,310192,310193,
                                310193,310195,310195,310196,310197,310198,
                                310198,310199,310199,310201,310201,310202,
                                310202,310203,310203,310204,310205,310205,
                                310206,310207,310207,310208,310208,310209,
                                310210,310210,310211,310211,310212,310213,
                                310213};
-        int i = 0;
+        std::size_t i = 0;
         bnav::ReaderNavEntry entry;
         while (reader.readLine(entry))
         {

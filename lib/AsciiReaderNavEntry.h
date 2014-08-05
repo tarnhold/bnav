@@ -12,8 +12,8 @@ namespace bnav
 class ReaderNavEntry
 {
 protected:
-    int m_prn;
-    int m_tow;
+    uint32_t m_prn;
+    uint32_t m_tow;
     SignalType m_sigtype;
     NavBits<300> m_bits;
 
@@ -23,8 +23,8 @@ public:
 
     void readLine(const std::string &line);
 
-    int getTOW() const;
-    int getPRN() const;
+    uint32_t getTOW() const;
+    uint32_t getPRN() const;
     SignalType getSignalType() const;
     NavBits<300> getBits() const;
 };

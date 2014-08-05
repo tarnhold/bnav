@@ -10,19 +10,19 @@ SvID::SvID()
 {
 }
 
-SvID::SvID(const int prn)
+SvID::SvID(const uint32_t prn)
 {
     setPRN(prn);
 }
 
-void SvID::setPRN(const int prn)
+void SvID::setPRN(const uint32_t prn)
 {
     assert(prn > 0 && prn <= BDS_MAX_PRN);
 
     m_prn = prn;
 }
 
-int SvID::getPRN() const
+uint32_t SvID::getPRN() const
 {
     return m_prn;
 }

@@ -14,10 +14,10 @@ namespace bnav
 class Subframe
 {
     NavBits<300> m_bits;
-    int m_tow;
-    int m_sow;
-    int m_frameID;
-    int m_pageNum;
+    uint32_t m_tow;
+    uint32_t m_sow;
+    uint32_t m_frameID;
+    uint32_t m_pageNum;
     bool m_isGeo;
 
     bool m_isParityWordOneFixed;
@@ -25,19 +25,19 @@ class Subframe
 
 public:
     Subframe();
-    Subframe(const int tow, const NavBits<300> &bits, const bool isGeo = false);
+    Subframe(const uint32_t tow, const NavBits<300> &bits, const bool isGeo = false);
 
     void setBits(const NavBits<300> &bits, const bool isGeo);
     NavBits<300> getBits() const;
-    void setTOW(const int tow);
-    int getTOW() const;
+    void setTOW(const uint32_t tow);
+    uint32_t getTOW() const;
 
-    int getSOW() const;
-    int getFrameID() const;
-    int getPageNum() const;
+    uint32_t getSOW() const;
+    uint32_t getFrameID() const;
+    uint32_t getPageNum() const;
 
     bool checkAndFixParityWordOne();
-    bool fixParityAll();
+    bool checkAndFixParityAll();
 
     bool operator==(const Subframe &rhs);
 
