@@ -7,92 +7,89 @@
 
 TEST(testNavBitsConstructor)
 {
-    // Constructor tests
+    // empty constructor
     {
-        // empty constructor
-        {
-            const bnav::NavBits<10> bits;
-            CHECK(bits.size() == 10);
-            CHECK(bits.to_string() == "0000000000");
-        }
+        const bnav::NavBits<10> bits;
+        CHECK(bits.size() == 10);
+        CHECK(bits.to_string() == "0000000000");
+    }
 
-        // numeric constructor
-        {
-            const bnav::NavBits<10> bits2(8);
-            CHECK(bits2.size() == 10);
-            CHECK(bits2.to_ulong() == 8);
+    // numeric constructor
+    {
+        const bnav::NavBits<10> bits2(8);
+        CHECK(bits2.size() == 10);
+        CHECK(bits2.to_ulong() == 8);
 
-            const bnav::NavBits<10> bits3(1023);
-            CHECK(bits3.size() == 10);
-            CHECK(bits3.to_string() == "1111111111");
+        const bnav::NavBits<10> bits3(1023);
+        CHECK(bits3.size() == 10);
+        CHECK(bits3.to_string() == "1111111111");
 
-            // fill leading pos with zeros
-            const bnav::NavBits<5> bits5(31);
-            const bnav::NavBits<10> bits6(bits5);
-            CHECK(bits6.size() == 10);
-            CHECK(bits6.to_string() == "0000011111");
-        }
+        // fill leading pos with zeros
+        const bnav::NavBits<5> bits5(31);
+        const bnav::NavBits<10> bits6(bits5);
+        CHECK(bits6.size() == 10);
+        CHECK(bits6.to_string() == "0000011111");
+    }
 
-        // string constructor
-        {
-            // we reserve 10 bits, but only set the 6 lsb bits
-            const bnav::NavBits<10> bits3("101000");
-            CHECK(bits3.size() == 10);
-            CHECK(bits3.to_string() == "0000101000");
+    // string constructor
+    {
+        // we reserve 10 bits, but only set the 6 lsb bits
+        const bnav::NavBits<10> bits3("101000");
+        CHECK(bits3.size() == 10);
+        CHECK(bits3.to_string() == "0000101000");
 
-            const bnav::NavBits<5> bits4("10100");
-            CHECK(bits4.size() == 5);
-            CHECK(bits4.to_string() == "10100");
-        }
+        const bnav::NavBits<5> bits4("10100");
+        CHECK(bits4.size() == 5);
+        CHECK(bits4.to_string() == "10100");
+    }
 
-        // bitset constructor, same size
-        {
-            const std::bitset<5> bitset4(31);
-            const bnav::NavBits<10> bits5(bitset4);
-            CHECK(bits5.size() == 10);
-            CHECK(bits5.to_string() == "0000011111");
-        }
+    // bitset constructor, same size
+    {
+        const std::bitset<5> bitset4(31);
+        const bnav::NavBits<10> bits5(bitset4);
+        CHECK(bits5.size() == 10);
+        CHECK(bits5.to_string() == "0000011111");
+    }
 
-        // bitest constructor
-        {
-            const std::bitset<10> bitset1("1111100001");
-            const bnav::NavBits<10> bits2(bitset1);
-            CHECK(bits2.size() == 10);
-            CHECK(bits2.to_string() == "1111100001");
+    // bitest constructor
+    {
+        const std::bitset<10> bitset1("1111100001");
+        const bnav::NavBits<10> bits2(bitset1);
+        CHECK(bits2.size() == 10);
+        CHECK(bits2.to_string() == "1111100001");
 
-            const std::bitset<10> bitset2(1023);
-            const bnav::NavBits<10> bits3(bitset2);
-            CHECK(bits3.size() == 10);
-            CHECK(bits3.to_string() == "1111111111");
-        }
+        const std::bitset<10> bitset2(1023);
+        const bnav::NavBits<10> bits3(bitset2);
+        CHECK(bits3.size() == 10);
+        CHECK(bits3.to_string() == "1111111111");
+    }
 
-        // NavBits constructor, same size
-        {
-            const bnav::NavBits<10> bits1("1111100001");
-            const bnav::NavBits<10> bits2(bits1);
-            CHECK(bits2.size() == 10);
-            CHECK(bits2.to_string() == "1111100001");
+    // NavBits constructor, same size
+    {
+        const bnav::NavBits<10> bits1("1111100001");
+        const bnav::NavBits<10> bits2(bits1);
+        CHECK(bits2.size() == 10);
+        CHECK(bits2.to_string() == "1111100001");
 
-            const bnav::NavBits<10> bits3(1023);
-            const bnav::NavBits<10> bits4(bits3);
-            CHECK(bits4.size() == 10);
-            CHECK(bits4.to_string() == "1111111111");
-        }
+        const bnav::NavBits<10> bits3(1023);
+        const bnav::NavBits<10> bits4(bits3);
+        CHECK(bits4.size() == 10);
+        CHECK(bits4.to_string() == "1111111111");
+    }
 
-        // NavBits constructor
-        {
-            // init with smaller NavBits dim
-            const bnav::NavBits<5> bits7("11111");
-            const bnav::NavBits<10> bits8(bits7);
-            CHECK(bits8.size() == 10);
-            CHECK(bits8.to_string() == "0000011111");
+    // NavBits constructor
+    {
+        // init with smaller NavBits dim
+        const bnav::NavBits<5> bits7("11111");
+        const bnav::NavBits<10> bits8(bits7);
+        CHECK(bits8.size() == 10);
+        CHECK(bits8.to_string() == "0000011111");
 
-            // init with empty NavBits
-            const bnav::NavBits<5> bits9;
-            const bnav::NavBits<10> bits10(bits9);
-            CHECK(bits10.size() == 10);
-            CHECK(bits10.to_ulong() == 0);
-        }
+        // init with empty NavBits
+        const bnav::NavBits<5> bits9;
+        const bnav::NavBits<10> bits10(bits9);
+        CHECK(bits10.size() == 10);
+        CHECK(bits10.to_ulong() == 0);
     }
 }
 
@@ -172,6 +169,12 @@ TEST(testNavBitsXor)
         CHECK(bits.to_string() == "1101");
         bits = bits ^ bits2;
         CHECK(bits.to_string() == "0001");
+
+        // differently sized
+        bnav::NavBits<10> bits3;
+        bnav::NavBits<5> bits4(31);
+        bits3 = bits3 ^ bits4;
+        CHECK(bits3.to_string() == "0000011111");
     }
 
     // operator^=
@@ -184,6 +187,12 @@ TEST(testNavBitsXor)
         CHECK(bits.to_string() == "1101");
         bits ^= bits2;
         CHECK(bits.to_string() == "0001");
+
+        // differently sized
+        bnav::NavBits<10> bits3;
+        bnav::NavBits<5> bits4(31);
+        bits3 ^= bits4;
+        CHECK(bits3.to_string() == "0000011111");
     }
 }
 
