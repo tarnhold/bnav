@@ -214,6 +214,24 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
     assert(splitline.size() == 6);
 
     // parse tow and prn fields
+
+    /*
+     * SBF TOW represents every single subframe time stamp. This makes no
+     * difference for D1, but for D2.
+     *
+     * Duration of one subframe:
+     * D1: 6s
+     * D2: 0.6s
+     *
+     * BDS SOW behavior:
+     * D1: Every subframe gets a unique timestamp.
+     * D2: Every _frame_ gets a unique timestamp. That means all subframes of
+     *     that frame have the same SOW.
+     *
+     * Additionaly there is an offset between TOW and BDS SOW:
+     * D1: 20s
+     * D2: 14.4s + frameID * 0.6s
+     */
     m_tow = std::stoi(splitline[0]);
     // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
     m_prn = std::stoi(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
