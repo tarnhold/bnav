@@ -30,7 +30,7 @@ namespace
 static std::string extractData(const std::string &line, const std::string &keyword)
 {
     // example: tow 310190 PRN 5 len 10 [data 09e345e3 ...]
-    std::size_t pos = line.find(keyword);
+    const std::size_t pos = line.find(keyword);
 
     // keyword not found
     if (pos == std::string::npos)
@@ -132,7 +132,7 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
 
     // get data field
     const std::string strdata("data ");
-    std::size_t pos = line.find(strdata);
+    const std::size_t pos = line.find(strdata);
     if (pos == std::string::npos)
     {
         std::cerr << "Malformed data line. Wrong format?" << std::endl;
@@ -155,7 +155,7 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
     {
         const uint32_t hexval = std::stoul(hexdata.substr(i, 2), nullptr, 16);
         const std::size_t bsize = 8;
-        NavBits<bsize> bitblock(hexval);
+        const NavBits<bsize> bitblock(hexval);
 
         // shift 8 bytes to the left and fill the right side
         navbits320 <<= bsize;
@@ -191,7 +191,7 @@ ReaderNavEntrySBF::ReaderNavEntrySBF(const std::string &line)
 
 void ReaderNavEntrySBF::readLine(const std::string &line)
 {
-    static const int SBF_SVID_OFFSET_BEIDOU = 140;
+    static const uint32_t SBF_SVID_OFFSET_BEIDOU = 140;
 
     // one line looks like:
     // 345605000,1801,145,1,28,3795932449 2099070704 0 0 0 0 0 0 0 1
@@ -240,7 +240,7 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
     //DEBUG("prn: " << m_prn);
 
     // determine signal type - yes, Septentrio saves both B1 and B2
-    int sigtype = std::stoul(splitline[4]);
+    const uint32_t sigtype = std::stoul(splitline[4]);
 
     if (sigtype == 28)
         m_sigtype = SignalType::BDS_B1;
@@ -259,7 +259,7 @@ void ReaderNavEntrySBF::readLine(const std::string &line)
     {
         const uint32_t val = std::stoul(*it);
         const std::size_t bsize = 32;
-        NavBits<bsize> bitblock(val);
+        const NavBits<bsize> bitblock(val);
 
         // shift 32 bytes to the left and fill the right side
         navbits320 <<= bsize;

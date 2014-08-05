@@ -165,7 +165,6 @@ void Subframe::parseFrameID()
     NavBits<3> fraID = m_bits.getLeft<15, 3>();
 //    std::cout << m_bits.getLeft<15, 3>() << " fraID: " << fraID << " : " << fraID.to_ulong() << std::endl;
 
-    // FIXME ulong inside int?!
     m_frameID = fraID.to_ulong();
 
     // FraIDs between 1 and 5 are valid

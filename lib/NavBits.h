@@ -157,7 +157,7 @@ public:
     }
 
 #if 0
-    template<int len>
+    template<std::size_t len>
     void setLeft(std::size_t index, const NavBits<len> &bits)
     {
         assert(index + len <= dim);
@@ -203,7 +203,7 @@ public:
      *
      * getLeft<0,10>() will return the 10 most significant bits
      */
-    template<int start, int len>
+    template<std::size_t start, std::size_t len>
     NavBits<len> getLeft() const
     {
         assert(start >= 0);
@@ -236,26 +236,20 @@ public:
         //return bTest;
     }
 
-#if 0
-    uint8_t as_uint8_t(uint8_t start, uint8_t end)
-    {
-
-    }
-#endif
-
     /**
      * Conversion
      *
      */
-     unsigned long to_ulong() const
-     {
-         return m_bitset.to_ulong();
-     }
+    // FIXME: be explicit: change to "uint32_t to_uint32_t() const"
+    unsigned long to_ulong() const
+    {
+     return m_bitset.to_ulong();
+    }
 
-     std::string to_string() const
-     {
-         return m_bitset.to_string();
-     }
+    std::string to_string() const
+    {
+     return m_bitset.to_string();
+    }
 };
 
 // non-members
