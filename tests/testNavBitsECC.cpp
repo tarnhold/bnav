@@ -44,22 +44,22 @@ TEST(testNavBitsECC)
 
     //checkAndFixParity(bTest);
 
-    std::cout << "-------------2" << std::endl;
+//    std::cout << "-------------2" << std::endl;
 
 //    checkAndFixParity(bTest2);
 
-    std::cout << "-------------3" << std::endl;
+//    std::cout << "-------------3" << std::endl;
 
 
     bnav::NavBitsECC<30> ecc(bTest);
     ecc.checkAndFixAll();
-    std::cerr << ecc.isModified() << std::endl;
+//    std::cerr << ecc.isModified() << std::endl;
     //ecc.checkParity();
 
 
 
 
-    std::cout << "-------------4" << std::endl;
+//    std::cout << "-------------4" << std::endl;
 
 }
 

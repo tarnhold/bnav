@@ -4,7 +4,6 @@
 #include "NavBits.h"
 
 #include <cstdint>
-//#include <bitset>
 #include <vector>
 
 #include <iostream>
@@ -251,11 +250,13 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
     {
         subword fixed(message xor NavBits<15>(cROMTable[idx]));
         ++m_counter;
-        
+
+#if 0
         std::cout << "parity check failed" << std::endl;
         std::cout << "old: " << message << std::endl;
         std::cout << "new: " << fixed << std::endl;
         std::cout << std::setw(3) << idx << ": " << NavBits<15>(cROMTable[idx]) << std::endl;
+#endif
 
         message = fixed;
         
@@ -309,7 +310,7 @@ NavBits<len> NavBitsECC<len>::getBits()
 template <std::size_t len>
 bool NavBitsECC<len>::isModified() const
 {
-    std::cout << m_counter << std::endl;
+    //std::cout << "m_counter: " << m_counter << std::endl;
     return m_counter > 0;
 }
 
