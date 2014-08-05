@@ -6,6 +6,11 @@
 namespace bnav
 {
 
+/**
+ * @brief The Subframe class
+ *
+ * Forms a subframe. Does decoding of FraID, Pnum and SOW.
+ */
 class Subframe
 {
     NavBits<300> m_bits;

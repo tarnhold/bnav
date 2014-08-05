@@ -43,6 +43,19 @@ void Subframe::setBits(const NavBits<300> &bits, const bool isGeo)
     initialize();
 }
 
+/**
+ * @brief Subframe::initialize
+ *
+ * Decoding procedure:
+ * 1. Check Preabmle
+ * 2. Check and fix parity for second half of the first word.
+ * 3. Decode FraID from first word.
+ * 4. Decode Pnum without parity check from second word.
+ *
+ * TODO (see notes from 17.07.2014 PageNum):
+ * 5. After Pnum has been read, do complete parity check of the whole message.
+ *      (maybe delay this until all pages are accumulated inside SubframeBuffer)
+ */
 void Subframe::initialize()
 {
     if (!isPreambleOk())
