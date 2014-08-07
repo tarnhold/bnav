@@ -79,14 +79,8 @@ SUITE(testSubframe_SBF_Simple)
 {
     TEST(testSubframe_SimpleD1)
     {
-        std::stringstream ssfile;
-        ssfile << PATH_TESTDATA << "sbf/prn6-fraID.txt";
-
-        bnav::AsciiReader reader;
-        reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        reader.open(ssfile.str());
-        CHECK(reader.isOpen());
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn6-fraID.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
@@ -114,19 +108,14 @@ SUITE(testSubframe_SBF_Simple)
             ++i;
         }
         CHECK(i == 5);
+        reader.close();
     }
 
     // same as testSubframeFraIDSimpleD1, but with empty constructor
     TEST(testSubframe_SimpleD1_empty)
     {
-        std::stringstream ssfile;
-        ssfile << PATH_TESTDATA << "sbf/prn6-fraID.txt";
-
-        bnav::AsciiReader reader;
-        reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        reader.open(ssfile.str());
-        CHECK(reader.isOpen());
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn6-fraID.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
@@ -160,18 +149,13 @@ SUITE(testSubframe_SBF_Simple)
             ++i;
         }
         CHECK(i == 5);
+        reader.close();
     }
 
     TEST(testSubframe_SimpleD2)
     {
-        std::stringstream ssfile;
-        ssfile << PATH_TESTDATA << "sbf/prn2-fraID.txt";
-
-        bnav::AsciiReader reader;
-        reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        reader.open(ssfile.str());
-        CHECK(reader.isOpen());
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn2-fraID.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         std::size_t i = 0;
         bnav::ReaderNavEntry entry;
@@ -198,6 +182,7 @@ SUITE(testSubframe_SBF_Simple)
             ++i;
         }
         CHECK(i == 5);
+        reader.close();
     }
 }
 
@@ -205,14 +190,8 @@ SUITE(testSubframe_SBF_OneFrame)
 {
     TEST(testSubframe_OneFrameD1)
     {
-        std::stringstream ssfile;
-        ssfile << PATH_TESTDATA << "sbf/prn6-oneframe.txt";
-
-        bnav::AsciiReader reader;
-        reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        reader.open(ssfile.str());
-        CHECK(reader.isOpen());
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn6-oneframe.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         const uint32_t sowfirst = 346320;
 
@@ -254,18 +233,13 @@ SUITE(testSubframe_SBF_OneFrame)
         CHECK(i == 24*5);
         CHECK(pnum_fra4 == 24);
         CHECK(pnum_fra5 == 24);
+        reader.close();
     }
 
     TEST(testSubframe_OneFrameD2)
     {
-        std::stringstream ssfile;
-        ssfile << PATH_TESTDATA << "sbf/prn2-oneframe.txt";
-
-        bnav::AsciiReader reader;
-        reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        reader.open(ssfile.str());
-        CHECK(reader.isOpen());
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn2-oneframe.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         // set first sow
         uint32_t sow = 365040;
@@ -325,5 +299,6 @@ SUITE(testSubframe_SBF_OneFrame)
         CHECK(pnum_fra2 == 6);
         CHECK(pnum_fra5 == 120);
         CHECK(sow == 365397 + 3); // because we incremented one too much
+        reader.close();
     }
 }

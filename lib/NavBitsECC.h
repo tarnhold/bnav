@@ -258,12 +258,12 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
         subword fixed(message xor NavBits<15>(cROMTable[idx]));
         ++m_counter;
 
-//#if 0
+#if 0
         std::cout << "parity check failed" << std::endl;
         std::cout << "old: " << message << std::endl;
         std::cout << "new: " << fixed << std::endl;
         std::cout << std::setw(3) << idx << ": " << NavBits<15>(cROMTable[idx]) << std::endl;
-//#endif
+#endif
 
         message = fixed;
         

@@ -1,5 +1,5 @@
 #include <unittest++/UnitTest++.h>
-#include "testConfig.h"
+#include "TestConfig.h"
 
 #include "AsciiReader.h"
 
@@ -9,8 +9,7 @@
 #include <sstream>
 
 TEST(testAsciiReaderSimple) {
-    std::stringstream ssfile;
-    ssfile << PATH_TESTDATA << "sbf/CUT12014071724.sbf_SBF_CMPRaw-snip.txt";
+    std::string filename(PATH_TESTDATA + "sbf/CUT12014071724.sbf_SBF_CMPRaw-snip.txt");
 
     // default constructor
     {
@@ -20,7 +19,7 @@ TEST(testAsciiReaderSimple) {
         CHECK(reader.getType() == bnav::AsciiReaderType::NONE);
         reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
         CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
-        reader.open(ssfile.str());
+        reader.open(filename.c_str());
         CHECK(reader.isOpen());
         reader.close();
         CHECK(!reader.isOpen());
@@ -28,7 +27,7 @@ TEST(testAsciiReaderSimple) {
 
     // "comfort" constructor
     {
-        bnav::AsciiReader reader(ssfile.str(), bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+        bnav::AsciiReader reader(filename, bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
         // should be opened automatically
         CHECK(reader.isOpen());
         CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);

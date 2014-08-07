@@ -227,7 +227,7 @@ void Subframe::parsePageNumD1()
         assert(m_pageNum > 0 && m_pageNum <= 24);
     }
 
-    std::cout << "D1: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
+//    std::cout << "D1: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
 }
 
 /**
@@ -266,7 +266,7 @@ void Subframe::parsePageNumD2()
         assert(m_pageNum > 0 && m_pageNum <= 120);
     }
 
-    std::cout << "D2: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
+//    std::cout << "D2: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
 }
 
 } // namespace bnav
