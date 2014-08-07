@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#if 0
+// synthetic frames...
 TEST(testSubframeConstructor)
 {
     // empty constructor
@@ -70,8 +72,10 @@ TEST(testSubframeConstructor)
        // bnav::Subframe sf(0, bits, true);
     }
 }
+#endif
 
-TEST(testSubframeFraIDSimpleD1)
+// Test real data
+TEST(testSubframe_SimpleD1)
 {
     std::stringstream ssfile;
     ssfile << PATH_TESTDATA << "sbf/prn6-fraID.txt";
@@ -110,7 +114,53 @@ TEST(testSubframeFraIDSimpleD1)
     CHECK(i == 5);
 }
 
-TEST(testSubframeFraIDSimpleD2)
+// same as testSubframeFraIDSimpleD1, but with empty constructor
+TEST(testSubframe_SimpleD1_empty)
+{
+    std::stringstream ssfile;
+    ssfile << PATH_TESTDATA << "sbf/prn6-fraID.txt";
+
+    bnav::AsciiReader reader;
+    reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+    CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+    reader.open(ssfile.str());
+    CHECK(reader.isOpen());
+
+    const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
+
+    std::size_t i = 0;
+    bnav::ReaderNavEntry entry;
+    while (reader.readLine(entry))
+    {
+        if (entry.getSignalType() != bnav::SignalType::BDS_B1)
+            continue;
+
+        bnav::SvID sv(entry.getPRN());
+        CHECK(!sv.isGeo());
+
+        // only difference
+        bnav::Subframe sf;
+        sf.setTOW(entry.getTOW());
+        sf.setBits(entry.getBits());
+        sf.setGeo(sv.isGeo());
+        sf.initialize();
+
+        CHECK(sf.getFrameID() == i + 1);
+
+        // non-Geo: FraID 1-3 have no Pnum
+        if (sf.getFrameID() < 4)
+            CHECK(sf.getPageNum() == 0);
+        else
+            CHECK(sf.getPageNum() == 1);
+
+        CHECK(sf.getSOW() == sowlist[i]);
+
+        ++i;
+    }
+    CHECK(i == 5);
+}
+
+TEST(testSubframe_SimpleD2)
 {
     std::stringstream ssfile;
     ssfile << PATH_TESTDATA << "sbf/prn2-fraID.txt";
@@ -148,7 +198,7 @@ TEST(testSubframeFraIDSimpleD2)
     CHECK(i == 5);
 }
 
-TEST(testSubframeFraIDOneFrameD1)
+TEST(testSubframe_OneFrameD1)
 {
     std::stringstream ssfile;
     ssfile << PATH_TESTDATA << "sbf/prn6-oneframe.txt";
@@ -201,7 +251,7 @@ TEST(testSubframeFraIDOneFrameD1)
     CHECK(pnum_fra5 == 24);
 }
 
-TEST(testSubframeFraIDOneFrameD2)
+TEST(testSubframe_OneFrameD2)
 {
     std::stringstream ssfile;
     ssfile << PATH_TESTDATA << "sbf/prn2-oneframe.txt";

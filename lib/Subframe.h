@@ -22,17 +22,20 @@ class Subframe
 
     bool m_isParityWordOneFixed;
     bool m_isParityAllFixed;
+    bool m_isInitialized;
 
 public:
     Subframe();
     Subframe(const uint32_t tow, const NavBits<300> &bits, const bool isGeo = false);
 
-    void setBits(const NavBits<300> &bits, const bool isGeo);
+    void setBits(const NavBits<300> &bits);
     NavBits<300> getBits() const;
     void setTOW(const uint32_t tow);
     uint32_t getTOW() const;
 
-    // setGeo(bool isGeo)
+    void setGeo(const bool isGeo);
+
+    void initialize();
 
     uint32_t getSOW() const;
     uint32_t getFrameID() const;
@@ -44,7 +47,6 @@ public:
     bool operator==(const Subframe &rhs);
 
 private:
-    void initialize();
     bool isPreambleOk() const;
     void parseSOW();
     void parseFrameID();

@@ -20,6 +20,7 @@ Subframe::Subframe()
     , m_isGeo(false)
     , m_isParityWordOneFixed(false)
     , m_isParityAllFixed(false)
+    , m_isInitialized(false)
 {
 }
 
@@ -31,6 +32,7 @@ Subframe::Subframe(const uint32_t tow, const NavBits<300> &bits, const bool isGe
     , m_isGeo(isGeo)
     , m_isParityWordOneFixed(false)
     , m_isParityAllFixed(false)
+    , m_isInitialized(false)
 {
     m_bits = bits;
 
@@ -70,14 +72,13 @@ void Subframe::initialize()
 
     // fix all remaining words
     checkAndFixParityAll();
+
+    m_isInitialized = true;
 }
 
-void Subframe::setBits(const NavBits<300> &bits, const bool isGeo)
+void Subframe::setBits(const NavBits<300> &bits)
 {
     m_bits = bits;
-    m_isGeo = isGeo;
-
-    initialize();
 }
 
 NavBits<300> Subframe::getBits() const
@@ -90,6 +91,11 @@ void Subframe::setTOW(const uint32_t tow)
     m_tow = tow;
 }
 
+void Subframe::setGeo(const bool isGeo)
+{
+    m_isGeo = isGeo;
+}
+
 uint32_t Subframe::getTOW() const
 {
     return m_tow;
@@ -97,16 +103,19 @@ uint32_t Subframe::getTOW() const
 
 uint32_t Subframe::getSOW() const
 {
+    assert(m_isInitialized);
     return m_sow;
 }
 
 uint32_t Subframe::getFrameID() const
 {
+    assert(m_isInitialized);
     return m_frameID;
 }
 
 uint32_t Subframe::getPageNum() const
 {
+    assert(m_isInitialized);
     return m_pageNum;
 }
 
@@ -187,6 +196,7 @@ void Subframe::parseSOW()
     NavBits<8> sow1 = m_bits.getLeft<18, 8>();
     NavBits<12> sow2 = m_bits.getLeft<30, 12>();
 
+    // merge both sow parts
     NavBits<20> sow(sow1);
     sow <<= 12;
     sow ^= sow2;
@@ -208,6 +218,7 @@ void Subframe::parsePageNumD1()
     if (m_frameID == 0)
         parseFrameID();
 
+    // for D1, only frame 4 and 5 have Pnum
     if (m_frameID > 3)
     {
         // Pnum
