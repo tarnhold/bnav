@@ -190,14 +190,6 @@ public:
         return m_bitset;
     }
 
-#if 0
-    /// optional: get as reference
-    typename std::bitset<dim>::reference get()
-    {
-        return m_bitset;
-    }
-#endif
-
     /**
      * Get a bitslice, index starting from left.
      *

@@ -6,6 +6,8 @@
 namespace bnav
 {
 
+static const uint32_t BDS_PREABMLE = 1810;
+
 enum class SignalType
 {
     BDS_B1,

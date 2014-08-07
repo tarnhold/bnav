@@ -32,6 +32,8 @@ public:
     void setTOW(const uint32_t tow);
     uint32_t getTOW() const;
 
+    // setGeo(bool isGeo)
+
     uint32_t getSOW() const;
     uint32_t getFrameID() const;
     uint32_t getPageNum() const;

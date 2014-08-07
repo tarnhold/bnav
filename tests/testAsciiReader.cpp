@@ -1,4 +1,5 @@
 #include <unittest++/UnitTest++.h>
+#include "testConfig.h"
 
 #include "AsciiReader.h"
 
@@ -6,8 +7,6 @@
 
 #include <iostream>
 #include <sstream>
-
-const char* PATH_TESTDATA = "/home/thomas/Dropbox/projects/bnav3/tests/data/";
 
 TEST(testAsciiReaderSimple) {
     std::stringstream ssfile;
@@ -130,7 +129,7 @@ TEST(TestAsciiReaderJPS) {
     std::stringstream ssfile;
     ssfile << PATH_TESTDATA << "jps/821_all_raw_eph-snip.txt";
 
-    // read a simple sbf file
+    // read a simple jps file
     {
         bnav::AsciiReader reader;
         reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_JPS);

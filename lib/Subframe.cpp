@@ -1,5 +1,7 @@
-#include "NavBitsECC.h"
 #include "Subframe.h"
+
+#include "BDSCommon.h"
+#include "NavBitsECC.h"
 
 namespace bnav
 {
@@ -65,6 +67,9 @@ void Subframe::initialize()
         parsePageNumD2();
     else
         parsePageNumD1();
+
+    // fix all remaining words
+    checkAndFixParityAll();
 }
 
 void Subframe::setBits(const NavBits<300> &bits, const bool isGeo)
@@ -117,7 +122,8 @@ bool Subframe::checkAndFixParityWordOne()
     {
         std::cerr << "Parity fixed for TOW: " << m_tow << std::endl;
         wordone = ecc.getBits();
-// FIXME: currently not further used, only to check it
+// FIXME currently only checked, not further used (corrected data should be
+// saved back into NavBits
     }
 
     // TODO
@@ -127,7 +133,7 @@ bool Subframe::checkAndFixParityWordOne()
 
 bool Subframe::checkAndFixParityAll()
 {
-    // TODO
+    // TODO remaining parities are ignored at the moment
     m_isParityAllFixed = false;
     return m_isParityAllFixed;
 }
@@ -152,7 +158,7 @@ bool Subframe::isPreambleOk() const
     NavBits<11> pre = m_bits.getLeft<0, 11>();
 
     // (11100010010)bin is (1810)dec
-    return pre.to_ulong() == 1810;
+    return pre.to_ulong() == BDS_PREABMLE;
 }
 
 /**
