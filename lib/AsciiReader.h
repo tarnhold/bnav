@@ -26,6 +26,7 @@ class AsciiReader : private boost::noncopyable
 {
 private:
     std::ifstream m_infile; //< Input file stream
+    std::string m_filename; //< File name
     AsciiReaderType m_filetype; //< Type of source file (sbf, jps)
     bool m_eof; //< State if EOF is reached
 

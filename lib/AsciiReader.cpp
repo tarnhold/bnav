@@ -16,6 +16,7 @@ namespace bnav
 
 AsciiReader::AsciiReader()
     : m_infile()
+    , m_filename()
     , m_filetype(AsciiReaderType::NONE)
     , m_eof(false)
 {
@@ -23,20 +24,16 @@ AsciiReader::AsciiReader()
 
 AsciiReader::AsciiReader(const char *filename, const AsciiReaderType &filetype)
     : m_infile()
+    , m_filename(filename)
     , m_filetype(filetype)
     , m_eof(false)
 {
-    //FIXME: check if filename is empty?
     open(filename);
 }
 
 AsciiReader::AsciiReader(const std::string &filename, const AsciiReaderType &filetype)
-    : m_infile()
-    , m_filetype(filetype)
-    , m_eof(false)
+    : AsciiReader(filename.c_str(), filetype)
 {
-    //FIXME: check if filename is empty?
-    open(filename);
 }
 
 AsciiReader::~AsciiReader()
@@ -59,10 +56,8 @@ void AsciiReader::open(const char *filename)
     // ensure filetype is set
     assert(m_filetype != AsciiReaderType::NONE);
 
-    // TODO: check if file exists
-    // TODO: check if file could be opened
-    // would be better to handle exceptions
-    m_infile.open(filename);
+    m_filename = filename;
+    m_infile.open(filename, std::ifstream::in);
 }
 
 void AsciiReader::open(const std::string &filename)
@@ -92,6 +87,12 @@ bool AsciiReader::readLine(ReaderNavEntry &data)
 
     std::string line;
     std::getline(m_infile, line);
+
+    if (m_infile.bad())
+    {
+        std::perror(("Error while reading file: " + m_filename).c_str());
+        return false;
+    }
 
     // assume empty line is also eof
     if (line.empty())

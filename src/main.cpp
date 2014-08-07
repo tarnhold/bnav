@@ -38,9 +38,9 @@ int main(int argc, char **argv)
 
     // Open file and parse lines
     std::string filename = argv[2];
-    bnav::AsciiReader reader(filename, filetype);
+    bnav::AsciiReader reader("filename", filetype);
     if (!reader.isOpen())
-        std::cerr << "Warning: Could not open file: " << filename << std::endl;
+        std::perror(("Error: Could not open file: " + filename).c_str());
 
     bnav::ReaderNavEntry data;
     while (reader.readLine(data))
