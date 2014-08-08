@@ -80,7 +80,7 @@ AsciiReaderType AsciiReader::getType() const
 @returns \true if line read was sucessful
          \false if line read was not successful
 */
-bool AsciiReader::readLine(ReaderNavEntry &data)
+bool AsciiReader::readLine(AsciiReaderEntry &data)
 {
     if (isEof())
         return false;
@@ -101,9 +101,9 @@ bool AsciiReader::readLine(ReaderNavEntry &data)
     //DEBUG("line: " << line);
 
     if (m_filetype == AsciiReaderType::TEXT_CONVERTED_JPS)
-        data = ReaderNavEntryJPS(line);
+        data = AsciiReaderEntryJPS(line);
     else if (m_filetype == AsciiReaderType::TEXT_CONVERTED_SBF)
-        data = ReaderNavEntrySBF(line);
+        data = AsciiReaderEntrySBF(line);
 
     if (m_infile.eof())
         m_eof = true;

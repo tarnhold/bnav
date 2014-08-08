@@ -85,7 +85,7 @@ SUITE(testSubframe_SBF_Simple)
         const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
         std::size_t i = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             if (entry.getSignalType() != bnav::SignalType::BDS_B1)
@@ -120,7 +120,7 @@ SUITE(testSubframe_SBF_Simple)
         const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
         std::size_t i = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             if (entry.getSignalType() != bnav::SignalType::BDS_B1)
@@ -158,7 +158,7 @@ SUITE(testSubframe_SBF_Simple)
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         std::size_t i = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             if (entry.getSignalType() != bnav::SignalType::BDS_B1)
@@ -198,7 +198,7 @@ SUITE(testSubframe_SBF_OneFrame)
         std::size_t i = 0;
         std::size_t pnum_fra4 = 0;
         std::size_t pnum_fra5 = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             if (entry.getSignalType() != bnav::SignalType::BDS_B1)
@@ -248,7 +248,7 @@ SUITE(testSubframe_SBF_OneFrame)
         std::size_t pnum_fra1 = 0;
         std::size_t pnum_fra2 = 0;
         std::size_t pnum_fra5 = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             if (entry.getSignalType() != bnav::SignalType::BDS_B1)

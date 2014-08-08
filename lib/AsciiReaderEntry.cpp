@@ -52,7 +52,7 @@ static std::string extractData(const std::string &line, const std::string &keywo
 namespace bnav
 {
 
-ReaderNavEntry::ReaderNavEntry()
+AsciiReaderEntry::AsciiReaderEntry()
     : m_prn(0)
     , m_tow(0)
     , m_sigtype(SignalType::NONE)
@@ -60,7 +60,7 @@ ReaderNavEntry::ReaderNavEntry()
 {
 }
 
-ReaderNavEntry::ReaderNavEntry(const std::string &/*line*/)
+AsciiReaderEntry::AsciiReaderEntry(const std::string &/*line*/)
     : m_prn(0)
     , m_tow(0)
     , m_sigtype(SignalType::NONE)
@@ -68,27 +68,27 @@ ReaderNavEntry::ReaderNavEntry(const std::string &/*line*/)
 {
 }
 
-uint32_t ReaderNavEntry::getTOW() const
+uint32_t AsciiReaderEntry::getTOW() const
 {
     return m_tow;
 }
 
-uint32_t ReaderNavEntry::getPRN() const
+uint32_t AsciiReaderEntry::getPRN() const
 {
     return m_prn;
 }
 
-SignalType ReaderNavEntry::getSignalType() const
+SignalType AsciiReaderEntry::getSignalType() const
 {
     return m_sigtype;
 }
 
-NavBits<300> ReaderNavEntry::getBits() const
+NavBits<300> AsciiReaderEntry::getBits() const
 {
     return m_bits;
 }
 
-void ReaderNavEntry::readLine(const std::string &)
+void AsciiReaderEntry::readLine(const std::string &)
 {
     // should not be called
     assert(false);
@@ -101,16 +101,16 @@ void ReaderNavEntry::readLine(const std::string &)
  *
  * Returns a bitset of the raw navigation message
  */
-ReaderNavEntryJPS::ReaderNavEntryJPS()
+AsciiReaderEntryJPS::AsciiReaderEntryJPS()
 {
 }
 
-ReaderNavEntryJPS::ReaderNavEntryJPS(const std::string &line)
+AsciiReaderEntryJPS::AsciiReaderEntryJPS(const std::string &line)
 {
     readLine(line);
 }
 
-void ReaderNavEntryJPS::readLine(const std::string &line)
+void AsciiReaderEntryJPS::readLine(const std::string &line)
 {
     // parse tow and prn fields
     try
@@ -180,16 +180,16 @@ void ReaderNavEntryJPS::readLine(const std::string &line)
  *
  * Returns a bitset of the raw navigation message
  */
-ReaderNavEntrySBF::ReaderNavEntrySBF()
+AsciiReaderEntrySBF::AsciiReaderEntrySBF()
 {
 }
 
-ReaderNavEntrySBF::ReaderNavEntrySBF(const std::string &line)
+AsciiReaderEntrySBF::AsciiReaderEntrySBF(const std::string &line)
 {
     readLine(line);
 }
 
-void ReaderNavEntrySBF::readLine(const std::string &line)
+void AsciiReaderEntrySBF::readLine(const std::string &line)
 {
     static const uint32_t SBF_SVID_OFFSET_BEIDOU = 140;
 

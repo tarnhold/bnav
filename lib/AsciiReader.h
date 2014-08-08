@@ -45,7 +45,7 @@ public:
     AsciiReaderType getType() const;
 
     /// Read current line, return data by reference
-    bool readLine(ReaderNavEntry &data);
+    bool readLine(AsciiReaderEntry &data);
     bool isEof() const;
     void close();
 };

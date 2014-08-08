@@ -1,5 +1,5 @@
-#ifndef ASCIIREADERNAVENTRY_H
-#define ASCIIREADERNAVENTRY_H
+#ifndef ASCIIREADERENTRY_H
+#define ASCIIREADERENTRY_H
 
 #include "AsciiReader.h"
 #include "BDSCommon.h"
@@ -9,7 +9,7 @@ namespace bnav
 {
 
 /// Base type for line element
-class ReaderNavEntry
+class AsciiReaderEntry
 {
 protected:
     uint32_t m_prn;
@@ -18,8 +18,8 @@ protected:
     NavBits<300> m_bits;
 
 public:
-    ReaderNavEntry();
-    ReaderNavEntry(const std::string &);
+    AsciiReaderEntry();
+    AsciiReaderEntry(const std::string &);
 
     void readLine(const std::string &line);
 
@@ -30,25 +30,25 @@ public:
 };
 
 // Type for JPS style files
-class ReaderNavEntryJPS : public ReaderNavEntry
+class AsciiReaderEntryJPS : public AsciiReaderEntry
 {
 public:
-    ReaderNavEntryJPS();
-    ReaderNavEntryJPS(const std::string &line);
+    AsciiReaderEntryJPS();
+    AsciiReaderEntryJPS(const std::string &line);
 
     void readLine(const std::string &line);
 };
 
 // Type for SBF style files
-class ReaderNavEntrySBF : public ReaderNavEntry
+class AsciiReaderEntrySBF : public AsciiReaderEntry
 {
 public:
-    ReaderNavEntrySBF();
-    ReaderNavEntrySBF(const std::string &line);
+    AsciiReaderEntrySBF();
+    AsciiReaderEntrySBF(const std::string &line);
 
     void readLine(const std::string &line);
 };
 
 } // namespace bnav
 
-#endif // ASCIIREADERNAVENTRY_H
+#endif // ASCIIREADERENTRY_H

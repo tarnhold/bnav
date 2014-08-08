@@ -57,7 +57,7 @@ TEST(testAsciiReaderSBF) {
                                345606200,345606200,345606200,345606200};
 
         std::size_t i = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             CHECK(entry.getPRN() == prnlist[i]);
@@ -99,7 +99,7 @@ TEST(testAsciiReaderSBFB1) {
                                345606200,345606200,345606200};
 
         std::size_t i = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             if (entry.getSignalType() != bnav::SignalType::BDS_B1)
@@ -144,7 +144,7 @@ TEST(TestAsciiReaderJPS) {
                                310210,310210,310211,310211,310212,310213,
                                310213};
         std::size_t i = 0;
-        bnav::ReaderNavEntry entry;
+        bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
             // this file has only prn 2 data

@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     bnav::EphemerisStore ephStore;
 #endif
 
-    bnav::ReaderNavEntry data;
+    bnav::AsciiReaderEntry data;
     while (reader.readLine(data))
     {
         // skip B2 signals, the differences are not in our interest
