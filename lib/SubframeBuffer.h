@@ -27,10 +27,12 @@ public:
     bool isAlmanacComplete() const;
 
     SubframeVector flushEphemerisData();
+    //SubframeVector flushIntegrityData();
+    SubframeVector flushAlmanacData();
 
     void clearEphemerisData();
-    void clearAlmanacData();
     void clearIntegrityData();
+    void clearAlmanacData();
 };
 
 } // namespace bnav

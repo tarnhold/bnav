@@ -105,6 +105,18 @@ SubframeVector SubframeBuffer::flushEphemerisData()
     return ephdata;
 }
 
+SubframeVector SubframeBuffer::flushAlmanacData()
+{
+    SubframeVector almdata;
+
+    almdata.push_back(m_buffer[3]);
+    almdata.push_back(m_buffer[4]);
+
+    clearAlmanacData();
+
+    return almdata;
+}
+
 void SubframeBuffer::clearEphemerisData()
 {
     m_buffer[0].clear();
