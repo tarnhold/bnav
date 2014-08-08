@@ -119,6 +119,22 @@ uint32_t Subframe::getPageNum() const
     return m_pageNum;
 }
 
+#if 0
+/**
+ * @brief Subframe::forcePageNum Force Subframe to be a specific Pnum.
+ *
+ * Could be used, if Subframe is suspicious to have a parity error, which
+ * is not currently fixed (because Pnum is read plain). So we force Pnum
+ * and try to fix all parities after that.
+ *
+ * @param pnum Index of page number.
+ */
+void Subframe::forcePageNum(const uint32_t pnum)
+{
+    m_pageNum = pnum;
+}
+#endif
+
 bool Subframe::checkAndFixParityWordOne()
 {
     // second 15 bits of word one need to be checked

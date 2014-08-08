@@ -41,6 +41,10 @@ public:
     uint32_t getFrameID() const;
     uint32_t getPageNum() const;
 
+#if 0
+    void forcePageNum(const uint32_t pnum);
+#endif
+
     bool checkAndFixParityWordOne();
     bool checkAndFixParityAll();
 
