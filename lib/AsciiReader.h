@@ -1,7 +1,7 @@
 #ifndef ASCIIREADER_H
 #define ASCIIREADER_H
 
-#include "AsciiReaderNavEntry.h"
+#include "AsciiReaderEntry.h"
 
 #include <string>
 #include <fstream>

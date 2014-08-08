@@ -9,19 +9,19 @@ SOURCES += \
     AsciiReader.cpp \
     NavBits.cpp \
     Subframe.cpp \
-    AsciiReaderNavEntry.cpp \
     NavBitsECC.cpp \
     SvID.cpp \
-    SubframeBuffer.cpp
+    SubframeBuffer.cpp \
+    AsciiReaderEntry.cpp
 
 HEADERS += \
     AsciiReader.h \
     Debug.h \
     NavBits.h \
     Subframe.h \
-    AsciiReaderNavEntry.h \
     NavBitsECC.h \
     BDSCommon.h \
     SvID.h \
-    SubframeBuffer.h
+    SubframeBuffer.h \
+    AsciiReaderEntry.h
 

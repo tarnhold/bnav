@@ -1,5 +1,5 @@
 #include "AsciiReader.h"
-#include "AsciiReaderNavEntry.h"
+#include "AsciiReaderEntry.h"
 #include "BDSCommon.h"
 
 #include "Debug.h"
