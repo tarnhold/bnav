@@ -2,7 +2,7 @@
 #define ASCIIREADERENTRY_H
 
 #include "AsciiReader.h"
-#include "BDSCommon.h"
+#include "BeiDou.h"
 #include "NavBits.h"
 
 namespace bnav

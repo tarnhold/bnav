@@ -3,7 +3,7 @@
 
 #include "AsciiReader.h"
 
-#include "BDSCommon.h"
+#include "BeiDou.h"
 
 #include <iostream>
 #include <sstream>

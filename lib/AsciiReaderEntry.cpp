@@ -1,6 +1,6 @@
 #include "AsciiReader.h"
 #include "AsciiReaderEntry.h"
-#include "BDSCommon.h"
+#include "BeiDou.h"
 
 #include "Debug.h"
 

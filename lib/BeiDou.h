@@ -1,5 +1,5 @@
-#ifndef BDSCOMMON_H
-#define BDSCOMMON_H
+#ifndef BEIDOU_H
+#define BEIDOU_H
 
 #include <iostream>
 
@@ -37,4 +37,4 @@ std::ostream & operator<<(std::ostream & out, const SignalType & rhs)
 
 } // namespace bnav
 
-#endif // BDSCOMMON_H
+#endif // BEIDOU_H

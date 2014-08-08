@@ -1,6 +1,6 @@
 #include "Subframe.h"
 
-#include "BDSCommon.h"
+#include "BeiDou.h"
 #include "NavBitsECC.h"
 
 namespace bnav

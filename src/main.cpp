@@ -1,5 +1,5 @@
 #include "AsciiReader.h"
-#include "BDSCommon.h"
+#include "BeiDou.h"
 #include "Subframe.h"
 #include "SubframeBuffer.h"
 #include "SvID.h"

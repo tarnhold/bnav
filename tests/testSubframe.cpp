@@ -4,7 +4,7 @@
 #include "Subframe.h"
 
 #include "AsciiReader.h"
-#include "BDSCommon.h"
+#include "BeiDou.h"
 #include "NavBits.h"
 #include "SvID.h"
 

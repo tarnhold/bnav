@@ -20,8 +20,8 @@ HEADERS += \
     NavBits.h \
     Subframe.h \
     NavBitsECC.h \
-    BDSCommon.h \
     SvID.h \
     SubframeBuffer.h \
-    AsciiReaderEntry.h
+    AsciiReaderEntry.h \
+    BeiDou.h
 
