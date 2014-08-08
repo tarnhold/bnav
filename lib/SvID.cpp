@@ -29,7 +29,7 @@ uint32_t SvID::getPRN() const
 
 bool SvID::isGeo() const
 {
-    return m_prn <= BDS_MAX_PRN_GEO;
+    return (m_prn > 0) && (m_prn <= BDS_MAX_PRN_GEO);
 }
 
 } // namespace bnav

@@ -10,7 +10,8 @@ SOURCES += main.cpp \
     testNavBits.cpp \
     testAsciiReader.cpp \
     testNavBitsECC.cpp \
-    testSubframe.cpp
+    testSubframe.cpp \
+    testSvID.cpp
 
 LIBS += -lunittest++ -L../lib -lbnav
 
