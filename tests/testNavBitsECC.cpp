@@ -63,6 +63,7 @@ TEST(testNavBitsECC)
 
 }
 
+// checks if error correction works for every single bit of one word
 TEST(testNavBitsECCParity15)
 {
     // set an arbitrary bit message, which parity check would succeed
