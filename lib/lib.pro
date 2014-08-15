@@ -11,8 +11,11 @@ SOURCES += \
     Subframe.cpp \
     NavBitsECC.cpp \
     SvID.cpp \
+    AsciiReaderEntry.cpp \
+    SubframeBufferStore.cpp \
+    SubframeBufferD1.cpp \
     SubframeBuffer.cpp \
-    AsciiReaderEntry.cpp
+    SubframeBufferD2.cpp
 
 HEADERS += \
     AsciiReader.h \
@@ -21,7 +24,8 @@ HEADERS += \
     Subframe.h \
     NavBitsECC.h \
     SvID.h \
-    SubframeBuffer.h \
     AsciiReaderEntry.h \
-    BeiDou.h
+    BeiDou.h \
+    SubframeBufferStore.h \
+    SubframeBuffer.h
 
