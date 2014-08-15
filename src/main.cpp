@@ -57,7 +57,7 @@ int main(int argc, char **argv)
             continue;
 
         bnav::SvID sv(data.getPRN());
-        bnav::Subframe sf(data.getTOW(), data.getBits(), sv.isGeo());
+        bnav::Subframe sf(sv, data.getTOW(), data.getBits());
 
         // debug
         std::cout << "prn: " << data.getPRN()

@@ -24,12 +24,12 @@ Subframe::Subframe()
 {
 }
 
-Subframe::Subframe(const uint32_t tow, const NavBits<300> &bits, const bool isGeo)
+Subframe::Subframe(const SvID &sv, const uint32_t tow, const NavBits<300> &bits)
     : m_tow(tow)
     , m_sow(0)
     , m_frameID(0)
     , m_pageNum(0)
-    , m_isGeo(isGeo)
+    , m_isGeo(sv.isGeo())
     , m_isParityWordOneFixed(false)
     , m_isParityAllFixed(false)
     , m_isInitialized(false)
@@ -91,9 +91,9 @@ void Subframe::setTOW(const uint32_t tow)
     m_tow = tow;
 }
 
-void Subframe::setGeo(const bool isGeo)
+void Subframe::setSvID(const SvID &sv)
 {
-    m_isGeo = isGeo;
+    m_isGeo = sv.isGeo();
 }
 
 uint32_t Subframe::getTOW() const

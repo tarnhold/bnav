@@ -2,6 +2,7 @@
 #define SUBFRAME_H
 
 #include "NavBits.h"
+#include "SvID.h"
 
 namespace bnav
 {
@@ -26,14 +27,14 @@ class Subframe
 
 public:
     Subframe();
-    Subframe(const uint32_t tow, const NavBits<300> &bits, const bool isGeo = false);
+    Subframe(const SvID &sv, const uint32_t tow, const NavBits<300> &bits);
 
     void setBits(const NavBits<300> &bits);
     NavBits<300> getBits() const;
     void setTOW(const uint32_t tow);
     uint32_t getTOW() const;
 
-    void setGeo(const bool isGeo);
+    void setSvID(const SvID &sv);
 
     void initialize();
 

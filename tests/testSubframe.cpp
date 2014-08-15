@@ -93,7 +93,7 @@ SUITE(testSubframe_SBF_Simple)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
-            bnav::Subframe sf(entry.getTOW(), entry.getBits(), sv.isGeo());
+            bnav::Subframe sf(sv, entry.getTOW(), entry.getBits());
 
             CHECK(sf.getFrameID() == i + 1);
 
@@ -133,7 +133,7 @@ SUITE(testSubframe_SBF_Simple)
             bnav::Subframe sf;
             sf.setTOW(entry.getTOW());
             sf.setBits(entry.getBits());
-            sf.setGeo(sv.isGeo());
+            sf.setSvID(sv);
             sf.initialize();
 
             CHECK(sf.getFrameID() == i + 1);
@@ -166,7 +166,7 @@ SUITE(testSubframe_SBF_Simple)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
-            bnav::Subframe sf(entry.getTOW(), entry.getBits(), sv.isGeo());
+            bnav::Subframe sf(sv, entry.getTOW(), entry.getBits());
 
             CHECK(sf.getFrameID() == i + 1);
 
@@ -206,7 +206,7 @@ SUITE(testSubframe_SBF_OneFrame)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
-            bnav::Subframe sf(entry.getTOW(), entry.getBits(), sv.isGeo());
+            bnav::Subframe sf(sv, entry.getTOW(), entry.getBits());
 
             CHECK(sf.getFrameID() == (i % 5) + 1);
 
@@ -256,7 +256,7 @@ SUITE(testSubframe_SBF_OneFrame)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
-            bnav::Subframe sf(entry.getTOW(), entry.getBits(), sv.isGeo());
+            bnav::Subframe sf(sv, entry.getTOW(), entry.getBits());
 
             CHECK(sf.getFrameID() == (i % 5) + 1);
             CHECK(sf.getSOW() == sow);
