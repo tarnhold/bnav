@@ -83,9 +83,14 @@ SubframeBufferParam SubframeBufferD1::flushEphemerisData()
     SubframeVector ephdata;
 
     // D1: first, second and third frame contain ephemeris data
-    ephdata.push_back(m_buffer[0]);
-    ephdata.push_back(m_buffer[1]);
-    ephdata.push_back(m_buffer[2]);
+    for (std::size_t i = 0; i <= 2; ++i)
+    {
+        ephdata.push_back(m_buffer[i]);
+
+        // ensure correct data sets, should not be possible!
+        // D1 ephemeris have no Pnum
+        assert(m_buffer[i].front().getPageNum() == 0);
+    }
 
     clearEphemerisData();
 
@@ -96,8 +101,14 @@ SubframeBufferParam SubframeBufferD1::flushAlmanacData()
 {
     SubframeVector almdata;
 
-    almdata.push_back(m_buffer[3]);
-    almdata.push_back(m_buffer[4]);
+    for (std::size_t i = 3; i <= 4; ++i)
+    {
+        almdata.push_back(m_buffer[i]);
+
+        // ensure correct data sets, should not be possible!
+        assert(m_buffer[i].front().getPageNum() == 1);
+        assert(m_buffer[i].back().getPageNum() == D1_FRAME_SIZE[i]);
+    }
 
     clearAlmanacData();
 

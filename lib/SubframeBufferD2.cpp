@@ -96,6 +96,10 @@ SubframeBufferParam SubframeBufferD2::flushEphemerisData()
     // D2: all ephemeris data is inside frame 1
     ephdata.push_back(m_buffer[0]);
 
+    // ensure correct data sets, should not be possible!
+    assert(m_buffer[0].front().getPageNum() == 1);
+    assert(m_buffer[0].back().getPageNum() == D2_FRAME_SIZE[0]);
+
     clearEphemerisData();
 
     return SubframeBufferParam(SubframeBufferType::D2_EPHEMERIS, ephdata);
@@ -105,6 +109,10 @@ SubframeBufferParam SubframeBufferD2::flushAlmanacData()
 {
     SubframeVector almdata;
     almdata.push_back(m_buffer[4]);
+
+    // ensure correct data sets, should not be possible!
+    assert(m_buffer[4].front().getPageNum() == 1);
+    assert(m_buffer[4].back().getPageNum() == D2_FRAME_SIZE[4]);
 
     clearAlmanacData();
 
