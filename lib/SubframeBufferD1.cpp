@@ -47,13 +47,20 @@ void SubframeBufferD1::addSubframe(const Subframe &sf)
         clearAlmanacData();
     }
 
-    // new Pnum has to be bigger than the previous one
-//    if (m_buffer[fraid - 1].size() && m_buffer[fraid - 1].back().getPageNum() > pnum)
-//    {
-//        std::cout << "not bigger: " << pnum << " > " << m_buffer[fraid - 1].back().getPageNum() << std::endl;
-//    }
-
-    // if size() > D1_FRAME_SIZE...
+    // D1: Only Subframes 4 and 5 have Pnum
+    // new Pnum has to be bigger than the previous one of the same subframe
+    // this proves a valid data set (continuous Pnum of a subframe), including
+    // the correct length (because 24 + 1 == 24, isn't possible).
+    if (fraid > 3
+            && m_buffer[fraid - 1].size()
+            && m_buffer[fraid - 1].back().getPageNum() + 1 != pnum)
+    {
+        std::cout << "Warning: SubframeBuffer: Pnum (" << pnum
+                  << ") doesn't fit to previous one("
+                  << m_buffer[fraid - 1].back().getPageNum()
+                  << ") for Subframe " << fraid << " at SOW "
+                  << sow << "!" << std::endl;
+    }
 
     m_buffer[fraid - 1].push_back(sf);
 }

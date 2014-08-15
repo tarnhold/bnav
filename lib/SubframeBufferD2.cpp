@@ -35,7 +35,8 @@ void SubframeBufferD2::addSubframe(const Subframe &sf)
         // D2 has the same SOW for all subframes of one frame, check this
         if (m_lastsow != sow && m_lastsow > 0)
         {
-            std::cout << "Warning: SubframeBuffer: Subframe has another "
+            std::cout << "Warning: SubframeBuffer: Subframe at SOW "
+                      << sow << " has another "
                       << "SOW than the current Frame!" << std::endl;
 
             // initialize new data sets, because the old are uncompleted
@@ -64,13 +65,17 @@ void SubframeBufferD2::addSubframe(const Subframe &sf)
         clearAlmanacData();
     }
 
-    // new Pnum has to be bigger than the previous one
-//    if (m_buffer[fraid - 1].size() && m_buffer[fraid - 1].back().getPageNum() > pnum)
-//    {
-//        std::cout << "not bigger: " << pnum << " > " << m_buffer[fraid - 1].back().getPageNum() << std::endl;
-//    }
-
-    // if size() > D2_FRAME_SIZE...
+    // New Pnum has to be bigger than the previous one of the same subframe.
+    // This proves a valid data set (continuous Pnum of a subframe), including
+    // the correct length (because 120 + 1 == 120, isn't possible).
+    if (m_buffer[fraid - 1].size() && m_buffer[fraid - 1].back().getPageNum() + 1 != pnum)
+    {
+        std::cout << "Warning: SubframeBuffer: Pnum (" << pnum
+                  << ") doesn't fit to previous one("
+                  << m_buffer[fraid - 1].back().getPageNum()
+                  << ") for Subframe " << fraid << " at SOW "
+                  << sow << "!" << std::endl;
+    }
 
     m_buffer[fraid - 1].push_back(sf);
 }
