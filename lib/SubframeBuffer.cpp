@@ -3,6 +3,16 @@
 namespace bnav
 {
 
+/**
+ * @brief SubframeBuffer::SubframeBuffer
+ *
+ * Currently we only handle complete data sets. That means, pages have to be
+ * complete and without gaps (SOW and Pnum cheched). Incomplete data sets
+ * get discarded at the moment.
+ *
+ * Data sets means Ephemeris, Almanac and Integrity data.
+ */
+
 SubframeBuffer::SubframeBuffer()
     : m_lastsow(0)
 {

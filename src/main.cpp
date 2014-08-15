@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     if (!reader.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 
-    bnav::SubframeBufferD2 sfbuf;
+    bnav::SubframeBufferStore sbstore;
 #if 0
     bnav::IonosphereStore ionoStore;
     bnav::EphemerisStore ephStore;
@@ -73,11 +73,13 @@ int main(int argc, char **argv)
                   << " fra: " << sf.getFrameID() << " pnum: "
                   << sf.getPageNum() << std::endl;
 
-        sfbuf.addSubframe(sf);
+        sbstore.addSubframe(sv, sf);
 
-        if (sfbuf.isEphemerisComplete())
+        bnav::SubframeBuffer* sfbuf = sbstore.getSubframeBuffer(sv);
+
+        if (sfbuf->isEphemerisComplete())
         {
-            bnav::SubframeBufferParam data = sfbuf.flushEphemerisData();
+            bnav::SubframeBufferParam data = sfbuf->flushEphemerisData();
             std::cout << "eph complete" << std::endl;
 
 #if 0
@@ -89,9 +91,9 @@ int main(int argc, char **argv)
             ephstore.add(sv, eph);
 #endif
         }
-        else if (sfbuf.isAlmanacComplete())
+        else if (sfbuf->isAlmanacComplete())
         {
-            sfbuf.clearAlmanacData();
+            sfbuf->clearAlmanacData();
             std::cout << "almanac complete" << std::endl;
 
 #if 0
@@ -104,17 +106,11 @@ int main(int argc, char **argv)
             ionoStore.add(sv, iono);
 #endif
         }
-/*        else if (sfbuf.isIonosphereComplete())
-        {
-        // iono steckt im almanach drin
-            std::cout << "iono complete" << std::endl;
-        }
-*/
     }
     reader.close();
 
-    if (sfbuf.hasIncompleteData())
-        std::cout << "SubframeBuffer has incomplete data sets at EOF. Ignoring." << std::endl;
+    if (sbstore.hasIncompleteData())
+        std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;
 
     return 0;
 }

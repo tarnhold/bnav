@@ -27,6 +27,11 @@ uint32_t SvID::getPRN() const
     return m_prn;
 }
 
+bool SvID::operator <(const SvID &rhs) const
+{
+    return m_prn < rhs.getPRN();
+}
+
 bool SvID::isGeo() const
 {
     return (m_prn > 0) && (m_prn <= BDS_MAX_PRN_GEO);

@@ -28,7 +28,7 @@ void SubframeBufferD1::addSubframe(const Subframe &sf)
     const std::size_t fraid = sf.getFrameID();
     const std::size_t pnum = sf.getPageNum();
     const uint32_t sow = sf.getSOW();
-
+std::cout << "add D1-" << std::endl;
     checkLastSOW(sow, D1_SUBFRAME_DURATION);
     m_lastsow = sow;
 
@@ -65,6 +65,11 @@ void SubframeBufferD1::addSubframe(const Subframe &sf)
     m_buffer[fraid - 1].push_back(sf);
 }
 
+/**
+ * @brief SubframeBufferD1::isEphemerisComplete Check if there is a complete
+ * Ephemeris data set available.
+ * @return true, if complete, false, if not.
+ */
 bool SubframeBufferD1::isEphemerisComplete() const
 {
     return m_buffer[0].size() == D1_FRAME_SIZE[0]
@@ -72,12 +77,22 @@ bool SubframeBufferD1::isEphemerisComplete() const
             && m_buffer[2].size() == D1_FRAME_SIZE[2];
 }
 
+/**
+ * @brief SubframeBufferD1::isAlmanacComplete Check if there is a complete
+ * Almanac data set is available.
+ * @return true, if complete, false, if not
+ */
 bool SubframeBufferD1::isAlmanacComplete() const
 {
     return m_buffer[3].size() == D1_FRAME_SIZE[3]
             && m_buffer[4].size() == D1_FRAME_SIZE[4];
 }
 
+/**
+ * @brief SubframeBufferD1::flushEphemerisData Get Ephemeris data and clear the
+ * buffer.
+ * @return Ephemeris data as SubframeBufferParam.
+ */
 SubframeBufferParam SubframeBufferD1::flushEphemerisData()
 {
     SubframeVector ephdata;
@@ -97,6 +112,11 @@ SubframeBufferParam SubframeBufferD1::flushEphemerisData()
     return SubframeBufferParam(SubframeBufferType::D1_EPHEMERIS, ephdata);
 }
 
+/**
+ * @brief SubframeBufferD1::flushAlmanacData Get Alamanc data and clear the
+ * buffer.
+ * @return The Almanac data as SubframeBufferParam.
+ */
 SubframeBufferParam SubframeBufferD1::flushAlmanacData()
 {
     SubframeVector almdata;
@@ -115,6 +135,10 @@ SubframeBufferParam SubframeBufferD1::flushAlmanacData()
     return SubframeBufferParam(SubframeBufferType::D1_ALMANAC, almdata);
 }
 
+/**
+ * @brief SubframeBufferD1::clearEphemerisData Clear all Ephemeris data from the
+ * buffer.
+ */
 void SubframeBufferD1::clearEphemerisData()
 {
     m_buffer[0].clear();
@@ -122,6 +146,10 @@ void SubframeBufferD1::clearEphemerisData()
     m_buffer[2].clear();
 }
 
+/**
+ * @brief SubframeBufferD1::clearAlmanacData Clear all Almanac data from the
+ * buffer.
+ */
 void SubframeBufferD1::clearAlmanacData()
 {
     m_buffer[3].clear();

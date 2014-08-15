@@ -12,16 +12,19 @@ namespace bnav
 
 class SubframeBufferStore
 {
-    std::map<SvID, SubframeBufferD1> m_store;
+    std::map<SvID, SubframeBuffer*> m_store;
 
 public:
     SubframeBufferStore();
 
-    void addSubframe(const Subframe &sf);
+    void addSubframe(const SvID &sv, const Subframe &sf);
 
-    SubframeBufferD1 getSubframeBuffer(const SvID &sv);
+    SubframeBuffer* getSubframeBuffer(const SvID &sv);
 
+    bool hasIncompleteData() const;
 
+private:
+    void addSvID(const SvID &sv);
 };
 
 } // namespace bnav

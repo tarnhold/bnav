@@ -15,7 +15,8 @@ SOURCES += \
     SubframeBufferStore.cpp \
     SubframeBufferD1.cpp \
     SubframeBuffer.cpp \
-    SubframeBufferD2.cpp
+    SubframeBufferD2.cpp \
+    Benchmark.cpp
 
 HEADERS += \
     AsciiReader.h \
@@ -27,5 +28,6 @@ HEADERS += \
     AsciiReaderEntry.h \
     BeiDou.h \
     SubframeBufferStore.h \
-    SubframeBuffer.h
+    SubframeBuffer.h \
+    Benchmark.h
 
