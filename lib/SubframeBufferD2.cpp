@@ -82,18 +82,20 @@ std::cout << "add D2" << std::endl;
 
 bool SubframeBufferD2::isEphemerisComplete() const
 {
+    // complete if we have all pages of subframe 1
     return m_buffer[0].size() == D2_FRAME_SIZE[0];
 }
 
 bool SubframeBufferD2::isAlmanacComplete() const
 {
+    // complete if we have all pages of subframe 5
     return m_buffer[4].size() == D2_FRAME_SIZE[4];
 }
 
 SubframeBufferParam SubframeBufferD2::flushEphemerisData()
 {
     SubframeVector ephdata;
-    // D2: all ephemeris data is inside frame 1
+    // D2: all ephemeris data is inside subframe 1
     ephdata.push_back(m_buffer[0]);
 
     // ensure correct data sets, should not be possible!

@@ -72,6 +72,7 @@ std::cout << "add D1-" << std::endl;
  */
 bool SubframeBufferD1::isEphemerisComplete() const
 {
+    // complete if we have subframes 1 to 3
     return m_buffer[0].size() == D1_FRAME_SIZE[0]
             && m_buffer[1].size() == D1_FRAME_SIZE[1]
             && m_buffer[2].size() == D1_FRAME_SIZE[2];
@@ -84,6 +85,7 @@ bool SubframeBufferD1::isEphemerisComplete() const
  */
 bool SubframeBufferD1::isAlmanacComplete() const
 {
+    // complete if we have all pages of subframe 4 and 5
     return m_buffer[3].size() == D1_FRAME_SIZE[3]
             && m_buffer[4].size() == D1_FRAME_SIZE[4];
 }

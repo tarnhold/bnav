@@ -36,6 +36,12 @@ bool SubframeBuffer::hasIncompleteData()
             || m_buffer[4].size() > 0;
 }
 
+/**
+ * @brief SubframeBuffer::checkLastSOW Check if the current SOW fits to the last
+ * one in the buffer.
+ * @param currentsow Current SOW.
+ * @param duration Duration of a Subframe.
+ */
 void SubframeBuffer::checkLastSOW(uint32_t currentsow, uint32_t duration)
 {
     // Last message SOW should fit the current one + 6s. So we can
