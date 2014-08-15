@@ -75,6 +75,7 @@ SubframeBuffer* SubframeBufferStore::getSubframeBuffer(const SvID &sv)
     if (it != m_store.end())
         return it->second;
 
+    assert(false); // who called this before adding the data?!
     return NULL;
 }
 
