@@ -12,7 +12,8 @@ SOURCES += main.cpp \
     testNavBitsECC.cpp \
     testSubframe.cpp \
     testSvID.cpp \
-    testSubframeBuffer.cpp
+    testSubframeBuffer.cpp \
+    testSubframeBufferStore.cpp
 
 LIBS += -lunittest++ -L../lib -lbnav
 

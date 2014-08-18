@@ -13,9 +13,9 @@
 
 // Test real data
 // Only for data sets from one single PRN
-SUITE(testSubframe_SBF_Superframe_OnePRN)
+SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 {
-    TEST(testSubframe_SuperframeD1)
+    TEST(testSubframeBuffer_SuperframeD1)
     {
         bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/subframebuffer/CUT12014071724.sbf_SBF_CMPRaw-prn6-onesuperframe.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
@@ -37,7 +37,6 @@ SUITE(testSubframe_SBF_Superframe_OnePRN)
 
             if (sfbuf.isEphemerisComplete())
             {
-                //bnav::SubframeBufferParam data = sfbuf.flushEphemerisData();
                 sfbuf.clearEphemerisData();
                 ++ephcount;
             }
@@ -49,7 +48,6 @@ SUITE(testSubframe_SBF_Superframe_OnePRN)
             }
 
             ++msgcount;
-           //std::cout << ephcount << std::endl;
         }
         CHECK(msgcount == 150);
         // we should have completed 30 ephemeris data sets
@@ -59,7 +57,7 @@ SUITE(testSubframe_SBF_Superframe_OnePRN)
         reader.close();
     }
 
-    TEST(testSubframe_SuperframeD2)
+    TEST(testSubframeBuffer_SuperframeD2)
     {
         bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/subframebuffer/CUT12014071724.sbf_SBF_CMPRaw-prn2-onesuperframe.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
@@ -94,7 +92,6 @@ SUITE(testSubframe_SBF_Superframe_OnePRN)
             }
 
             ++msgcount;
-            //std::cout << msgcount << std::endl;
         }
         CHECK(msgcount == 750);
         // we should have completed 30 ephemeris data sets

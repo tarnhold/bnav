@@ -27,7 +27,7 @@ void SubframeBufferD2::addSubframe(const Subframe &sf)
     const std::size_t fraid = sf.getFrameID();
     const std::size_t pnum = sf.getPageNum();
     const uint32_t sow = sf.getSOW();
-std::cout << "add D2" << std::endl;
+
     if (fraid == 1)
         checkLastSOW(sow, D2_FRAME_DURATION);
     else
