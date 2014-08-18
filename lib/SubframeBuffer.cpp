@@ -43,7 +43,17 @@ bool SubframeBuffer::hasIncompleteData()
  * @param duration Duration of a Subframe.
  */
 void SubframeBuffer::checkLastSOW(uint32_t currentsow, uint32_t duration)
-{
+{    
+    // special case: if last SOW is the last of the week
+    if ((m_lastsow + duration == 7*24*60*60) && (currentsow == 0))
+    {
+        std::cout << "Warning: SubframeBuffer: Week change!" << std::endl;
+
+        clearEphemerisData();
+        clearAlmanacData();
+        return;
+    }
+
     // Last message SOW should fit the current one + 6s. So we can
     // easily detect data gaps.
     if ((m_lastsow + duration != currentsow) && (m_lastsow > 0))
