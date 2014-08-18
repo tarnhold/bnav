@@ -116,7 +116,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
 // complete data set, with all PRNs
 SUITE(testSubframeBufferStore_SBF)
 {
-    TEST(testSubframeBufferStore)
+    TEST(testSubframeBufferStore15k)
     {
         bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/subframebuffer/CUT12014071724.sbf_SBF_CMPRaw-snip15k.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
@@ -166,6 +166,68 @@ SUITE(testSubframeBufferStore_SBF)
         {
             CHECK(it->first.isGeo());
             CHECK(it->second == 2);
+        }
+
+        // there should be incomplete data at EOF
+        CHECK(sbstore.hasIncompleteData());
+
+        reader.close();
+    }
+
+    TEST(testSubframeBufferStore20k)
+    {
+        bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/subframebuffer/CUT12014071324.sbf_SBF_CMPRaw-snip20k.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+
+        bnav::SubframeBufferStore sbstore;
+
+        std::size_t msgcount = 0;
+        std::map<bnav::SvID, std::size_t> ephcount;
+        std::map<bnav::SvID, std::size_t> almcount;
+
+        bnav::AsciiReaderEntry entry;
+        while (reader.readLine(entry))
+        {
+            if (entry.getSignalType() != bnav::SignalType::BDS_B1)
+                continue;
+
+            bnav::SvID sv(entry.getPRN());
+            bnav::Subframe sf(sv, entry.getTOW(), entry.getBits());
+
+            sbstore.addSubframe(sv, sf);
+            bnav::SubframeBuffer* sfbuf = sbstore.getSubframeBuffer(sv);
+
+            if (sfbuf->isEphemerisComplete())
+            {
+                sfbuf->clearEphemerisData();
+                ++ephcount[sv];
+            }
+
+            else if (sfbuf->isAlmanacComplete())
+            {
+                sfbuf->clearAlmanacData();
+                ++almcount[sv];
+            }
+
+            ++msgcount;
+        }
+        CHECK(msgcount == 10000);
+
+        // we should have ephemeris data from 5 geos and 3 non-geos
+        CHECK(ephcount.size() == 8);
+        for (auto it = ephcount.begin(); it != ephcount.end(); ++it)
+        {
+            CHECK(it->second == 37);
+        }
+
+        // we should only have a three complete data sets for GEOs
+        // and one completed for non-GEOs
+        for (auto it = almcount.cbegin(); it != almcount.cend(); ++it)
+        {
+            if (it->first.isGeo())
+                CHECK(it->second == 3);
+            else
+                CHECK(it->second == 1);
         }
 
         // there should be incomplete data at EOF
