@@ -59,11 +59,9 @@ int main(int argc, char **argv)
 
         bnav::SvID sv(data.getPRN());
 
-#if 0
         // skip non-GEO SVs
         if (!sv.isGeo())
             continue;
-#endif
 
         bnav::Subframe sf(sv, data.getTOW(), data.getBits());
 
