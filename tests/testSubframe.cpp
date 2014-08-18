@@ -79,7 +79,7 @@ SUITE(testSubframe_SBF_Simple)
 {
     TEST(testSubframe_SimpleD1)
     {
-        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn6-fraID.txt",
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn6-fraID.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
@@ -114,7 +114,7 @@ SUITE(testSubframe_SBF_Simple)
     // same as testSubframeFraIDSimpleD1, but with empty constructor
     TEST(testSubframe_SimpleD1_empty)
     {
-        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn6-fraID.txt",
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn6-fraID.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
@@ -154,7 +154,7 @@ SUITE(testSubframe_SBF_Simple)
 
     TEST(testSubframe_SimpleD2)
     {
-        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn2-fraID.txt",
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn2-fraID.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         std::size_t i = 0;
@@ -190,7 +190,7 @@ SUITE(testSubframe_SBF_OneFrame)
 {
     TEST(testSubframe_OneFrameD1)
     {
-        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn6-oneframe.txt",
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn6-oneframe.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         const uint32_t sowfirst = 346320;
@@ -238,7 +238,7 @@ SUITE(testSubframe_SBF_OneFrame)
 
     TEST(testSubframe_OneFrameD2)
     {
-        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/prn2-oneframe.txt",
+        bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn2-oneframe.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
         // set first sow
