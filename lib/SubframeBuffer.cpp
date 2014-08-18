@@ -20,6 +20,10 @@ SubframeBuffer::SubframeBuffer()
     m_buffer = SubframeVector(5);
 }
 
+SubframeBuffer::~SubframeBuffer()
+{
+}
+
 /**
  * @brief SubframeBuffer::hasIncompleteData Checks if there is any dataset left.
  *

@@ -49,6 +49,7 @@ protected:
 
 public:
     SubframeBuffer();
+    virtual ~SubframeBuffer() = 0;
 
     virtual void addSubframe(const Subframe &sf) = 0;
     bool hasIncompleteData();
@@ -73,6 +74,7 @@ class SubframeBufferD1 : public SubframeBuffer
 {
 public:
     SubframeBufferD1();
+    ~SubframeBufferD1();
 
     void addSubframe(const Subframe &sf);
 
@@ -90,6 +92,7 @@ class SubframeBufferD2 : public SubframeBuffer
 {
 public:
     SubframeBufferD2();
+    ~SubframeBufferD2();
 
     void addSubframe(const Subframe &sf);
 

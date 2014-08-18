@@ -13,6 +13,10 @@ SubframeBufferD1::SubframeBufferD1()
 {
 }
 
+SubframeBufferD1::~SubframeBufferD1()
+{
+}
+
 /**
  * @brief SubframeBuffer::addSubframe Add Subframe to buffer.
  *

@@ -16,6 +16,7 @@ class SubframeBufferStore
 
 public:
     SubframeBufferStore();
+    ~SubframeBufferStore();
 
     void addSubframe(const SvID &sv, const Subframe &sf);
 

@@ -1,7 +1,5 @@
 #include "SubframeBufferStore.h"
 
-#include <boost/scoped_ptr.hpp>
-
 namespace bnav
 {
 
@@ -16,6 +14,12 @@ SubframeBufferStore::SubframeBufferStore()
 {
 }
 
+SubframeBufferStore::~SubframeBufferStore()
+{
+    for (auto it = m_store.begin(); it != m_store.end(); ++it)
+        delete it->second;
+}
+
 /**
  * @brief SubframeBufferStore::addSvID Add SubframeBuffer to the storage.
  *
@@ -25,15 +29,12 @@ SubframeBufferStore::SubframeBufferStore()
  */
 void SubframeBufferStore::addSvID(const SvID &sv)
 {
-    //boost::scoped_ptr<SubframeBuffer*> sfbuf;
     SubframeBuffer* sfbuf;
 
     if (sv.isGeo())
         sfbuf = new SubframeBufferD2();
-        //sfbuf = boost::scoped_ptr<SubframeBufferD2*>(new SubframeBufferD2());
     else
         sfbuf = new SubframeBufferD1();
-        //sfbuf = boost::scoped_ptr<SubframeBufferD1*>(new SubframeBufferD1());
 
     m_store.emplace(sv, sfbuf);
 }
