@@ -1,7 +1,5 @@
 #include "NavBitsECC.h"
 
-#include <iostream>
-
 namespace
 {
     

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <stdio.h>
 #include <string>
 
 #include <boost/algorithm/string.hpp>

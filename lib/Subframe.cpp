@@ -3,6 +3,9 @@
 #include "BeiDou.h"
 #include "NavBitsECC.h"
 
+#include <cassert>
+#include <iostream>
+
 namespace bnav
 {
 

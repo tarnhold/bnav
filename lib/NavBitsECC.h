@@ -4,10 +4,11 @@
 #include "NavBits.h"
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include <iostream>
-#include <iomanip>
+//#include <iomanip>
 
 typedef bnav::NavBits<15> subword;
 
