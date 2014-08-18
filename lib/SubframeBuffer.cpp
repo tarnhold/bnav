@@ -1,4 +1,5 @@
 #include "SubframeBuffer.h"
+#include "BeiDou.h"
 
 namespace bnav
 {
@@ -49,7 +50,7 @@ bool SubframeBuffer::hasIncompleteData()
 void SubframeBuffer::checkLastSOW(uint32_t currentsow, uint32_t duration)
 {    
     // special case: if last SOW is the last of the week
-    if ((m_lastsow + duration == 7*24*60*60) && (currentsow == 0))
+    if ((m_lastsow + duration == SECONDS_OF_A_WEEK) && (currentsow == 0))
     {
         std::cout << "Warning: SubframeBuffer: Week change!" << std::endl;
 
