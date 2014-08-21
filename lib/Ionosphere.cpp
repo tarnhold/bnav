@@ -6,6 +6,12 @@
 
 namespace
 {
+// [1] 5.3.3.8.2 Grid Ionospheric Vertical Error Index (GIVEI)
+const double GIVEI_LOOKUP_TABLE[] = { 0.3, 0.6, 0.9, 1.2,
+                                      1.5, 1.8, 2.1, 2.4,
+                                      2.7, 3.0, 3.6, 4.5,
+                                      6.0, 9.0, 15.0, 45.0};
+
 template <std::size_t msb, std::size_t msb_len,
           std::size_t lsb, std::size_t lsb_len>
 bnav::NavBits<13> lcl_parsePageIon(const bnav::NavBits<300> &bits)
@@ -50,7 +56,11 @@ IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
     // last 4 bits are givei
     NavBits<4> givei = bits.getLeft<9, 4>();
 
-    m_dt = dt.to_ulong() * 0.125;
+    uint32_t ndt = dt.to_ulong();
+    // maximum value is 63.875m, which is 511 when scaled by 0.125
+    assert(ndt >= 0 && ndt <= 511);
+
+    m_dt = ndt * 0.125;
     m_givei = givei.to_ulong();
 
     assert(m_givei >= 0 && m_givei <= 15);
@@ -166,7 +176,7 @@ void Ionosphere::dump()
         {
             // calc IGP num formula: col * 10 + row
             // array index is then -1
-            std::cout << std::setw(10) << m_grid[col * 10 + row].get_dt();
+            std::cout << std::setw(10) << m_grid[col * 10 + row - 1].get_dt();
 
             ++igp_counter;
         }
@@ -184,7 +194,7 @@ void Ionosphere::dump()
         {
             // calc IGP num formula: col * 10 + row
             // array index is then -1
-            std::cout << std::setw(10) << m_grid[col * 10 + row].get_dt();
+            std::cout << std::setw(10) << m_grid[col * 10 + row - 1].get_dt();
 
             ++igp_counter;
         }
