@@ -38,7 +38,7 @@ public:
     Ionosphere(const SubframeBufferParam &sfbuf);
 
 private:
-    void parseIonospherePage(const NavBits<300> &bits);
+    void parseIonospherePage(const NavBits<300> &bits, bool lastpage);
 };
 
 } // namespace bnav

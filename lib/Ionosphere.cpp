@@ -92,70 +92,54 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
     // Pnum 1 to 13 and Pnum 61 to 73 of Frame 5 are Ionosphere in D2
     for (std::size_t i = 0; i < 13; ++i)
     {
-        // FIXME: Seite 13 ist anders!
         uint32_t pnum = vfra5[i].getPageNum();
         assert(pnum == i + 1);
 
         NavBits<300> bits = vfra5[i].getBits();
-        parseIonospherePage(bits);
 
-        std::cout << "pnum: " << pnum << std::endl;
+        // page 13 has reserved bits
+        parseIonospherePage(bits, pnum == 13);
+
+        //std::cout << "pnum: " << pnum << std::endl;
     }
+
+    // ensure we have all IGPs
+    assert(m_grid.size() == 160);
 
     // FIXME: Seite 73 ist auch wie 13, anders
 }
 
-void Ionosphere::parseIonospherePage(const NavBits<300> &bits)
+void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
 {
-    /*
-    2, 11
-    11, 2
-    13
-    7, 6
-    */
-
-    /*
-    NavBits<13> iono = bits.getLeft<50, 2>();
-    iono <<= 11;
-    NavBits<11> lsb = bits.getLeft<60, 11>();
-    iono ^= lsb;
-*/
     // Ion1
     m_grid.push_back(IonoGridInfo(lcl_parsePageIon<50, 2, 60, 11>(bits)));
-
     // Ion2
     m_grid.push_back(IonoGridInfo(lcl_parsePageIon<71, 11, 90, 2>(bits)));
-
     // Ion3
     m_grid.push_back(IonoGridInfo(bits.getLeft<92, 13>()));
-
     // Ion4
     m_grid.push_back(IonoGridInfo(lcl_parsePageIon<105, 7, 120, 6>(bits)));
 
+    // page 13 and 73 have no more data, bail out
+    if (lastpage)
+        return;
+
     // Ion5
     m_grid.push_back(IonoGridInfo(bits.getLeft<126, 13>()));
-
     // Ion6
     m_grid.push_back(IonoGridInfo(lcl_parsePageIon<139, 3, 150, 10>(bits)));
-
     // Ion7
     m_grid.push_back(IonoGridInfo(lcl_parsePageIon<160, 12, 180, 1>(bits)));
-
     // Ion8
     m_grid.push_back(IonoGridInfo(bits.getLeft<181, 13>()));
-
     // Ion9
     m_grid.push_back(IonoGridInfo(lcl_parsePageIon<194, 8, 210, 5>(bits)));
-
     // Ion10
     m_grid.push_back(IonoGridInfo(bits.getLeft<215, 13>()));
-
     // Ion11
     m_grid.push_back(IonoGridInfo(lcl_parsePageIon<228, 4, 240, 9>(bits)));
-
     // Ion12
     m_grid.push_back(IonoGridInfo(bits.getLeft<249, 13>()));
-
     // Ion13
     m_grid.push_back(IonoGridInfo(bits.getLeft<270, 13>()));
 
