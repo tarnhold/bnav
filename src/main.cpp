@@ -66,11 +66,13 @@ int main(int argc, char **argv)
 
         bnav::Subframe sf(sv, data.getTOW(), data.getBits());
 
+#if 0
         // debug
         std::cout << "prn: " << data.getPRN()
                   << " tow: " << data.getTOW() << " sow: " << sf.getSOW()
                   << " fra: " << sf.getFrameID() << " pnum: "
                   << sf.getPageNum() << std::endl;
+#endif
 
         sbstore.addSubframe(sv, sf);
 
@@ -79,7 +81,7 @@ int main(int argc, char **argv)
         if (sfbuf->isEphemerisComplete())
         {
             bnav::SubframeBufferParam data = sfbuf->flushEphemerisData();
-            std::cout << "eph complete" << std::endl;
+//            std::cout << "eph complete" << std::endl;
 #if 0
             bnav::Ephemeris eph(sv, data);
             ephstore.add(sv, eph);
@@ -91,6 +93,8 @@ int main(int argc, char **argv)
             std::cout << "almanac complete" << std::endl;
 
             bnav::Ionosphere iono(data);
+
+            iono.dump();
 
 #if 0
             bnav::Almanac alm(data);

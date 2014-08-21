@@ -89,24 +89,31 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
     // ensure there are all pages
     assert(vfra5.size() == 120);
 
-    // Pnum 1 to 13 and Pnum 61 to 73 of Frame 5 are Ionosphere in D2
-    for (std::size_t i = 0; i < 13; ++i)
+    // Pnum 1 to 13 of Frame 5
+    processPageBlock(vfra5, 0);
+    // ensure we have all IGPs
+    assert(m_grid.size() == 160);
+
+    // Pnum 61 to 73 of Frame 5
+    processPageBlock(vfra5, 60);
+    // ensure we have all IGPs
+    assert(m_grid.size() == 320);
+}
+
+void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t startpage)
+{
+    for (std::size_t i = startpage; i < startpage + 13; ++i)
     {
         uint32_t pnum = vfra5[i].getPageNum();
         assert(pnum == i + 1);
 
         NavBits<300> bits = vfra5[i].getBits();
 
-        // page 13 has reserved bits
-        parseIonospherePage(bits, pnum == 13);
+        // page 13 ash 73 have reserved bits at the end of message
+        parseIonospherePage(bits, pnum == 13 || pnum == 73);
 
         //std::cout << "pnum: " << pnum << std::endl;
     }
-
-    // ensure we have all IGPs
-    assert(m_grid.size() == 160);
-
-    // FIXME: Seite 73 ist auch wie 13, anders
 }
 
 void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
@@ -143,9 +150,47 @@ void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
     // Ion13
     m_grid.push_back(IonoGridInfo(bits.getLeft<270, 13>()));
 
-
     //std::cout << "iono: " << iono << std::endl;
     //std::cout << "dt: " << m_grid.back().get_dt() << " givei: " << m_grid.back().get_give_index() << " give: " << m_grid.back().get_give() << std::endl;
+}
+
+void Ionosphere::dump()
+{
+    std::size_t igp_counter = 1;
+
+    std::cout << "IGP <= 160" << std::endl;
+    // IGP <= 160
+    for (std::size_t row = 10; row > 0; --row)
+    {
+        for (std::size_t col = 0; col <= 15; ++col)
+        {
+            // calc IGP num formula: col * 10 + row
+            // array index is then -1
+            std::cout << std::setw(10) << m_grid[col * 10 + row].get_dt();
+
+            ++igp_counter;
+        }
+
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    std::cout << "IGP > 160" << std::endl;
+    // IGP > 160
+    for (std::size_t row = 170; row > 160; --row)
+    {
+        for (std::size_t col = 0; col <= 15; ++col)
+        {
+            // calc IGP num formula: col * 10 + row
+            // array index is then -1
+            std::cout << std::setw(10) << m_grid[col * 10 + row].get_dt();
+
+            ++igp_counter;
+        }
+
+        std::cout << std::endl;
+    }
 }
 
 } // namespace bnav
