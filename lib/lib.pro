@@ -16,7 +16,8 @@ SOURCES += \
     SubframeBufferD1.cpp \
     SubframeBuffer.cpp \
     SubframeBufferD2.cpp \
-    Benchmark.cpp
+    Benchmark.cpp \
+    Ionosphere.cpp
 
 HEADERS += \
     AsciiReader.h \
@@ -29,5 +30,6 @@ HEADERS += \
     BeiDou.h \
     SubframeBufferStore.h \
     SubframeBuffer.h \
-    Benchmark.h
+    Benchmark.h \
+    Ionosphere.h
 

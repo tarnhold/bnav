@@ -1,5 +1,6 @@
 #include "AsciiReader.h"
 #include "BeiDou.h"
+#include "Ionosphere.h"
 #include "Subframe.h"
 #include "SubframeBuffer.h"
 #include "SubframeBufferStore.h"
@@ -79,28 +80,20 @@ int main(int argc, char **argv)
         {
             bnav::SubframeBufferParam data = sfbuf->flushEphemerisData();
             std::cout << "eph complete" << std::endl;
-
 #if 0
-            bnav::SubframeBufferParam data = sfbuf.getAlmanacData(sv);
-
             bnav::Ephemeris eph(sv, data);
-#endif
-#if 0
             ephstore.add(sv, eph);
 #endif
         }
         else if (sfbuf->isAlmanacComplete())
         {
-            sfbuf->clearAlmanacData();
+            bnav::SubframeBufferParam data = sfbuf->flushAlmanacData();
             std::cout << "almanac complete" << std::endl;
 
-#if 0
-            bnav::SubframeBufferParam data = sfbuf.getAlmanacData(sv);
-
             bnav::Ionosphere iono(data);
-            bnav::Almanac alm(data);
-#endif
+
 #if 0
+            bnav::Almanac alm(data);
             ionoStore.add(sv, iono);
 #endif
         }

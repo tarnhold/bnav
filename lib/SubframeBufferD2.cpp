@@ -51,6 +51,7 @@ void SubframeBufferD2::addSubframe(const Subframe &sf)
     m_lastsow = sow;
 
     // skip integrity data frames, this is not implemented
+    // skip frame 4, as there is no data in it atm
     if (fraid > 1 && fraid < 5)
         return;
 
@@ -98,7 +99,7 @@ bool SubframeBufferD2::isAlmanacComplete() const
 
 SubframeBufferParam SubframeBufferD2::flushEphemerisData()
 {
-    SubframeVector ephdata;
+    SubframeVectorVector ephdata;
     // D2: all ephemeris data is inside subframe 1
     ephdata.push_back(m_buffer[0]);
 
@@ -113,7 +114,7 @@ SubframeBufferParam SubframeBufferD2::flushEphemerisData()
 
 SubframeBufferParam SubframeBufferD2::flushAlmanacData()
 {
-    SubframeVector almdata;
+    SubframeVectorVector almdata;
     almdata.push_back(m_buffer[4]);
 
     // ensure correct data sets, should not be possible!

@@ -101,7 +101,7 @@ bool SubframeBufferD1::isAlmanacComplete() const
  */
 SubframeBufferParam SubframeBufferD1::flushEphemerisData()
 {
-    SubframeVector ephdata;
+    SubframeVectorVector ephdata;
 
     // D1: first, second and third frame contain ephemeris data
     for (std::size_t i = 0; i <= 2; ++i)
@@ -125,7 +125,7 @@ SubframeBufferParam SubframeBufferD1::flushEphemerisData()
  */
 SubframeBufferParam SubframeBufferD1::flushAlmanacData()
 {
-    SubframeVector almdata;
+    SubframeVectorVector almdata;
 
     for (std::size_t i = 3; i <= 4; ++i)
     {
