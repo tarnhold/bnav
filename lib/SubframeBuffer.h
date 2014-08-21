@@ -8,7 +8,8 @@
 namespace bnav
 {
 
-using SubframeVector = std::vector< std::vector< Subframe > >;
+using SubframeVector = std::vector< Subframe >;
+using SubframeVectorVector = std::vector< std::vector< Subframe > >;
 
 enum class SubframeBufferType
 {
@@ -24,7 +25,7 @@ enum class SubframeBufferType
 struct SubframeBufferParam
 {
     SubframeBufferType type;
-    SubframeVector data;
+    SubframeVectorVector data;
 
     SubframeBufferParam()
         : type(SubframeBufferType::NONE)
@@ -32,7 +33,7 @@ struct SubframeBufferParam
     {
     }
 
-    SubframeBufferParam(SubframeBufferType rtype, const SubframeVector &vec)
+    SubframeBufferParam(SubframeBufferType rtype, const SubframeVectorVector &vec)
         : type(rtype)
         , data(vec)
     {
@@ -43,7 +44,7 @@ class SubframeBuffer
 {
 protected:
     // save: frame< pages >
-    SubframeVector m_buffer;
+    SubframeVectorVector m_buffer;
 
     uint32_t m_lastsow;
 

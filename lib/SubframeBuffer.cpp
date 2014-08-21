@@ -18,7 +18,7 @@ SubframeBuffer::SubframeBuffer()
     : m_lastsow(0)
 {
     // reserve space for five subframes
-    m_buffer = SubframeVector(5);
+    m_buffer = SubframeVectorVector(5);
 }
 
 SubframeBuffer::~SubframeBuffer()
