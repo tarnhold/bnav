@@ -7,9 +7,7 @@ TARGET = bnav
 
 SOURCES += \
     AsciiReader.cpp \
-    NavBits.cpp \
     Subframe.cpp \
-    NavBitsECC.cpp \
     SvID.cpp \
     AsciiReaderEntry.cpp \
     SubframeBufferStore.cpp \
