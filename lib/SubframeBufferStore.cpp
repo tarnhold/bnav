@@ -14,6 +14,11 @@ SubframeBufferStore::SubframeBufferStore()
 {
 }
 
+/**
+ * @brief SubframeBufferStore::~SubframeBufferStore
+ *
+ * Clean up underlying SubframeBuffers if store gets destroyed.
+ */
 SubframeBufferStore::~SubframeBufferStore()
 {
     for (auto it = m_store.begin(); it != m_store.end(); ++it)

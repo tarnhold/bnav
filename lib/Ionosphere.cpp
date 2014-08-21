@@ -50,6 +50,7 @@ namespace bnav
  * [1]. 5.3.3.8 Ionospheric Grid Information (Ion)
  */
 IonoGridInfo::IonoGridInfo()
+// TODO: initialize correctly (not with 0, because this is a valid value)
 {
 }
 
