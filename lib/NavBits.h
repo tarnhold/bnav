@@ -41,8 +41,8 @@ public:
      * @param bitset bitset with same dimension as NavBits.
      */
     NavBits(const std::bitset<dim> & bitset)
+        : m_bitset(bitset)
     {
-        m_bitset = bitset;
     }
 
     /**
@@ -51,8 +51,8 @@ public:
      */
     template <std::size_t len>
     NavBits(const std::bitset<len> & bitset)
+        : m_bitset(std::bitset<dim>(bitset.to_string()))
     {
-        m_bitset = std::bitset<dim>(bitset.to_string());
     }
 
     /**
@@ -60,8 +60,8 @@ public:
      * @param bits NavBits with the same size.
      */
     NavBits(const NavBits<dim> & bits)
+        : m_bitset(bits.getBits())
     {
-        m_bitset = bits.getBits();
     }
 
     /**

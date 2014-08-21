@@ -16,7 +16,8 @@ namespace bnav
  */
 
 Subframe::Subframe()
-    : m_tow(0)
+    : m_bits()
+    , m_tow(0)
     , m_sow(0)
     , m_frameID(0)
     , m_pageNum(0)
@@ -28,7 +29,8 @@ Subframe::Subframe()
 }
 
 Subframe::Subframe(const SvID &sv, const uint32_t tow, const NavBits<300> &bits)
-    : m_tow(tow)
+    : m_bits(bits)
+    , m_tow(tow)
     , m_sow(0)
     , m_frameID(0)
     , m_pageNum(0)
@@ -37,8 +39,6 @@ Subframe::Subframe(const SvID &sv, const uint32_t tow, const NavBits<300> &bits)
     , m_isParityAllFixed(false)
     , m_isInitialized(false)
 {
-    m_bits = bits;
-
     initialize();
 }
 
