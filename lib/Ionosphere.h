@@ -32,6 +32,7 @@ public:
     Ionosphere(const SubframeBufferParam &sfbuf);
 
     void dump();
+    void dump2();
 
 private:
     void processPageBlock(const SubframeVector &vfra5, const std::size_t startpage);

@@ -12,6 +12,11 @@ const double GIVEI_LOOKUP_TABLE[] = { 0.3, 0.6, 0.9, 1.2,
                                       2.7, 3.0, 3.6, 4.5,
                                       6.0, 9.0, 15.0, 45.0};
 
+/**
+ * Parse an 13 bit ionospheric info element (dt and givei), which is splitted by
+ * parity information. This helper is used to collect msb and lsb blocks and
+ * to merge them.
+ */
 template <std::size_t msb, std::size_t msb_len,
           std::size_t lsb, std::size_t lsb_len>
 bnav::NavBits<13> lcl_parsePageIon(const bnav::NavBits<300> &bits)
@@ -83,6 +88,8 @@ double IonoGridInfo::get_give() const
 
 /**
  * @brief The Ionosphere class
+ *
+ * Stores IGP data into a single row vector.
  */
 Ionosphere::Ionosphere()
 {
@@ -110,6 +117,15 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
     assert(m_grid.size() == 320);
 }
 
+/**
+ * @brief Ionosphere::processPageBlock Process one block of ionospheric pages.
+ *
+ * Both IGP tables are at separate page blocks: IGP<=160 is at pages 1 to 13
+ * and IGP>160 is at 61 to 73.
+ *
+ * @param vfra5 SubframeVector of all 120 pages of frame 5.
+ * @param startpage Index where the block starts.
+ */
 void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t startpage)
 {
     for (std::size_t i = startpage; i < startpage + 13; ++i)
@@ -126,6 +142,11 @@ void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t
     }
 }
 
+/**
+ * @brief Ionosphere::parseIonospherePage Parse one page of ionospheric info.
+ * @param bits message NavBits.
+ * @param lastpage true, if this is page 13 or 73.
+ */
 void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
 {
     // Ion1
@@ -164,10 +185,35 @@ void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
     //std::cout << "dt: " << m_grid.back().get_dt() << " givei: " << m_grid.back().get_give_index() << " give: " << m_grid.back().get_give() << std::endl;
 }
 
+/**
+ * @brief Ionosphere::dump Dump complete IGP table.
+ */
 void Ionosphere::dump()
 {
-    std::size_t igp_counter = 1;
+    for (std::size_t row = 10; row > 0; --row)
+    {
+        // we use a single row vector for m_grid:
+        // table 0 is IGP <= 160
+        // table 1 is IGP > 160 -> has an offset of 160
+        for (std::size_t table = 0; table <= 1; ++table)
+        {
+            for (std::size_t col = 0; col <= 15; ++col)
+            {
+                // calc IGP num formula: col * 10 + row
+                // + table * 160, to access both IGP tables
+                // array index is then -1
+                std::cout << std::setw(10) << m_grid[col * 10 + (table * 160) + row - 1].get_dt();
+            }
+            std::cout << std::endl;
+        }
+    }
+}
 
+/**
+ * @brief Ionosphere::dump2 Dump two IGP tables (<=160 and >160).
+ */
+void Ionosphere::dump2()
+{
     std::cout << "IGP <= 160" << std::endl;
     // IGP <= 160
     for (std::size_t row = 10; row > 0; --row)
@@ -177,15 +223,11 @@ void Ionosphere::dump()
             // calc IGP num formula: col * 10 + row
             // array index is then -1
             std::cout << std::setw(10) << m_grid[col * 10 + row - 1].get_dt();
-
-            ++igp_counter;
         }
-
         std::cout << std::endl;
     }
 
     std::cout << std::endl;
-
     std::cout << "IGP > 160" << std::endl;
     // IGP > 160
     for (std::size_t row = 170; row > 160; --row)
@@ -195,10 +237,7 @@ void Ionosphere::dump()
             // calc IGP num formula: col * 10 + row
             // array index is then -1
             std::cout << std::setw(10) << m_grid[col * 10 + row - 1].get_dt();
-
-            ++igp_counter;
         }
-
         std::cout << std::endl;
     }
 }
