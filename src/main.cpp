@@ -1,6 +1,7 @@
 #include "AsciiReader.h"
 #include "BeiDou.h"
 #include "Ionosphere.h"
+#include "IonosphereStore.h"
 #include "Subframe.h"
 #include "SubframeBuffer.h"
 #include "SubframeBufferStore.h"
@@ -46,8 +47,9 @@ int main(int argc, char **argv)
         std::perror(("Error: Could not open file: " + filename).c_str());
 
     bnav::SubframeBufferStore sbstore;
+    bnav::IonosphereStore ionostore;
+
 #if 0
-    bnav::IonosphereStore ionoStore;
     bnav::EphemerisStore ephStore;
 #endif
 
@@ -96,12 +98,13 @@ int main(int argc, char **argv)
 
             iono.dump();
 
-            bnav::Ionosphere ionoclone(data);
-            std::cout << (ionoclone == iono) << std::endl;
+            //bnav::Ionosphere ionoclone(data);
+            //std::cout << (ionoclone == iono) << std::endl;
 
+            ionostore.addIonosphere(sv, iono);
 #if 0
             bnav::Almanac alm(data);
-            ionoStore.add(sv, iono);
+
 #endif
         }
     }
