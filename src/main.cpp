@@ -96,6 +96,9 @@ int main(int argc, char **argv)
 
             iono.dump();
 
+            bnav::Ionosphere ionoclone(data);
+            std::cout << (ionoclone == iono) << std::endl;
+
 #if 0
             bnav::Almanac alm(data);
             ionoStore.add(sv, iono);

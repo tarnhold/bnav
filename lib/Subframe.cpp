@@ -161,6 +161,27 @@ bool Subframe::checkAndFixParityWordOne()
 
 bool Subframe::checkAndFixParityAll()
 {
+#if 0
+    if (m_isGeo && m_frameID == 5)
+    {
+        if ((m_pageNum > 0 && m_pageNum <= 13)
+                && (m_pageNum >= 35 && m_pageNum <= 73))
+        {
+            NavBits<270> remaining = m_bits.getLeft<30, 270>();
+            NavBitsECC<15> ecc(remaining);
+            ecc.checkAndFixAll();
+            if (ecc.isModified())
+            {
+                std::cerr << "Parity fixed for TOW: " << m_tow << std::endl;
+                remaining = ecc.getBits();
+        // FIXME currently only checked, not further used (corrected data should be
+        // saved back into NavBits
+            }
+
+        }
+    }
+#endif
+
     // TODO remaining parities are ignored at the moment
     m_isParityAllFixed = false;
     return m_isParityAllFixed;

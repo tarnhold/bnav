@@ -121,6 +121,14 @@ SubframeBufferParam SubframeBufferD2::flushAlmanacData()
     assert(m_buffer[4].front().getPageNum() == 1);
     assert(m_buffer[4].back().getPageNum() == D2_FRAME_SIZE[4]);
 
+#if 0
+    // seems not neccessary at the moment, only minimal error count in sbf data
+    for (auto it = m_buffer[4].begin(); it != m_buffer[4].end(); ++it)
+    {
+        it->checkAndFixParityAll();
+    }
+#endif
+
     clearAlmanacData();
 
     return SubframeBufferParam(SubframeBufferType::D2_ALMANAC, almdata);

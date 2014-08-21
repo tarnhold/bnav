@@ -86,12 +86,19 @@ double IonoGridInfo::get_give() const
     return GIVEI_LOOKUP_TABLE[m_givei];
 }
 
+bool IonoGridInfo::operator==(const IonoGridInfo &rhs) const
+{
+    return rhs.get_dt() == m_dt
+           && rhs.get_give_index() == m_givei;
+}
+
 /**
  * @brief The Ionosphere class
  *
  * Stores IGP data into a single row vector.
  */
 Ionosphere::Ionosphere()
+    : m_sow(0)
 {
 }
 
@@ -115,6 +122,10 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
     processPageBlock(vfra5, 60);
     // ensure we have all IGPs
     assert(m_grid.size() == 320);
+
+    // date of issue of ionospheric model is at page 1 of subframe 1
+    // [1] 5.3.3.1 Basic NAV Information, p. 68
+    m_sow = vfra5.front().getSOW();
 }
 
 /**
@@ -186,13 +197,43 @@ void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
 }
 
 /**
+ * @brief Ionosphere::getSOW Get issue date of ionospheric model.
+ * @return SOW.
+ */
+uint32_t Ionosphere::getSOW() const
+{
+    return m_sow;
+}
+
+/**
+ * @brief getGrid Return the raw iono grid as single row vector.
+ * @return vector of IonoGridInfo.
+ */
+std::vector<IonoGridInfo> Ionosphere::getGrid() const
+{
+    return m_grid;
+}
+
+/**
+ * @brief Ionosphere::operator== Checks if two Ionospheric models are the same.
+ * @param iono Ionosphere model.
+ * @return true, if equal. false, if not.
+ */
+bool Ionosphere::operator==(const Ionosphere &iono) const
+{
+    assert(iono.getGrid().size() == m_grid.size());
+    return (iono.getGrid() == m_grid);
+}
+
+/**
  * @brief Ionosphere::dump Dump complete IGP table.
  */
 void Ionosphere::dump()
 {
+    std::cout << "DoI: " << m_sow << std::endl;
     for (std::size_t row = 10; row > 0; --row)
     {
-        // we use a single row vector for m_grid:
+        // we use a single row vector for m_grid
         // table 0 is IGP <= 160
         // table 1 is IGP > 160 -> has an offset of 160
         for (std::size_t table = 0; table <= 1; ++table)
@@ -214,6 +255,7 @@ void Ionosphere::dump()
  */
 void Ionosphere::dump2()
 {
+    std::cout << "DoI: " << m_sow << std::endl;
     std::cout << "IGP <= 160" << std::endl;
     // IGP <= 160
     for (std::size_t row = 10; row > 0; --row)
