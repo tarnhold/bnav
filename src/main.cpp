@@ -1,5 +1,6 @@
 #include "AsciiReader.h"
 #include "BeiDou.h"
+#include "Ephemeris.h"
 #include "Ionosphere.h"
 #include "IonosphereStore.h"
 #include "Subframe.h"
@@ -83,9 +84,10 @@ int main(int argc, char **argv)
         if (sfbuf->isEphemerisComplete())
         {
             bnav::SubframeBufferParam data = sfbuf->flushEphemerisData();
-//            std::cout << "eph complete" << std::endl;
+            std::cout << "eph complete" << std::endl;
+
+            bnav::Ephemeris eph(data);
 #if 0
-            bnav::Ephemeris eph(sv, data);
             ephstore.add(sv, eph);
 #endif
         }

@@ -105,6 +105,9 @@ Ionosphere::Ionosphere()
 
 Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
 {
+    // TODO in load() schieben
+    // unter die klasse etwas abstrahieren, damit eph/alm zusammenpassen
+
     // ensure correct type
     assert(sfbuf.type == SubframeBufferType::D2_ALMANAC);
     // ensure there is one subframe
@@ -126,6 +129,7 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
 
     // date of issue of ionospheric model is at page 1 of subframe 1
     // [1] 5.3.3.1 Basic NAV Information, p. 68
+// FIXME: this gets it from subframe 5...
     m_sow = vfra5.front().getSOW();
 }
 

@@ -34,6 +34,8 @@ public:
     Ionosphere();
     Ionosphere(const SubframeBufferParam &sfbuf);
 
+// TODO    void load(const SubframeBufferParam &sfbuf);
+
     uint32_t getSOW() const;
     std::vector<IonoGridInfo> getGrid() const;
 
