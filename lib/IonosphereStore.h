@@ -10,6 +10,7 @@
 namespace bnav
 {
 
+//TODO: class template -> eph,alm,..Store are all nearly identical
 class IonosphereStore
 {
     std::map<SvID, std::map< uint32_t, Ionosphere > > m_store;

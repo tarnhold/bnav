@@ -47,7 +47,7 @@ void IonosphereStore::addSvID(const SvID &sv)
  * Automatically adds a new storage object, if a given SvID is not known.
  *
  * @param sv The SvID.
- * @param sf The Ionosphere object.
+ * @param iono The Ionosphere object.
  */
 void IonosphereStore::addIonosphere(const SvID &sv, const Ionosphere &iono)
 {

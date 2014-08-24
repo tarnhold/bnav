@@ -88,8 +88,15 @@ public:
         m_bitset = std::bitset<dim>(val);
     }
 
-    ~NavBits()
+    /**
+     * @brief operator= Copy assignment operator.
+     * @param rhs NavBits.
+     * @return Pointer to this object.
+     */
+    NavBits<dim>& operator=(const NavBits<dim> &rhs)
     {
+        m_bitset = rhs.getBits();
+        return *this;
     }
 
     /** Access from right - LSB is [0] **/

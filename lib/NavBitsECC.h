@@ -18,7 +18,7 @@ namespace
 /*
  * [1] Table 5-2 ROM table list for error correction
  */
-static const std::vector< uint16_t > cROMTable = {
+const uint16_t cROMTable[] = {
     0x0000, 0x0001, 0x0002, 0x0010, // 0 - 3
     0x0004, 0x0100, 0x0020, 0x0400, // 4 - 7
     0x0008, 0x4000, 0x0200, 0x0080, // 8 - 11
@@ -31,7 +31,7 @@ static const std::vector< uint16_t > cROMTable = {
  *
  * [1] Chapter 5.1.3 Data Error Correction Code Mode
  *
- * @param 15 bits of a navigation message (11+4)
+ * @param message 15 bits of a navigation message (11+4)
  * @return Index value of the ROM table
  *
  */
@@ -52,7 +52,7 @@ static inline std::size_t decodeBCH(const subword &message)
     }
 
     // put all together
-    return d0 + (d1 << 1) + (d2 << 2) + (d3 << 3);
+    return static_cast<std::size_t>(d0 + (d1 << 1) + (d2 << 2) + (d3 << 3));
 }
 
 /*!
@@ -97,9 +97,9 @@ template <std::size_t len>
 class NavBitsECC
 {
 private:
-    NavBits<len> m_bits;                          //< raw message bits
-    std::vector< subword > m_msglist;     //< bit split into 15 bit parts
-    std::size_t m_counter; //< how many subwords got fixed
+    NavBits<len> m_bits; ///< raw message bits
+    std::vector< subword > m_msglist; ///< bit split into 15 bit parts
+    std::size_t m_counter; ///< how many subwords got fixed
 
 public:
     NavBitsECC(const NavBits<len> &bits);
@@ -221,7 +221,7 @@ template <std::size_t len>
 /*!
  * Concatenate an array (11+4,11+4,...) back to 11+11+...+4+4+...
  *
- * @TODO: don't use to_string()!
+ * TODO: don't use to_string()!
  */
 template <std::size_t len>
 std::string NavBitsECC<len>::mergeMessage(/*std::vector< subword > msglist*/)

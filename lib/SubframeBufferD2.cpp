@@ -3,10 +3,10 @@
 namespace bnav
 {
 
-static const std::vector< std::size_t > D2_FRAME_SIZE = {10, 6, 6, 6, 120};
+const std::size_t D2_FRAME_SIZE[] = {10, 6, 6, 6, 120};
 // one frame has a duration of 3s (0.6s * 5)
 // D2 has the same SOW for all subframes of one frame
-static const uint32_t D2_FRAME_DURATION = 3;
+const uint32_t D2_FRAME_DURATION = 3;
 
 SubframeBufferD2::SubframeBufferD2()
 {

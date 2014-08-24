@@ -5,9 +5,9 @@
 namespace bnav
 {
 
-static const std::vector< std::size_t > D1_FRAME_SIZE = {1, 1, 1, 24, 24};
+const std::size_t D1_FRAME_SIZE[] = {1, 1, 1, 24, 24};
 // one subframe has a duration of 6s
-static const uint32_t D1_SUBFRAME_DURATION = 6;
+const uint32_t D1_SUBFRAME_DURATION = 6;
 
 SubframeBufferD1::SubframeBufferD1()
 {

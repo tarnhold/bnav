@@ -83,24 +83,24 @@ int main(int argc, char **argv)
 
         if (sfbuf->isEphemerisComplete())
         {
-            bnav::SubframeBufferParam data = sfbuf->flushEphemerisData();
-            std::cout << "eph complete" << std::endl;
+            bnav::SubframeBufferParam bdata = sfbuf->flushEphemerisData();
+//            std::cout << "eph complete" << std::endl;
 
-            bnav::Ephemeris eph(data);
+//            bnav::Ephemeris eph(bdata);
 #if 0
             ephstore.add(sv, eph);
 #endif
         }
         else if (sfbuf->isAlmanacComplete())
         {
-            bnav::SubframeBufferParam data = sfbuf->flushAlmanacData();
+            bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             std::cout << "almanac complete" << std::endl;
 
-            bnav::Ionosphere iono(data);
+            bnav::Ionosphere iono(bdata);
 
             iono.dump();
 
-            //bnav::Ionosphere ionoclone(data);
+            //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
 
             ionostore.addIonosphere(sv, iono);

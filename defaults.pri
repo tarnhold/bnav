@@ -6,8 +6,15 @@ QMAKE_CXXFLAGS += -std=c++11 \
         -Wextra \
         -Wundef \
         -Wunused-macros \
+        -Wfloat-equal \
+        -Wshadow \
+        -Wsign-conversion \
+        -Wdeprecated \
+        -Wdocumentation \
+        #-Weverything \
+        -Wno-c++98-compat \
         -fmessage-length=0 \
-        -fno-common
+        -fno-common \
 
 HEADERS +=
 
