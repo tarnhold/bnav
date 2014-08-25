@@ -19,10 +19,13 @@ public:
      IonoGridInfo();
      IonoGridInfo(const NavBits<13> &bits);
 
-     double get_dt() const;
-     uint32_t get_dtInTECU() const;
-     uint32_t get_give_index() const;
-     double get_give() const;
+     uint32_t getVerticalDelay_TECU() const;
+     uint32_t getGive_TECU() const;
+#if 0
+     uint32_t getGiveIndex() const;
+     double getVerticalDelay_Meter() const;
+     double getGive_Meter() const;
+#endif
 
      bool operator==(const IonoGridInfo &rhs) const;
 };
@@ -43,8 +46,8 @@ public:
 
     bool operator==(const Ionosphere &iono) const;
 
-    void dump();
-    void dump2();
+    void dump(bool rms = false);
+    void dump2(bool rms = false);
 
 private:
     void processPageBlock(const SubframeVector &vfra5, const std::size_t startpage);

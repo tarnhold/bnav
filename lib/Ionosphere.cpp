@@ -86,16 +86,18 @@ IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
     assert(m_givei >= 0 && m_givei <= 15);
 }
 
-double IonoGridInfo::get_dt() const
+#if 0
+double IonoGridInfo::getVerticalDelay_Meter() const
 {
     return m_dt;
 }
+#endif
 
 /**
- * @brief IonoGridInfo::getTECU Return ionospheric delay as 0.1 TECU.
+ * @brief IonoGridInfo::getVerticalDelay_TECU Return ionospheric delay as 0.1 TECU.
  * @return TECU value, 9999 if not available.
  */
-uint32_t IonoGridInfo::get_dtInTECU() const
+uint32_t IonoGridInfo::getVerticalDelay_TECU() const
 {
     if (m_dtraw == 510 || m_dtraw == 511)
         return 9999;
@@ -103,20 +105,37 @@ uint32_t IonoGridInfo::get_dtInTECU() const
     return lcl_convertMeterToTECU(m_dt, BDS_B1I_FREQ);
 }
 
-uint32_t IonoGridInfo::get_give_index() const
+/**
+ * @brief IonoGridInfo::getGive_TECU Return delay correction accuracy as 0.1 TECU.
+ * @return TECU value.
+ */
+uint32_t IonoGridInfo::getGive_TECU() const
+{
+    // according to the ICD there are no invalid values, but invalid dt values
+    // get GIVEI 15, so set this to invalid, too
+    if (m_givei == 15)
+        return 9999;
+
+    return lcl_convertMeterToTECU(
+                GIVEI_LOOKUP_TABLE[m_givei], BDS_B1I_FREQ);
+}
+
+#if 0
+uint32_t IonoGridInfo::getGiveIndex() const
 {
     return m_givei;
 }
 
-double IonoGridInfo::get_give() const
+double IonoGridInfo::getGive_Meter() const
 {
     return GIVEI_LOOKUP_TABLE[m_givei];
 }
+#endif
 
 bool IonoGridInfo::operator==(const IonoGridInfo &rhs) const
 {
-    return rhs.get_dtInTECU() == get_dtInTECU()
-           && rhs.get_give_index() == m_givei;
+    return rhs.getVerticalDelay_TECU() == getVerticalDelay_TECU()
+           && rhs.getGive_TECU() == getGive_TECU();
 }
 
 /**
@@ -258,8 +277,9 @@ bool Ionosphere::operator==(const Ionosphere &iono) const
 
 /**
  * @brief Ionosphere::dump Dump complete IGP table.
+ * @param rms Whether to print vertical delay or its RMS (GIVEI).
  */
-void Ionosphere::dump()
+void Ionosphere::dump(bool rms)
 {
     std::cout << "DoI: " << m_sow << std::endl;
     for (std::size_t row = 10; row > 0; --row)
@@ -274,7 +294,9 @@ void Ionosphere::dump()
                 // calc IGP num formula: col * 10 + row
                 // + table * 160, to access both IGP tables
                 // array index is then -1
-                std::cout << std::setw(5) << m_grid[col * 10 + (table * 160) + row - 1].get_dtInTECU();
+                std::size_t index = col * 10 + (table * 160) + row - 1;
+                std::cout << std::setw(5)
+                          << (rms ? m_grid[index].getGive_TECU() : m_grid[index].getVerticalDelay_TECU());
             }
             std::cout << std::endl;
         }
@@ -284,7 +306,7 @@ void Ionosphere::dump()
 /**
  * @brief Ionosphere::dump2 Dump two IGP tables (<=160 and >160).
  */
-void Ionosphere::dump2()
+void Ionosphere::dump2(bool rms)
 {
     std::cout << "DoI: " << m_sow << std::endl;
     std::cout << "IGP <= 160" << std::endl;
@@ -295,7 +317,9 @@ void Ionosphere::dump2()
         {
             // calc IGP num formula: col * 10 + row
             // array index is then -1
-            std::cout << std::setw(5) << m_grid[col * 10 + row - 1].get_dtInTECU();
+            std::size_t index = col * 10 + row - 1;
+            std::cout << std::setw(5)
+                      << (rms ? m_grid[index].getGive_TECU() : m_grid[index].getVerticalDelay_TECU());
         }
         std::cout << std::endl;
     }
@@ -309,7 +333,9 @@ void Ionosphere::dump2()
         {
             // calc IGP num formula: col * 10 + row
             // array index is then -1
-            std::cout << std::setw(5) << m_grid[col * 10 + row - 1].get_dtInTECU();
+            std::size_t index = col * 10 + row - 1;
+            std::cout << std::setw(5)
+                      << (rms ? m_grid[index].getGive_TECU() : m_grid[index].getVerticalDelay_TECU());
         }
         std::cout << std::endl;
     }

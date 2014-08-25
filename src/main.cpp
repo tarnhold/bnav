@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 
             bnav::Ionosphere iono(bdata);
 
-            iono.dump();
+            iono.dump2();
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
