@@ -20,7 +20,7 @@ enum class TimeSystem
 
 class DateTime
 {
-    TimeSystem m_tsys;
+    TimeSystem m_tsys; ///< Time system
     boost::posix_time::ptime m_time; ///< Date and Time store
 
 public:

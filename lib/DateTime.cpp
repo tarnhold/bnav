@@ -5,12 +5,22 @@
 namespace bnav
 {
 
+/**
+ * @brief DateTime::DateTime Default constructor.
+ */
 DateTime::DateTime()
     : m_tsys(TimeSystem::NONE)
     , m_time()
 {
 }
 
+/**
+ * @brief DateTime::DateTime Set date and time from weeknum and SOw.
+ * @param ts TimeSystem, to which weeknum, SOW and millisec refer.
+ * @param weeknum Weeks since reference epoch.
+ * @param sow Seconds of current week.
+ * @param millisec Milliseconds part.
+ */
 DateTime::DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
     : m_tsys(ts)
     , m_time()
@@ -18,11 +28,21 @@ DateTime::DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t s
     setWeekAndSOW(weeknum, sow, millisec);
 }
 
+/**
+ * @brief DateTime::setTimeSystem Set time system
+ * @param ts TimeSystem.
+ */
 void DateTime::setTimeSystem(const TimeSystem ts)
 {
     m_tsys = ts;
 }
 
+/**
+ * @brief DateTime::setWeekAndSOW Set date by weeknum and SOW.
+ * @param weeknum Week since reference epoch.
+ * @param sow Seconds of current week.
+ * @param millisec Milliseconds part.
+ */
 void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
 {
     boost::gregorian::date d0;
@@ -61,11 +81,19 @@ void DateTime::setToCurrentDateTimeUTC()
    m_time = now;
 }
 
+/**
+ * @brief DateTime::getTimeSystem Return the current time system.
+ * @return TimeSystem
+ */
 TimeSystem DateTime::getTimeSystem() const
 {
     return m_tsys;
 }
 
+/**
+ * @brief DateTime::get_ptime Return raw ptime object.
+ * @return ptime.
+ */
 boost::posix_time::ptime DateTime::get_ptime() const
 {
     return m_time;
@@ -162,6 +190,11 @@ std::string DateTime::getIonexDate() const
     return ss.str();
 }
 
+/**
+ * @brief DateTime::operator== Compare two DateTime objects for equality
+ * @param rhs DateTime object.
+ * @return true if time system, date and time are equal.
+ */
 bool DateTime::operator==(const DateTime &rhs) const
 {
     return (m_tsys == rhs.getTimeSystem()) && (m_time == rhs.get_ptime());
