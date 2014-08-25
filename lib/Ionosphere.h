@@ -16,6 +16,7 @@ class IonoGridInfo
      uint32_t m_dtTECU; ///< dt converted to 0.1 TECU
      uint32_t m_givei; ///< GIVE index value
      uint32_t m_giveTECU; ///< GIVE converted to 0.1 TECU
+     bool m_isValid;
 
 public:
      IonoGridInfo();

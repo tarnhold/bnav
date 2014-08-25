@@ -69,6 +69,7 @@ IonoGridInfo::IonoGridInfo()
     , m_dtTECU(UINT32_MAX)
     , m_givei(UINT32_MAX)
     , m_giveTECU(UINT32_MAX)
+    , m_isValid(false)
 {
 }
 
@@ -98,6 +99,9 @@ void IonoGridInfo::load(const NavBits<13> &bits)
     // convert to TECU
     m_dtTECU = lcl_convertMeterToTECU(m_dt, BDS_B1I_FREQ);
     m_giveTECU = lcl_convertMeterToTECU(GIVEI_LOOKUP_TABLE[m_givei], BDS_B1I_FREQ);
+
+    // set state to valid
+    m_isValid = true;
 }
 
 #if 0
@@ -113,6 +117,7 @@ double IonoGridInfo::getVerticalDelay_Meter() const
  */
 uint32_t IonoGridInfo::getVerticalDelay_TECU() const
 {
+    assert(m_isValid);
     if (m_dtraw >= 510)
         return 9999;
 
@@ -125,6 +130,7 @@ uint32_t IonoGridInfo::getVerticalDelay_TECU() const
  */
 uint32_t IonoGridInfo::getGive_TECU() const
 {
+    assert(m_isValid);
     // according to the ICD there are no invalid values, but invalid dt values
     // get GIVEI 15, so set this to invalid, too
     if (m_givei == 15)
@@ -147,6 +153,7 @@ double IonoGridInfo::getGive_Meter() const
 
 bool IonoGridInfo::operator==(const IonoGridInfo &rhs) const
 {
+    assert(m_isValid);
     return rhs.getVerticalDelay_TECU() == getVerticalDelay_TECU()
            && rhs.getGive_TECU() == getGive_TECU();
 }
