@@ -1,6 +1,7 @@
 #ifndef SUBFRAME_H
 #define SUBFRAME_H
 
+#include "DateTime.h"
 #include "NavBits.h"
 #include "SvID.h"
 
@@ -17,7 +18,7 @@ namespace bnav
 class Subframe
 {
     NavBits<300> m_bits;
-    uint32_t m_tow;
+    DateTime m_datetime;
     uint32_t m_sow;
     uint32_t m_frameID;
     uint32_t m_pageNum;
@@ -29,12 +30,12 @@ class Subframe
 
 public:
     Subframe();
-    Subframe(const SvID &sv, const uint32_t tow, const NavBits<300> &bits);
+    Subframe(const SvID &sv, const DateTime date, const NavBits<300> &bits);
 
     void setBits(const NavBits<300> &bits);
     NavBits<300> getBits() const;
-    void setTOW(const uint32_t tow);
-    uint32_t getTOW() const;
+    void setDateTime(const DateTime &date);
+    DateTime getDateTime() const;
 
     void setSvID(const SvID &sv);
 

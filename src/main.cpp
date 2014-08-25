@@ -58,9 +58,18 @@ int main(int argc, char **argv)
 
 
     bnav::DateTime dt;
-    dt.setToCurrentDateTimeUTC();
+//    dt.setToCurrentDateTimeUTC();
+    /*
     std::cout << dt.getMonthNameShort() << std::endl;
+    std::cout << dt.getIonexDate() << std::endl;
 
+    dt.setWeekAndSOW(0, 0);
+    std::cout << dt.getMonthNameShort() << std::endl;
+    std::cout << dt.getIonexDate() << std::endl;
+*/
+    dt.setTimeSystem(bnav::TimeSystem::GPST);
+    dt.setWeekAndSOW(1801, 0);
+    std::cout << dt.getMonthNameShort() << std::endl;
     std::cout << dt.getIonexDate() << std::endl;
 
     bnav::AsciiReaderEntry data;
@@ -76,11 +85,11 @@ int main(int argc, char **argv)
         if (!sv.isGeo())
             continue;
 
-        bnav::Subframe sf(sv, data.getTOW(), data.getBits());
+        bnav::Subframe sf(sv, data.getDateTime(), data.getBits());
 
 #if 0
         // debug
-        std::cout << "prn: " << data.getPRN()
+        std::cout << "prn: " << data.getPRN() << " wn: " << data.getWeek()
                   << " tow: " << data.getTOW() << " sow: " << sf.getSOW()
                   << " fra: " << sf.getFrameID() << " pnum: "
                   << sf.getPageNum() << std::endl;

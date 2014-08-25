@@ -54,7 +54,7 @@ namespace bnav
 
 AsciiReaderEntry::AsciiReaderEntry()
     : m_prn(0)
-    , m_tow(0)
+    , m_datetime()
     , m_sigtype(SignalType::NONE)
     , m_bits()
 {
@@ -62,15 +62,15 @@ AsciiReaderEntry::AsciiReaderEntry()
 
 AsciiReaderEntry::AsciiReaderEntry(const std::string &/*line*/)
     : m_prn(0)
-    , m_tow(0)
+    , m_datetime()
     , m_sigtype(SignalType::NONE)
     , m_bits()
 {
 }
 
-uint32_t AsciiReaderEntry::getTOW() const
+DateTime AsciiReaderEntry::getDateTime() const
 {
-    return m_tow;
+    return m_datetime;
 }
 
 uint32_t AsciiReaderEntry::getPRN() const
@@ -115,7 +115,10 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     // parse tow and prn fields
     try
     {
-        m_tow = std::stoul(extractData(line, "tow "));
+        uint32_t tow = std::stoul(extractData(line, "tow "));
+        // FIXME: m_week has to be set, but jps doesn't contain this data
+        m_datetime = DateTime(TimeSystem::GPST, 0, tow);
+
         m_prn = std::stoul(extractData(line, "PRN "));
     }
     catch (std::invalid_argument)
@@ -123,9 +126,6 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
         std::cerr << "Malformed data line. Wrong format?" << std::endl;
         exit(1);
     }
-
-    //DEBUG("tow:" << m_tow);
-    //DEBUG("prn:" << m_prn);
 
     // assume JPS is only B1 signal
     m_sigtype = SignalType::BDS_B1;
@@ -232,12 +232,14 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
      * D1: 20s
      * D2: 14.4s + frameID * 0.6s
      */
-    m_tow = std::stoul(splitline[0]);
+    uint32_t tow = std::stoul(splitline[0]);
+    uint32_t week = std::stoul(splitline[1]);
+    uint32_t millisec = tow % 1000;
+    tow = (tow - millisec) / 1000;
+    m_datetime = DateTime(bnav::TimeSystem::GPST, week, tow, millisec);
+
     // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
     m_prn = std::stoul(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
-
-    //DEBUG("tow: " << m_tow);
-    //DEBUG("prn: " << m_prn);
 
     // determine signal type - yes, Septentrio saves both B1 and B2
     const uint32_t sigtype = std::stoul(splitline[4]);

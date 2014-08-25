@@ -61,6 +61,16 @@ void DateTime::setToCurrentDateTimeUTC()
    m_time = now;
 }
 
+TimeSystem DateTime::getTimeSystem() const
+{
+    return m_tsys;
+}
+
+boost::posix_time::ptime DateTime::get_ptime() const
+{
+    return m_time;
+}
+
 /**
  * @brief DateTime::getDay Get day number.
  * @return Day.
@@ -150,6 +160,11 @@ std::string DateTime::getIonexDate() const
        << getHourString() << ":"
        << getMinuteString();
     return ss.str();
+}
+
+bool DateTime::operator==(const DateTime &rhs) const
+{
+    return (m_tsys == rhs.getTimeSystem()) && (m_time == rhs.get_ptime());
 }
 
 } // namespace bnav

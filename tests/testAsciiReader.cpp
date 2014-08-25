@@ -2,6 +2,7 @@
 #include "TestConfig.h"
 
 #include "AsciiReader.h"
+#include "DateTime.h"
 
 #include "BeiDou.h"
 
@@ -61,7 +62,7 @@ TEST(testAsciiReaderSBF) {
         while (reader.readLine(entry))
         {
             CHECK(entry.getPRN() == prnlist[i]);
-            CHECK(entry.getTOW() == towlist[i]);
+            CHECK(entry.getDateTime() == bnav::DateTime(bnav::TimeSystem::GPST, 1801, towlist[i] / 1000, towlist[i] % 1000));
 
             // TODO: write data into file and compare to already converted file
             // TestWriter.write(), TestFile.isEqual(filename)...
@@ -106,7 +107,7 @@ TEST(testAsciiReaderSBFB1) {
                 continue;
 
             CHECK(entry.getPRN() == prnlist[i]);
-            CHECK(entry.getTOW() == towlist[i]);
+            CHECK(entry.getDateTime() == bnav::DateTime(bnav::TimeSystem::GPST, 1801, towlist[i] / 1000, towlist[i] % 1000));
 
             // TODO: write data into file and compare to already converted file
             // TestWriter.write(), TestFile.isEqual(filename)...
@@ -149,7 +150,7 @@ TEST(TestAsciiReaderJPS) {
         {
             // this file has only prn 2 data
             CHECK(entry.getPRN() == 2);
-            CHECK(entry.getTOW() == towlist[i]);
+            CHECK(entry.getDateTime() == bnav::DateTime(bnav::TimeSystem::GPST, 0, towlist[i]));
 
             // TODO: write data into file and compare to already converted file
             // TestWriter.write(), TestFile.isEqual(filename)...

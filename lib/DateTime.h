@@ -31,6 +31,9 @@ public:
     void setToCurrentDateTimeUTC();
     void setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const uint32_t millisec = 0);
 
+    TimeSystem getTimeSystem() const;
+    boost::posix_time::ptime get_ptime() const;
+
     uint32_t getDay() const;
     uint32_t getMonth() const;
     uint32_t getYear() const;
@@ -42,6 +45,8 @@ public:
     std::string getMonthNameShort() const;
 
     std::string getIonexDate() const;
+
+    bool operator==(const DateTime &rhs) const;
 };
 
 } // namespace bnav

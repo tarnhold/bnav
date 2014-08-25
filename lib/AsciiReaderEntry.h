@@ -3,6 +3,7 @@
 
 #include "AsciiReader.h"
 #include "BeiDou.h"
+#include "DateTime.h"
 #include "NavBits.h"
 
 namespace bnav
@@ -13,7 +14,7 @@ class AsciiReaderEntry
 {
 protected:
     uint32_t m_prn;
-    uint32_t m_tow;
+    DateTime m_datetime;
     SignalType m_sigtype;
     NavBits<300> m_bits;
 
@@ -23,8 +24,8 @@ public:
 
     void readLine(const std::string &line);
 
-    uint32_t getTOW() const;
     uint32_t getPRN() const;
+    DateTime getDateTime() const;
     SignalType getSignalType() const;
     NavBits<300> getBits() const;
 };
