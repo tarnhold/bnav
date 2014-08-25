@@ -6,6 +6,8 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 
+LIBS += -lunittest++ -L../lib -lbnav
+
 SOURCES += main.cpp \
     testNavBits.cpp \
     testAsciiReader.cpp \
@@ -15,8 +17,6 @@ SOURCES += main.cpp \
     testSubframeBuffer.cpp \
     testSubframeBufferStore.cpp \
     testIonosphere.cpp
-
-LIBS += -lunittest++ -L../lib -lbnav
 
 HEADERS += \
     TestConfig.h

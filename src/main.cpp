@@ -8,6 +8,8 @@
 #include "SubframeBufferStore.h"
 #include "SvID.h"
 
+#include "DateTime.h"
+
 static void usage()
 {
     std::cout
@@ -53,6 +55,13 @@ int main(int argc, char **argv)
 #if 0
     bnav::EphemerisStore ephStore;
 #endif
+
+
+    bnav::DateTime dt;
+    dt.setToCurrentDateTimeUTC();
+    std::cout << dt.getMonthNameShort() << std::endl;
+
+    std::cout << dt.getIonexDate() << std::endl;
 
     bnav::AsciiReaderEntry data;
     while (reader.readLine(data))

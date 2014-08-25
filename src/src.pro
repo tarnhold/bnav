@@ -8,11 +8,11 @@ TARGET = bapp
 CONFIG += console
 CONFIG -= app_bundle
 
+LIBS += -L../lib -lbnav
+
 SOURCES += main.cpp
 
 HEADERS +=
-
-LIBS += -L../lib -lbnav
 
 OTHER_FILES +=
 

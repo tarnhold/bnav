@@ -5,6 +5,8 @@
 TEMPLATE = lib
 TARGET = bnav
 
+LIBS += -lboost_date_time
+
 SOURCES += \
     AsciiReader.cpp \
     Subframe.cpp \
@@ -17,7 +19,8 @@ SOURCES += \
     Benchmark.cpp \
     Ionosphere.cpp \
     IonosphereStore.cpp \
-    Ephemeris.cpp
+    Ephemeris.cpp \
+    DateTime.cpp
 
 HEADERS += \
     AsciiReader.h \
@@ -33,5 +36,6 @@ HEADERS += \
     Benchmark.h \
     Ionosphere.h \
     IonosphereStore.h \
-    Ephemeris.h
+    Ephemeris.h \
+    DateTime.h
 
