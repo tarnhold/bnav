@@ -6,7 +6,47 @@ namespace bnav
 {
 
 DateTime::DateTime()
+    : m_tsys(TimeSystem::NONE)
+    , m_time()
 {
+}
+
+DateTime::DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
+    : m_tsys(ts)
+    , m_time()
+{
+    setWeekAndSOW(weeknum, sow, millisec);
+}
+
+void DateTime::setTimeSystem(const TimeSystem ts)
+{
+    m_tsys = ts;
+}
+
+void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
+{
+    boost::gregorian::date d0;
+
+    if (m_tsys == TimeSystem::BDT)
+    {
+        // Weeknum starts on 00:00:00 Jan, 1, 2006 BDT
+        d0 = boost::gregorian::date(2006, 1, 1);
+    }
+    else if (m_tsys == TimeSystem::GPST)
+    {
+        // Weeknum stars on 00:00:00 Jan, 6, 1980 for GPS
+        d0 = boost::gregorian::date(1980, 1, 6);
+    }
+    else
+    {
+        assert(false); // not implemented
+    }
+
+    boost::posix_time::ptime t0(d0, boost::posix_time::hours(0));
+
+    m_time = t0 + boost::gregorian::weeks(static_cast<int>(weeknum))
+            + boost::posix_time::seconds(static_cast<int>(sow))
+            + boost::posix_time::milliseconds(static_cast<int>(millisec));
 }
 
 /**
@@ -17,25 +57,74 @@ void DateTime::setToCurrentDateTimeUTC()
    // get the current time from the clock -- one second resolution
    boost::posix_time::ptime now = boost::posix_time::second_clock::universal_time();
 
+   m_tsys = TimeSystem::UTC;
    m_time = now;
 }
 
+/**
+ * @brief DateTime::getDay Get day number.
+ * @return Day.
+ */
 uint32_t DateTime::getDay() const
 {
     boost::gregorian::date d = m_time.date();
     return d.day();
 }
 
+/**
+ * @brief DateTime::getMonth Get month number.
+ * @return Month.
+ */
 uint32_t DateTime::getMonth() const
 {
     boost::gregorian::date d = m_time.date();
     return d.month();
 }
 
+/**
+ * @brief DateTime::getYear Get year.
+ * @return Year.
+ */
 uint32_t DateTime::getYear() const
 {
     boost::gregorian::date d = m_time.date();
     return d.year();
+}
+
+/**
+ * @brief DateTime::getHourString Return hours padded with zero.
+ * @return Hours as string.
+ */
+std::string DateTime::getHourString() const
+{
+    boost::posix_time::time_duration t = m_time.time_of_day();
+    std::stringstream ss;
+    ss << std::setw(2) << std::setfill('0') << t.hours();
+    return ss.str();
+}
+
+/**
+ * @brief DateTime::getMinuteString Return minutes padded with zero.
+ * @return Minutes as string.
+ */
+std::string DateTime::getMinuteString() const
+{
+    boost::posix_time::time_duration t = m_time.time_of_day();
+    std::stringstream ss;
+    ss << std::setw(2) << std::setfill('0') << t.minutes();
+    return ss.str();
+}
+
+/**
+ * @brief DateTime::getSecondString Return seconds padded with zero.
+ * @return Seconds as string.
+ */
+std::string DateTime::getSecondString() const
+{
+    boost::posix_time::time_duration t = m_time.time_of_day();
+    std::stringstream ss;
+    ss << std::setw(2) << std::setfill('0') << t.seconds();
+    return ss.str();
 }
 
 /**
@@ -54,14 +143,12 @@ std::string DateTime::getMonthNameShort() const
  */
 std::string DateTime::getIonexDate() const
 {
-    boost::posix_time::time_duration t = m_time.time_of_day();
-
     std::stringstream ss;
     ss << std::to_string(getDay()) << "-"
        << getMonthNameShort() << "-"
        << std::to_string(getYear()).substr(2) << " "
-       << std::to_string(t.hours()) << ":"
-       << std::to_string(t.minutes());
+       << getHourString() << ":"
+       << getMinuteString();
     return ss.str();
 }
 
