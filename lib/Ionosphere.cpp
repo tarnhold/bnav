@@ -16,10 +16,6 @@ uint32_t lcl_convertMeterToTECU(const double value, const double freq)
     return std::round((value * (freq * freq) / 40.3) / 1.0e16 * 10);
 }
 
-}
-
-namespace
-{
 // [1] 5.3.3.8.2 Grid Ionospheric Vertical Error Index (GIVEI)
 const double GIVEI_LOOKUP_TABLE[] = { 0.3, 0.6, 0.9, 1.2,
                                       1.5, 1.8, 2.1, 2.4,
