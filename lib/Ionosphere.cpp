@@ -64,11 +64,21 @@ namespace bnav
  * [1]. 5.3.3.8 Ionospheric Grid Information (Ion)
  */
 IonoGridInfo::IonoGridInfo()
-// TODO: initialize correctly (not with 0, because this is a valid value)
+    : m_dtraw(UINT32_MAX) // zero would be a valid value, so use max
+    , m_dt(-1.0)
+    , m_dtTECU(UINT32_MAX)
+    , m_givei(UINT32_MAX)
+    , m_giveTECU(UINT32_MAX)
 {
 }
 
 IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
+    : IonoGridInfo()
+{
+    load(bits);
+}
+
+void IonoGridInfo::load(const NavBits<13> &bits)
 {
     // [1] 5.3.2 D2 NAV Message Detailed structure, p. 50
     // first 9 bits are dt
@@ -80,10 +90,14 @@ IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
     // maximum value is 63.875m, which is 511 when scaled by 0.125
     assert(m_dtraw >= 0 && m_dtraw <= 511);
 
+    // metric
     m_dt = m_dtraw * 0.125;
     m_givei = givei.to_ulong();
-
     assert(m_givei >= 0 && m_givei <= 15);
+
+    // convert to TECU
+    m_dtTECU = lcl_convertMeterToTECU(m_dt, BDS_B1I_FREQ);
+    m_giveTECU = lcl_convertMeterToTECU(GIVEI_LOOKUP_TABLE[m_givei], BDS_B1I_FREQ);
 }
 
 #if 0
@@ -99,10 +113,10 @@ double IonoGridInfo::getVerticalDelay_Meter() const
  */
 uint32_t IonoGridInfo::getVerticalDelay_TECU() const
 {
-    if (m_dtraw == 510 || m_dtraw == 511)
+    if (m_dtraw >= 510)
         return 9999;
 
-    return lcl_convertMeterToTECU(m_dt, BDS_B1I_FREQ);
+    return m_dtTECU;
 }
 
 /**
@@ -116,8 +130,7 @@ uint32_t IonoGridInfo::getGive_TECU() const
     if (m_givei == 15)
         return 9999;
 
-    return lcl_convertMeterToTECU(
-                GIVEI_LOOKUP_TABLE[m_givei], BDS_B1I_FREQ);
+    return m_giveTECU;
 }
 
 #if 0
