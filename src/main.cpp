@@ -72,6 +72,8 @@ int main(int argc, char **argv)
     std::cout << dt.getMonthNameShort() << std::endl;
     std::cout << dt.getIonexDate() << std::endl;
 
+    bnav::Ionosphere iono_old;
+
     bnav::AsciiReaderEntry data;
     while (reader.readLine(data))
     {
@@ -116,7 +118,16 @@ int main(int argc, char **argv)
 
             bnav::Ionosphere iono(bdata);
 
-            iono.dump();
+            // diff only for one single prn
+            if (sv.getPRN() == 2)
+            {
+                if (iono_old.hasData())
+                    iono.diffToModel(iono_old).dump();
+
+                iono_old = iono;
+            }
+
+           // iono.dump();
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;

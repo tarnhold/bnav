@@ -9,6 +9,7 @@ QMAKE_CXXFLAGS += -std=c++11 \
         -Wfloat-equal \
         -Wshadow \
         -Wsign-conversion \
+        -Wconversion \
         -Wdeprecated \
         -Wdocumentation \
         #-Weverything \

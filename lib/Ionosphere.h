@@ -11,28 +11,26 @@ namespace bnav
 
 class IonoGridInfo
 {
-     uint32_t m_dtraw; ///< Raw dt value
-     double m_dt; ///< dt converted to meters
      uint32_t m_dtTECU; ///< dt converted to 0.1 TECU
-     uint32_t m_givei; ///< GIVE index value
      uint32_t m_giveTECU; ///< GIVE converted to 0.1 TECU
      bool m_isValid;
 
 public:
      IonoGridInfo();
      IonoGridInfo(const NavBits<13> &bits);
+     IonoGridInfo(const uint32_t vertdelay, const uint32_t rms);
 
      void load(const NavBits<13> &bits);
 
      uint32_t getVerticalDelay_TECU() const;
      uint32_t getGive_TECU() const;
-#if 0
-     uint32_t getGiveIndex() const;
-     double getVerticalDelay_Meter() const;
-     double getGive_Meter() const;
-#endif
 
      bool operator==(const IonoGridInfo &rhs) const;
+     IonoGridInfo operator-(const IonoGridInfo &rhs) const;
+
+private:
+     void loadVerticalDelay(const NavBits<9> &bits);
+     void loadGivei(const NavBits<4> &bits);
 };
 
 class Ionosphere
@@ -44,10 +42,16 @@ public:
     Ionosphere();
     Ionosphere(const SubframeBufferParam &sfbuf);
 
-// TODO    void load(const SubframeBufferParam &sfbuf);
+    void load(const SubframeBufferParam &sfbuf);
 
+    bool hasData() const;
+    void setSOW(const uint32_t sow);
     uint32_t getSOW() const;
+
+    void setGrid(const std::vector<IonoGridInfo> &rhs);
     std::vector<IonoGridInfo> getGrid() const;
+
+    Ionosphere diffToModel(const Ionosphere &rhs);
 
     bool operator==(const Ionosphere &iono) const;
 

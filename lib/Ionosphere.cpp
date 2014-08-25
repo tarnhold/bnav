@@ -11,9 +11,30 @@ namespace
 
 uint32_t lcl_convertMeterToTECU(const double value, const double freq)
 {
+    assert(value >= 0);
     // 1 TECU is 1.0e16 el/m2
     // IONEX refers to 0.1 TECU, so we need to multiply * 10
-    return std::round((value * (freq * freq) / 40.3) / 1.0e16 * 10);
+    return static_cast<uint32_t>(std::lround((value * (freq * freq) / 40.3) / 1.0e16 * 10));
+}
+
+/**
+ * @brief lcl_diffTECUValues Difference between two TECU values.
+ * @param t1 TECU 1
+ * @param t2 TECU 2
+ * @return Invalid 9999, if one of both is invalid, otherwise absolute difference.
+ */
+uint32_t lcl_diffTECUValues(const uint32_t t1, const uint32_t t2)
+{
+    // comprises two cases:
+    // 1. one of both is not available
+    // 2. both are not available
+    if (t1 == 9999 || t2 == 9999)
+        return 9999;
+
+    if (t2 > t1)
+        return t2 - t1;
+    else
+        return t1 - t2;
 }
 
 // [1] 5.3.3.8.2 Grid Ionospheric Vertical Error Index (GIVEI)
@@ -60,10 +81,7 @@ namespace bnav
  * [1]. 5.3.3.8 Ionospheric Grid Information (Ion)
  */
 IonoGridInfo::IonoGridInfo()
-    : m_dtraw(UINT32_MAX) // zero would be a valid value, so use max
-    , m_dt(-1.0)
-    , m_dtTECU(UINT32_MAX)
-    , m_givei(UINT32_MAX)
+    : m_dtTECU(UINT32_MAX)
     , m_giveTECU(UINT32_MAX)
     , m_isValid(false)
 {
@@ -75,37 +93,57 @@ IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
     load(bits);
 }
 
+IonoGridInfo::IonoGridInfo(const uint32_t vertdelay, const uint32_t rms)
+    : IonoGridInfo()
+{
+    m_isValid = true;
+    m_dtTECU = vertdelay;
+    m_giveTECU = rms;
+}
+
 void IonoGridInfo::load(const NavBits<13> &bits)
 {
     // [1] 5.3.2 D2 NAV Message Detailed structure, p. 50
     // first 9 bits are dt
-    NavBits<9> dt = bits.getLeft<0, 9>();
+    NavBits<9> bitsdt = bits.getLeft<0, 9>();
     // last 4 bits are givei
-    NavBits<4> givei = bits.getLeft<9, 4>();
+    NavBits<4> bitsgivei = bits.getLeft<9, 4>();
 
-    m_dtraw = dt.to_ulong();
-    // maximum value is 63.875m, which is 511 when scaled by 0.125
-    assert(m_dtraw >= 0 && m_dtraw <= 511);
-
-    // metric
-    m_dt = m_dtraw * 0.125;
-    m_givei = givei.to_ulong();
-    assert(m_givei >= 0 && m_givei <= 15);
-
-    // convert to TECU
-    m_dtTECU = lcl_convertMeterToTECU(m_dt, BDS_B1I_FREQ);
-    m_giveTECU = lcl_convertMeterToTECU(GIVEI_LOOKUP_TABLE[m_givei], BDS_B1I_FREQ);
+    loadVerticalDelay(bitsdt);
+    loadGivei(bitsgivei);
 
     // set state to valid
     m_isValid = true;
 }
 
-#if 0
-double IonoGridInfo::getVerticalDelay_Meter() const
+void IonoGridInfo::loadVerticalDelay(const NavBits<9> &bits)
 {
-    return m_dt;
+    uint32_t dtraw = bits.to_ulong();
+    // maximum value is 63.875m, which is 511 when scaled by 0.125
+    assert(dtraw >= 0 && dtraw <= 511);
+    // convert to TECU
+    if (dtraw >= 510)
+        m_dtTECU =  9999;
+    else
+    {
+        // metric
+        double dt = dtraw * 0.125;
+        m_dtTECU = lcl_convertMeterToTECU(dt, BDS_B1I_FREQ);
+    }
 }
-#endif
+
+void IonoGridInfo::loadGivei(const NavBits<4> &bits)
+{
+    uint32_t givei = bits.to_ulong();
+    assert(givei >= 0 && givei <= 15);
+
+    // according to the ICD there are no invalid values, but invalid dt values
+    // get GIVEI 15, so set this to invalid, too
+    if (givei == 15)
+        m_giveTECU = 9999;
+    else
+        m_giveTECU = lcl_convertMeterToTECU(GIVEI_LOOKUP_TABLE[givei], BDS_B1I_FREQ);
+}
 
 /**
  * @brief IonoGridInfo::getVerticalDelay_TECU Return ionospheric delay as 0.1 TECU.
@@ -114,9 +152,6 @@ double IonoGridInfo::getVerticalDelay_Meter() const
 uint32_t IonoGridInfo::getVerticalDelay_TECU() const
 {
     assert(m_isValid);
-    if (m_dtraw >= 510)
-        return 9999;
-
     return m_dtTECU;
 }
 
@@ -127,31 +162,22 @@ uint32_t IonoGridInfo::getVerticalDelay_TECU() const
 uint32_t IonoGridInfo::getGive_TECU() const
 {
     assert(m_isValid);
-    // according to the ICD there are no invalid values, but invalid dt values
-    // get GIVEI 15, so set this to invalid, too
-    if (m_givei == 15)
-        return 9999;
-
     return m_giveTECU;
 }
-
-#if 0
-uint32_t IonoGridInfo::getGiveIndex() const
-{
-    return m_givei;
-}
-
-double IonoGridInfo::getGive_Meter() const
-{
-    return GIVEI_LOOKUP_TABLE[m_givei];
-}
-#endif
 
 bool IonoGridInfo::operator==(const IonoGridInfo &rhs) const
 {
     assert(m_isValid);
     return rhs.getVerticalDelay_TECU() == getVerticalDelay_TECU()
            && rhs.getGive_TECU() == getGive_TECU();
+}
+
+IonoGridInfo IonoGridInfo::operator-(const IonoGridInfo &rhs) const
+{
+    uint32_t dvdel = lcl_diffTECUValues(getVerticalDelay_TECU(), rhs.getVerticalDelay_TECU());
+    uint32_t dgive = lcl_diffTECUValues(getGive_TECU(), rhs.getGive_TECU());
+
+    return IonoGridInfo(dvdel, dgive);
 }
 
 /**
@@ -166,13 +192,18 @@ Ionosphere::Ionosphere()
 
 Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
 {
-    // TODO in load() schieben
-    // unter die klasse etwas abstrahieren, damit eph/alm zusammenpassen
+    load(sfbuf);
+}
 
+void Ionosphere::load(const SubframeBufferParam &sfbuf)
+{
     // ensure correct type
     assert(sfbuf.type == SubframeBufferType::D2_ALMANAC);
     // ensure there is one subframe
     assert(sfbuf.data.size() == 1);
+
+    // if there was already data loaded
+    m_grid.clear();
 
     SubframeVector vfra5 = sfbuf.data[0];
     // ensure there are all pages
@@ -190,7 +221,7 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
 
     // date of issue of ionospheric model is at page 1 of subframe 1
     // [1] 5.3.3.1 Basic NAV Information, p. 68
-// FIXME: this gets it from subframe 5...
+    // FIXME: this gets it from subframe 5...
     m_sow = vfra5.front().getSOW();
 }
 
@@ -262,6 +293,16 @@ void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
     //std::cout << "dt: " << m_grid.back().get_dt() << " givei: " << m_grid.back().get_give_index() << " give: " << m_grid.back().get_give() << std::endl;
 }
 
+bool Ionosphere::hasData() const
+{
+    return m_grid.size() == 320;
+}
+
+void Ionosphere::setSOW(const uint32_t sow)
+{
+    m_sow = sow;
+}
+
 /**
  * @brief Ionosphere::getSOW Get issue date of ionospheric model.
  * @return SOW.
@@ -278,6 +319,33 @@ uint32_t Ionosphere::getSOW() const
 std::vector<IonoGridInfo> Ionosphere::getGrid() const
 {
     return m_grid;
+}
+
+void Ionosphere::setGrid(const std::vector<IonoGridInfo> &rhs)
+{
+    assert(rhs.size() == 320);
+    m_grid.clear();
+    for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
+        m_grid.push_back(*it);
+}
+
+Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
+{
+    Ionosphere diff;
+    std::vector<IonoGridInfo> vdiff;
+    std::vector<IonoGridInfo> gridrhs = rhs.getGrid();
+    assert(m_grid.size() == gridrhs.size());
+
+    // use SOW from current Ionosphere
+    diff.setSOW(m_sow);
+
+    for (std::size_t i = 0; i < m_grid.size(); ++i)
+    {
+        vdiff.push_back(m_grid[i] - gridrhs[i]);
+    }
+    diff.setGrid(vdiff);
+
+    return diff;
 }
 
 /**
