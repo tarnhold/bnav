@@ -16,7 +16,8 @@ SOURCES += main.cpp \
     testSvID.cpp \
     testSubframeBuffer.cpp \
     testSubframeBufferStore.cpp \
-    testIonosphere.cpp
+    testIonosphere.cpp \
+    testDateTime.cpp
 
 HEADERS += \
     TestConfig.h

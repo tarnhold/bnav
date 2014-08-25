@@ -10,7 +10,7 @@ namespace bnav
  */
 DateTime::DateTime()
     : m_tsys(TimeSystem::NONE)
-    , m_time()
+    , m_time(boost::posix_time::ptime())
 {
 }
 
@@ -34,6 +34,8 @@ DateTime::DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t s
  */
 void DateTime::setTimeSystem(const TimeSystem ts)
 {
+    // we don't want to mangle with TimeSystem changes...
+    assert(m_tsys == TimeSystem::NONE);
     m_tsys = ts;
 }
 

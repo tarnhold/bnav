@@ -69,6 +69,7 @@ void Ephemeris::processPage1(const Subframe &sf)
     //bits.getLeft<47, 5>()
 
     m_weeknum = bits.getLeft<64, 13>().to_ulong();
+    std::cout << "weeknum BDT: " << m_weeknum << std::endl;
 
     // tgd1
     std::cout << "tgd1: " << bits.getLeft<102, 10>() << std::endl;
