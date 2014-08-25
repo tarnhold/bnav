@@ -1,8 +1,22 @@
 #include "Ionosphere.h"
+#include "BeiDou.h"
 #include "NavBits.h"
 #include "SubframeBuffer.h"
 
+#include <cmath>
 #include <iostream>
+
+namespace
+{
+
+uint32_t lcl_convertMeterToTECU(const double value, const double freq)
+{
+    // 1 TECU is 1.0e16 el/m2
+    // IONEX refers to 0.1 TECU, so we need to multiply * 10
+    return std::round((value * (freq * freq) / 40.3) / 1.0e16 * 10);
+}
+
+}
 
 namespace
 {
@@ -62,11 +76,11 @@ IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
     // last 4 bits are givei
     NavBits<4> givei = bits.getLeft<9, 4>();
 
-    uint32_t ndt = dt.to_ulong();
+    m_dtraw = dt.to_ulong();
     // maximum value is 63.875m, which is 511 when scaled by 0.125
-    assert(ndt >= 0 && ndt <= 511);
+    assert(m_dtraw >= 0 && m_dtraw <= 511);
 
-    m_dt = ndt * 0.125;
+    m_dt = m_dtraw * 0.125;
     m_givei = givei.to_ulong();
 
     assert(m_givei >= 0 && m_givei <= 15);
@@ -75,6 +89,18 @@ IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
 double IonoGridInfo::get_dt() const
 {
     return m_dt;
+}
+
+/**
+ * @brief IonoGridInfo::getTECU Return ionospheric delay as 0.1 TECU.
+ * @return TECU value, 9999 if not available.
+ */
+uint32_t IonoGridInfo::get_dtInTECU() const
+{
+    if (m_dtraw == 510 || m_dtraw == 511)
+        return 9999;
+
+    return lcl_convertMeterToTECU(m_dt, BDS_B1I_FREQ);
 }
 
 uint32_t IonoGridInfo::get_give_index() const
@@ -89,7 +115,7 @@ double IonoGridInfo::get_give() const
 
 bool IonoGridInfo::operator==(const IonoGridInfo &rhs) const
 {
-    return rhs.get_dt() == m_dt
+    return rhs.get_dtInTECU() == get_dtInTECU()
            && rhs.get_give_index() == m_givei;
 }
 
@@ -248,7 +274,7 @@ void Ionosphere::dump()
                 // calc IGP num formula: col * 10 + row
                 // + table * 160, to access both IGP tables
                 // array index is then -1
-                std::cout << std::setw(10) << m_grid[col * 10 + (table * 160) + row - 1].get_dt();
+                std::cout << std::setw(5) << m_grid[col * 10 + (table * 160) + row - 1].get_dtInTECU();
             }
             std::cout << std::endl;
         }
@@ -269,7 +295,7 @@ void Ionosphere::dump2()
         {
             // calc IGP num formula: col * 10 + row
             // array index is then -1
-            std::cout << std::setw(10) << m_grid[col * 10 + row - 1].get_dt();
+            std::cout << std::setw(5) << m_grid[col * 10 + row - 1].get_dtInTECU();
         }
         std::cout << std::endl;
     }
@@ -283,7 +309,7 @@ void Ionosphere::dump2()
         {
             // calc IGP num formula: col * 10 + row
             // array index is then -1
-            std::cout << std::setw(10) << m_grid[col * 10 + row - 1].get_dt();
+            std::cout << std::setw(5) << m_grid[col * 10 + row - 1].get_dtInTECU();
         }
         std::cout << std::endl;
     }

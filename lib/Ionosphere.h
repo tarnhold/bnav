@@ -12,6 +12,7 @@ namespace bnav
 class IonoGridInfo
 {
      double m_dt;
+     uint32_t m_dtraw;
      uint32_t m_givei;
 
 public:
@@ -19,6 +20,7 @@ public:
      IonoGridInfo(const NavBits<13> &bits);
 
      double get_dt() const;
+     uint32_t get_dtInTECU() const;
      uint32_t get_give_index() const;
      double get_give() const;
 

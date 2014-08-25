@@ -10,6 +10,9 @@ static const uint32_t SECONDS_OF_A_WEEK = 7*24*60*60;
 
 static const uint32_t BDS_PREABMLE = 1810;
 
+const double BDS_B1I_FREQ = 1561.098e6;
+const double BDS_B2I_FREQ = 1207.140e6;
+
 enum class SignalType
 {
     BDS_B1,
