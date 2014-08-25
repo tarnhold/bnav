@@ -215,6 +215,9 @@ TEST(testNavBitsEquality)
         bnav::NavBits<4> bits1("0001");
         bnav::NavBits<4> bits2("0001");
         CHECK(bits1 == bits2);
+
+        bnav::NavBits<4> bits3("1000");
+        CHECK(!(bits1 == bits3));
     }
 }
 

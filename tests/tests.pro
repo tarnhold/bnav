@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     testSubframe.cpp \
     testSvID.cpp \
     testSubframeBuffer.cpp \
-    testSubframeBufferStore.cpp
+    testSubframeBufferStore.cpp \
+    testIonosphere.cpp
 
 LIBS += -lunittest++ -L../lib -lbnav
 
