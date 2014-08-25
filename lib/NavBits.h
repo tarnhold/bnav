@@ -85,7 +85,7 @@ public:
         assert(val >= 0);
         // warn if value won't fit dim, otherwise bits get lost
         assert(val < std::pow(2, dim));
-        m_bitset = std::bitset<dim>(val);
+        m_bitset = std::bitset<dim>(static_cast<unsigned long long>(val));
     }
 
     /**
