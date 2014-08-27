@@ -187,6 +187,12 @@ public:
         m_bitset.flip(m_bitset.size() - 1 - index);
     }
 
+    void flipAll()
+    {
+        for (std::size_t i = 0; i < m_bitset.size(); ++i)
+            m_bitset.flip(i);
+    }
+
     std::size_t size() const
     {
         return m_bitset.size();
@@ -243,6 +249,28 @@ public:
     unsigned long to_ulong() const
     {
      return m_bitset.to_ulong();
+    }
+
+    /**
+     * @brief to_double Convert value to double precision values, with sign ext.
+     * @param scale_pow2 Scale by power of two.
+     * @return Value converted to double with sign extension.
+     */
+    double to_double(const int32_t scale_pow2 = 0) const
+    {
+        double scale = std::pow(2, scale_pow2);
+        NavBits<1> sign = getLeft<0, 1>();
+        NavBits<dim - 1> value = getLeft<1, dim - 1>();
+
+        // negative value
+        if (sign[0])
+        {
+            value.flipAll();
+
+            return (-1.0 * static_cast<double>(value.to_ulong()) - 1.0) * scale;
+        }
+
+        return 1.0 * static_cast<double>(value.to_ulong()) * scale;
     }
 
     std::string to_string() const

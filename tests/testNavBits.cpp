@@ -155,6 +155,24 @@ TEST(testNavBitsFlip)
         bits.flipLeft(1);
         CHECK(bits.to_string() == "1101");
     }
+
+    // flip all
+    {
+        {
+            bnav::NavBits<4> bits("0001");
+            bits.flipAll();
+            CHECK(bits.to_string() == "1110");
+            bits.flipAll();
+            CHECK(bits.to_string() == "0001");
+        }
+        {
+            bnav::NavBits<4> bits("1010");
+            bits.flipAll();
+            CHECK(bits.to_string() == "0101");
+            bits.flipAll();
+            CHECK(bits.to_string() == "1010");
+        }
+    }
 }
 
 TEST(testNavBitsXor)
@@ -218,6 +236,94 @@ TEST(testNavBitsEquality)
 
         bnav::NavBits<4> bits3("1000");
         CHECK(!(bits1 == bits3));
+    }
+}
+
+SUITE(testNavBitsToDouble)
+{
+    // Two's complement, no scale, positive values
+    TEST(testNavBitsToDouble_Positive)
+    {
+        bnav::NavBits<8> bits1("00000000");
+        CHECK_CLOSE(0.0, bits1.to_double(), 0.0);
+
+        bnav::NavBits<8> bits2("00000001");
+        CHECK_CLOSE(1.0, bits2.to_double(), 0.0);
+
+        bnav::NavBits<8> bits3("00000010");
+        CHECK_CLOSE(2.0, bits3.to_double(), 0.0);
+
+        bnav::NavBits<8> bits4("01111110");
+        CHECK_CLOSE(126.0, bits4.to_double(), 0.0);
+
+        bnav::NavBits<8> bits5("01111111");
+        CHECK_CLOSE(127.0, bits5.to_double(), 0.0);
+    }
+
+    // Two's complement, no scale, negative values
+    TEST(testNavBitsToDouble_Negative)
+    {
+        bnav::NavBits<8> bits1("11111111");
+        CHECK_CLOSE(-1.0, bits1.to_double(), 0.0);
+
+        bnav::NavBits<8> bits2("11111110");
+        CHECK_CLOSE(-2.0, bits2.to_double(), 0.0);
+
+        bnav::NavBits<8> bits4("10000010");
+        CHECK_CLOSE(-126.0, bits4.to_double(), 0.0);
+
+        bnav::NavBits<8> bits5("10000001");
+        CHECK_CLOSE(-127.0, bits5.to_double(), 0.0);
+
+        bnav::NavBits<8> bits3("10000000");
+        CHECK_CLOSE(-128.0, bits3.to_double(), 0.0);
+    }
+
+    // Two's complement, with scale, positive values
+    TEST(testNavBitsToDouble_PositiveScale)
+    {
+        bnav::NavBits<8> bits1("00000000");
+        CHECK_CLOSE(0.0, bits1.to_double(2), 0.0);
+
+        bnav::NavBits<8> bits2("00000001");
+        CHECK_CLOSE(4.0, bits2.to_double(2), 0.0);
+
+        bnav::NavBits<8> bits3("00000010");
+        CHECK_CLOSE(8.0, bits3.to_double(2), 0.0);
+        // some huge scales
+        CHECK_CLOSE(2048.0, bits3.to_double(10), 0.0);
+        CHECK_CLOSE(2097152.0, bits3.to_double(20), 0.0);
+        CHECK_CLOSE(2147483648.0, bits3.to_double(30), 0.0);
+        CHECK_CLOSE(2199023255552.0, bits3.to_double(40), 0.0);
+
+        bnav::NavBits<8> bits4("01111110");
+        CHECK_CLOSE(504.0, bits4.to_double(2), 0.0);
+
+        bnav::NavBits<8> bits5("01111111");
+        CHECK_CLOSE(508.0, bits5.to_double(2), 0.0);
+    }
+
+    // Two's complement, with scale, negative values
+    TEST(testNavBitsToDouble_NegativeScale)
+    {
+        bnav::NavBits<8> bits1("11111111");
+        CHECK_CLOSE(-0.25, bits1.to_double(-2), 0.0);
+        // some huge scales
+        CHECK_CLOSE(-0.0009765625, bits1.to_double(-10), 1.0e-10);
+        CHECK_CLOSE(-0.00000095367431640625, bits1.to_double(-20), 1.0e-20);
+        CHECK_CLOSE(-0.000000000931322574615478515625, bits1.to_double(-30), 1.0e-30);
+
+        bnav::NavBits<8> bits2("11111110");
+        CHECK_CLOSE(-0.5, bits2.to_double(-2), 0.0);
+
+        bnav::NavBits<8> bits4("10000010");
+        CHECK_CLOSE(-31.5, bits4.to_double(-2), 0.0);
+
+        bnav::NavBits<8> bits5("10000001");
+        CHECK_CLOSE(-31.75, bits5.to_double(-2), 0.0);
+
+        bnav::NavBits<8> bits3("10000000");
+        CHECK_CLOSE(-32.0, bits3.to_double(-2), 0.0);
     }
 }
 
