@@ -104,9 +104,9 @@ int main(int argc, char **argv)
         if (sfbuf->isEphemerisComplete())
         {
             bnav::SubframeBufferParam bdata = sfbuf->flushEphemerisData();
-//            std::cout << "eph complete" << std::endl;
+            std::cout << "eph complete" << std::endl;
 
-//            bnav::Ephemeris eph(bdata);
+            bnav::Ephemeris eph(bdata);
 #if 0
             ephstore.add(sv, eph);
 #endif
@@ -118,6 +118,7 @@ int main(int argc, char **argv)
 
             bnav::Ionosphere iono(bdata);
 
+#if 0
             // diff only for one single prn
             if (sv.getPRN() == 2)
             {
@@ -126,8 +127,9 @@ int main(int argc, char **argv)
 
                 iono_old = iono;
             }
+#endif
 
-           // iono.dump();
+            //iono.dump();
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;

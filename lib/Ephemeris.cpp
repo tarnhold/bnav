@@ -5,11 +5,14 @@ namespace bnav
 
 Ephemeris::Ephemeris()
     : m_sow(0)
+    , m_weeknum(0)
+    , m_dateofissue()
+    , m_klob(KlobucharParam())
 {
 }
 
 Ephemeris::Ephemeris(const SubframeBufferParam &sfbuf)
-    : m_sow(0)
+    : Ephemeris()
 {
     load(sfbuf);
 }
@@ -25,6 +28,32 @@ void Ephemeris::load(const SubframeBufferParam &sfbuf)
         loadD2(sfbuf);
     else
         loadD1(sfbuf);
+}
+
+uint32_t Ephemeris::getSOW() const
+{
+    return m_sow;
+}
+
+uint32_t Ephemeris::getWeekNum() const
+{
+    return m_weeknum;
+}
+
+DateTime Ephemeris::getDateOfIssue() const
+{
+    return m_dateofissue;
+}
+
+KlobucharParam Ephemeris::getKlobucharParam() const
+{
+    return m_klob;
+}
+
+bool Ephemeris::operator==(const Ephemeris &rhs) const
+{
+    return (getDateOfIssue() == rhs.getDateOfIssue());
+            //&& (getKlobucharParam() == rhs.getKlobucharParam());
 }
 
 void Ephemeris::loadD1(const SubframeBufferParam &sfbuf)
@@ -44,69 +73,80 @@ void Ephemeris::loadD2(const SubframeBufferParam &sfbuf)
 
     std::cout << "loadD2" << std::endl;
 
-    processPage1(vfra[0]);
-
-#if 0
-    // Pnum 1 to 13 of Frame 5
-    processPageBlock(vfra, 0);
-    // ensure we have all IGPs
-    assert(m_grid.size() == 160);
-#endif
-
-#if 0
-// wrong, because it gets it from sf 5, see Ionosphere, too
-    // date of issue of ionospheric model is at page 1 of subframe 1
-    // [1] 5.3.3.1 Basic NAV Information, p. 68
-    m_sow = vfra5.front().getSOW();
-#endif
+    processD2Page1(vfra[0]);
+    processD2Page2(vfra[1]);
 }
 
-void Ephemeris::processPage1(const Subframe &sf)
+/**
+ * @brief Ephemeris::processD2Page1 Parse page 1 of subframe 1 of D2
+ * @param sf Subframe 1 page 1.
+ *
+ * [1] 5.3.2 D2 NAV Message Detailed structure, p. 44
+ * [1] 5.2.4.4 Week Number (WN), p. 23
+ */
+void Ephemeris::processD2Page1(const Subframe &sf)
 {
     assert(sf.getPageNum() == 1);
     NavBits<300> bits = sf.getBits();
 
-    //bits.getLeft<47, 5>()
+    // date of issue of ionospheric model is at page 1 of subframe 1
+    // [1] 5.3.3.1 Basic NAV Information, p. 68
+    // we read this already, use it
+    m_sow = sf.getSOW();
 
     m_weeknum = bits.getLeft<64, 13>().to_ulong();
-    std::cout << "weeknum BDT: " << m_weeknum << std::endl;
+    m_dateofissue = DateTime(TimeSystem::BDT, m_weeknum, m_sow);
 
     // tgd1
-    std::cout << "tgd1: " << bits.getLeft<102, 10>() << std::endl;
+    //std::cout << "tgd1: " << bits.getLeft<102, 10>() << std::endl;
 
     // tgd2
-    std::cout << "tgd2: " << bits.getLeft<120, 10>() << std::endl;
-
+    //std::cout << "tgd2: " << bits.getLeft<120, 10>() << std::endl;
 }
 
-void Ephemeris::processPage2(const Subframe &sf)
+/**
+ * @brief Ephemeris::processD2Page2 Parse page 2 of subframe 1 of D2
+ * @param sf Subframe 1 page 2.
+ *
+ * [1] 5.3.2 D2 NAV Message Detailed structure, p. 44
+ * [1] 5.2.4.7 Ionospheric Delay Model Parameters, p. 25
+ */
+void Ephemeris::processD2Page2(const Subframe &sf)
 {
     assert(sf.getPageNum() == 2);
     NavBits<300> bits = sf.getBits();
 
-    // ..
-    //std::cout << bits.getLeft<46, 6>() << std::endl;
     // alpha0
-    bits.getLeft<46, 6>();
-    bits.getLeft<60, 2>();
-
-    // 1
-    bits.getLeft<62, 8>();
-    // 2
-    bits.getLeft<70, 8>();
-    // 3
-    bits.getLeft<78, 4>();
-    bits.getLeft<90, 4>();
+    NavBits<8> kval = bits.getLeft<46, 6>();
+    kval <<= 2;
+    kval ^= bits.getLeft<60, 2>();
+    m_klob.alpha0 = kval.to_double(-30);
+    // alpha1
+    kval = bits.getLeft<62, 8>();
+    m_klob.alpha1 = kval.to_double(-27);
+    // alpha2
+    kval = bits.getLeft<70, 8>();
+    m_klob.alpha2 = kval.to_double(-24);
+    // alpha3
+    kval = bits.getLeft<78, 4>();
+    kval <<= 4;
+    kval ^= bits.getLeft<90, 4>();
+    m_klob.alpha3 = kval.to_double(-24);
 
     // beta0
-    bits.getLeft<94, 8>();
-    // 1
-    bits.getLeft<102, 8>();
-    // 2
-    bits.getLeft<110, 2>();
-    bits.getLeft<120, 6>();
-    // 3
-    bits.getLeft<126, 8>();
+    kval = bits.getLeft<94, 8>();
+    m_klob.beta0 = kval.to_double(11);
+    // beta1
+    kval = bits.getLeft<102, 8>();
+    m_klob.beta1 = kval.to_double(14);
+    // beta2
+    kval = bits.getLeft<110, 2>();
+    kval <<= 6;
+    kval ^= bits.getLeft<120, 6>();
+    m_klob.beta2 = kval.to_double(16);
+    // beta3
+    kval = bits.getLeft<126, 8>();
+    m_klob.beta3 = kval.to_double(16);
 }
 
 } // namespace bnav
