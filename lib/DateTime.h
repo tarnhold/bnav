@@ -22,6 +22,8 @@ class DateTime
 {
     TimeSystem m_tsys; ///< Time system
     boost::posix_time::ptime m_time; ///< Date and Time store
+    uint32_t m_weeknum; ///< Safe weeknum in weeks of TimeSystem
+    uint32_t m_sow; ///< Safe SOW of week
 
 public:
     DateTime();
@@ -33,6 +35,9 @@ public:
 
     TimeSystem getTimeSystem() const;
     boost::posix_time::ptime get_ptime() const;
+
+    uint32_t getWeekNum() const;
+    uint32_t getSOW() const;
 
     uint32_t getDay() const;
     uint32_t getMonth() const;

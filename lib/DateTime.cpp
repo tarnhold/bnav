@@ -49,6 +49,10 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
 {
     boost::gregorian::date d0;
 
+    // safe original values, too
+    m_weeknum = weeknum;
+    m_sow = sow;
+
     if (m_tsys == TimeSystem::BDT)
     {
         // Weeknum starts on 00:00:00 Jan, 1, 2006 BDT
@@ -99,6 +103,16 @@ TimeSystem DateTime::getTimeSystem() const
 boost::posix_time::ptime DateTime::get_ptime() const
 {
     return m_time;
+}
+
+uint32_t DateTime::getWeekNum() const
+{
+    return m_weeknum;
+}
+
+uint32_t DateTime::getSOW() const
+{
+    return m_sow;
 }
 
 /**
