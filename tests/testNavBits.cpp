@@ -348,4 +348,18 @@ TEST(testNavBitsSlice)
         ret = bTest.getLeft<6, 0>().to_string();
         CHECK(ret == "");
     }
+
+    // Get bit slice from left (msb is index 0), check by assignment
+    {
+        const bnav::NavBits<6> bTest("111001");
+
+        bnav::NavBits<6> ret6 = bTest.getLeft<0, 6>();
+        CHECK(ret6.to_string() == "111001");
+        bnav::NavBits<5> ret5 = bTest.getLeft<1, 5>();
+        CHECK(ret5.to_string() == "11001");
+        bnav::NavBits<1> ret1 = bTest.getLeft<5, 1>();
+        CHECK(ret1.to_string() == "1");
+        bnav::NavBits<0> ret0 = bTest.getLeft<6, 0>();
+        CHECK(ret0.to_string() == "");
+    }
 }
