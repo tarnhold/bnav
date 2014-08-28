@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <iostream>
-//#include <iomanip>
 
 typedef bnav::NavBits<15> subword;
 
@@ -110,11 +109,10 @@ public:
 
 private:
     void checkAndFixAllSubwords();
-    /*std::vector< subword >*/void splitWordToSubword();
-    std::string mergeSubwordsToWord(/*std::vector< subword > msglist*/);
+    void splitWordToSubword();
+    std::string mergeSubwordsToWord();
 
     bool checkAndFixSubword(subword &message);
-    //bool checkAndFixParity(const NavBits<len> &message);
 
 };
 
@@ -155,9 +153,9 @@ NavBitsECCWord<len>::NavBitsECCWord(const NavBits<len> &bits)
  *
  */
 template <std::size_t len>
-/*std::vector< subword >*/ void NavBitsECCWord<len>::splitWordToSubword()
+void NavBitsECCWord<len>::splitWordToSubword()
 {
-    //assert(messagestr.length() % 15 == 0);
+    static_assert(len % 15 == 0, "invalid size");
 
     const std::size_t num = len / 15;
     m_msglist.resize(num);
@@ -170,28 +168,12 @@ template <std::size_t len>
         return;
     }
 
-    //std::cout << "complete:" << messagestr.length() << std::endl;
-
-
     for (std::size_t i = 0; i < num; ++i)
     {
         std::size_t startinfo = 11*i;
         std::size_t startpar = 11*num + 4*i;
 
         NavBits<15> submessage;
-//std::cerr << "startinfo:" << startinfo << " num: " << num << std::endl;
-/* CASE mirrored message
- * frisst etwas zeit, das mirroring
-        for (std::size_t k = 0; k < 12; ++k)
-        {
-            submessage[15 - k - 1] = message[startinfo + k];
-        }
-
-        for (std::size_t k = 0; k < 4; ++k)
-        {
-            submessage[15-11 - k - 1] = message[startpar + k];
-        }
-*/
 
         // note: this is accessed from right
         for (std::size_t k = 0; k < 12; ++k)
@@ -200,20 +182,10 @@ template <std::size_t len>
         for (std::size_t k = 0; k < 4; ++k)
             submessage[15-11 - k - 1] = m_bits[len-1 - startpar - k];
 
-  //      std::cout << submessage << std::endl;
-
-/* subword mit substr - fuer unittest nehmen
-        subword submessage(
-              messagestr.substr(11*i, 11)
-            + messagestr.substr(11*num + 4*i, 4));
-*/
-
         m_msglist[i] = submessage;
 
         //std::cout << i << ":" << submessage << std::endl;
     }
-
-    //return m_msglist;
 }
 
 /*!
@@ -222,7 +194,7 @@ template <std::size_t len>
  * TODO: don't use to_string()!
  */
 template <std::size_t len>
-std::string NavBitsECCWord<len>::mergeSubwordsToWord(/*std::vector< subword > msglist*/)
+std::string NavBitsECCWord<len>::mergeSubwordsToWord()
 {
     // merge msg list back to original message
     // only if some parity bits were fixed!
@@ -236,9 +208,6 @@ std::string NavBitsECCWord<len>::mergeSubwordsToWord(/*std::vector< subword > ms
         info += msgstr.substr(0, 11);
         parity += msgstr.substr(11);
     }
-
-    //std::cerr << "blubber: "
-    //    << info << " : "<< parity << std::endl;
 
     return info + parity;
 }
@@ -275,30 +244,15 @@ bool NavBitsECCWord<len>::checkAndFixSubword(subword &message)
 
 
 template <std::size_t len>
-void NavBitsECCWord<len>::checkAndFixAllSubwords(/*const NavBits<len> &message*/)
+void NavBitsECCWord<len>::checkAndFixAllSubwords()
 {
-    //for (std::vector< subword >::iterator it = m_msglist.begin(); it != m_msglist.end(); ++it)
-    //     checkAndFix(&(*it));
     for (std::size_t i = 0; i < m_msglist.size(); ++i)
         checkAndFixSubword(m_msglist[i]);
-
-/*
-    // 11+11+...+4+4+...
-    std::vector< subword > vlist = splitMessage(message);
-    
-    // @TODO use returned value and save it into vlist[i]
-    // at the moment we are using the uncorrected one
-    for (std::vector< subword >::const_iterator it = vlist.begin(); it != vlist.end(); ++it)
-         checkAndFixParity(*it);
-*/    
-   // std::cout << "orig :" << message << std::endl;
-   // std::cout << "merge:" << mergeMessage(/*vlist*/) << std::endl;
 }
 
 template <std::size_t len>
 NavBits<len> NavBitsECCWord<len>::getBits()
 {
-    //std::cout << m_counter << std::endl;
     std::string merge;
     merge = mergeSubwordsToWord();
 
