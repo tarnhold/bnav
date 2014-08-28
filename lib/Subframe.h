@@ -24,8 +24,7 @@ class Subframe
     uint32_t m_pageNum;
     bool m_isGeo;
 
-    bool m_isParityWordOneFixed;
-    bool m_isParityAllFixed;
+    bool m_isParityFixed;
     bool m_isInitialized;
 
 public:
@@ -49,8 +48,7 @@ public:
     void forcePageNum(const uint32_t pnum);
 #endif
 
-    bool checkAndFixParityWordOne();
-    bool checkAndFixParityAll();
+    bool checkAndFixParities();
 
     bool operator==(const Subframe &rhs);
 

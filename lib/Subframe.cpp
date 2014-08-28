@@ -22,8 +22,7 @@ Subframe::Subframe()
     , m_frameID(0)
     , m_pageNum(0)
     , m_isGeo(false)
-    , m_isParityWordOneFixed(false)
-    , m_isParityAllFixed(false)
+    , m_isParityFixed(false)
     , m_isInitialized(false)
 {
 }
@@ -35,8 +34,7 @@ Subframe::Subframe(const SvID &sv, const DateTime date, const NavBits<300> &bits
     , m_frameID(0)
     , m_pageNum(0)
     , m_isGeo(sv.isGeo())
-    , m_isParityWordOneFixed(false)
-    , m_isParityAllFixed(false)
+    , m_isParityFixed(false)
     , m_isInitialized(false)
 {
     initialize();
@@ -46,28 +44,23 @@ Subframe::Subframe(const SvID &sv, const DateTime date, const NavBits<300> &bits
  * @brief Subframe::initialize
  *
  * Decoding procedure:
- * 1. Check Preabmle
- * 2. Check and fix parity for second half of the first word.
+ * 1. Check Preamble
+ * 2. Check and fix all parities. Unlike the ICD, all messages are made up of
+ *    words with 30 bits. This means that there are no special pages like D2
+ *    subframe 4 with 72 parity bits at the end.
  * 3. Decode FraID from first word.
- * 4. Decode Pnum without parity check from second word.
- *
- * TODO (see notes from 17.07.2014 PageNum):
- * 5. After Pnum has been read, do complete parity check of the whole message.
- *      (maybe delay this until all pages are accumulated inside SubframeBuffer)
+ * 4. Decode Pnum.
  */
 void Subframe::initialize()
 {
     if (!isPreambleOk())
         std::cerr << "Wrong preamble: " << m_bits << std::endl;
 
-    // ensure our FraID is safe
-    checkAndFixParityWordOne();
-
     // fix all remaining words
     // other than the ICD says, there are no blocks like D2 subframe 4, which
     // has 72 parity bits at the end of the message. Those pages are as all
     // other, 30+30+30...
-    checkAndFixParityAll();
+    checkAndFixParities();
 
     // read basic info from NavBits
     parseFrameID();
@@ -141,27 +134,20 @@ void Subframe::forcePageNum(const uint32_t pnum)
 }
 #endif
 
-bool Subframe::checkAndFixParityWordOne()
+bool Subframe::checkAndFixParities()
 {
     // second 15 bits of word one need to be checked
     // first 15 bits are preamble and 4 bit reserved
-    NavBits<15> wordone = m_bits.getLeft<15, 15>();
-
-    NavBitsECCWord<15> ecc(wordone);
-    if (ecc.isModified())
+    NavBitsECCWord<15> ecc1(m_bits.getLeft<15, 15>());
+    if (ecc1.isModified())
     {
         // SOW is not this helpful here, because we have an offset between SOW
         // and TOW from sbf file, but better than nothing
         std::cout << "Parity fixed for SOW: " << m_datetime.getSOW() << std::endl;
-        m_bits.setLeft(15, ecc.getBits());
+        m_bits.setLeft(15, ecc1.getBits());
     }
 
-    m_isParityWordOneFixed = true;
-    return m_isParityWordOneFixed;
-}
-
-bool Subframe::checkAndFixParityAll()
-{
+    // fix remaining words
     NavBitsECCWord<30> ecc(m_bits.getLeft<30, 30>());
     if (ecc.isModified())
     {
@@ -217,9 +203,9 @@ bool Subframe::checkAndFixParityAll()
         m_bits.setLeft(270, ecc.getBits());
     }
 
-    m_isParityAllFixed = true;
+    m_isParityFixed= true;
 
-    return m_isParityAllFixed;
+    return m_isParityFixed;
 }
 
 /**
