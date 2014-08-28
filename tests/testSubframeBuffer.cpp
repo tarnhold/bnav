@@ -100,4 +100,44 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
         CHECK(almcount == 1);
         reader.close();
     }
+
+    // data has one complete set of frame 1 (page 1 to 10), but at TOW 361284
+    // (sbf) there is a parity error, so that there is an offset of 256
+    // with that error uncorrected there would be no complete ephemeris data set
+    // check if error gets corrected accordingly
+    TEST(testSubframeBuffer_ParityFixD2)
+    {
+        bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/subframebuffer/sow-parity.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+
+        bnav::SubframeBufferD2 sfbuf;
+
+        std::size_t msgcount = 0, ephcount = 0;
+        bnav::AsciiReaderEntry entry;
+        while (reader.readLine(entry))
+        {
+            if (entry.getSignalType() != bnav::SignalType::BDS_B1)
+                continue;
+
+            bnav::SvID sv(entry.getPRN());
+            CHECK(sv.isGeo());
+            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+
+            sfbuf.addSubframe(sf);
+
+            if (sfbuf.isEphemerisComplete())
+            {
+                bnav::SubframeBufferParam data = sfbuf.flushEphemerisData();
+                (void) data; // avoid warnings
+                ++ephcount;
+            }
+
+            ++msgcount;
+        }
+        std::cout << msgcount << std::endl;
+        CHECK(msgcount == 52);
+        // we should have on complete data set
+        CHECK(ephcount == 1);
+        reader.close();
+    }
 }
