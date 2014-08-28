@@ -93,10 +93,11 @@ TEST(testNavBitsConstructor)
     }
 }
 
-TEST(testNavBitsAccess)
+SUITE(testNavBitsAccess)
 {
     // Access from right, like std::bitset
     // operator[] and &operator[]
+    TEST(testNavBitsAccessSimple)
     {
         bnav::NavBits<3> bits;
         bits[0] = true;
@@ -116,6 +117,7 @@ TEST(testNavBitsAccess)
 
     // Access from left
     // atLeft and &atLeft
+    TEST(testNavBitsAccessSimpleLeft)
     {
         bnav::NavBits<3> bits;
         bits.setLeft(0, true);
@@ -133,6 +135,36 @@ TEST(testNavBitsAccess)
         CHECK(bits2.atLeft(1) == true);
         CHECK(bits2.atLeft(2) == true);
         CHECK(bits2.to_string() == "011");
+    }
+
+    // Access from left, set a bunch of bits
+    TEST(testNavBitsAccessSetLeftNavBits)
+    {
+        const bnav::NavBits<4> setter("1101");
+        bnav::NavBits<10> bits;
+        bits.setLeft(0, setter);
+        CHECK(bits.size() == 10);
+        CHECK(bits.to_string() == "1101000000");
+
+        bits = bnav::NavBits<10>(0);
+        CHECK(bits.to_ulong() == 0);
+        bits.setLeft(1, setter);
+        CHECK(bits.to_string() == "0110100000");
+
+        bits = bnav::NavBits<10>(0);
+        CHECK(bits.to_ulong() == 0);
+        bits.setLeft(6, setter);
+        CHECK(bits.to_string() == "0000001101");
+
+        bits = bnav::NavBits<10>(31);
+        CHECK(bits.to_string() == "0000011111");
+        bits.setLeft(0, setter);
+        CHECK(bits.to_string() == "1101011111");
+
+        bits = bnav::NavBits<10>(31);
+        CHECK(bits.to_string() == "0000011111");
+        bits.setLeft(2, setter);
+        CHECK(bits.to_string() == "0011011111");
     }
 }
 

@@ -163,19 +163,14 @@ public:
         m_bitset.set(m_bitset.size() - 1 - index, value);
     }
 
-#if 0
     template<std::size_t len>
     void setLeft(std::size_t index, const NavBits<len> &bits)
     {
         assert(index + len <= dim);
 
         for (std::size_t i = index; i < index + len; ++i)
-        {
-            // save first bit into [0]:
-            setLeft(i - index, bits.atLeft(i));
-        }
+            setLeft(i, bits.atLeft(i - index));
     }
-#endif
 
     void flip(std::size_t index)
     {
