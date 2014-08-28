@@ -75,35 +75,6 @@ void Ephemeris::loadD2(const SubframeBufferParam &sfbuf)
 
     processD2Page1(vfra[0]);
     processD2Page2(vfra[1]);
-
-
-    // SF 1
-    NavBits<300> bits = vfra[0].getBits();
-    NavBits<17> toc = bits.getLeft<77, 5>();
-    toc <<= 12;
-    toc ^= bits.getLeft<90, 12>();
-    std::cout << "toc: " << toc.to_ulong() * 8 << std::endl;
-
-    // SF 3
-    bits = vfra[2].getBits();
-    NavBits<24> a0 = bits.getLeft<100, 12>();
-    a0 <<= 12;
-    a0 ^= bits.getLeft<120, 12>();
-    std::cout << "a0: " << a0.to_double(-33) << std::endl;
-
-    // SF 3+4
-    NavBits<22> a1 = bits.getLeft<122, 4>();
-    a1 <<= 6;
-    bits = vfra[3].getBits();
-    a1 ^= bits.getLeft<46, 6>();
-    a1 <<= 12;
-    a1 ^= bits.getLeft<60, 12>();
-    std::cout << "a1: " << a1.to_double(-50) << std::endl;
-
-    std::cout << "<<<< delta t: " <<
-                 a0.to_double(-33) + a1.to_double(-50) * (m_sow - toc.to_ulong()) << std::endl;
-
-    std::cout << "TOW (SBF): " << vfra[0].getDateTime().getSecondString() << " - sow: " << vfra[0].getSOW() << std::endl;
 }
 
 /**

@@ -219,66 +219,6 @@ void Ionosphere::load(const SubframeBufferParam &sfbuf)
     // ensure we have all IGPs
     assert(m_grid.size() == 320);
 
-
-    // TimeOffset, should be inside Almanac, only testing here
-    // leap seconds are 2s at the moment (2014/07), so this is neglectable.
-    if (vfra5[101].getPageNum() == 102)
-    {
-        std::cout << "<<<<< page 102" << std::endl;
-        NavBits<300> bits = vfra5[101].getBits();
-
-        // dtLS: delta time due to leap seconds before the new leap second effective
-        NavBits<8> dtLS = bits.getLeft<50, 2>();
-        dtLS <<= 6;
-        dtLS ^= bits.getLeft<60, 6>();
-        std::cout << "dtLS: "<< dtLS.to_ulong() << std::endl;
-
-        // week number of the new leap second
-        NavBits<8> wnLSF = bits.getLeft<74, 8>();
-        std::cout << "WNLSF: " << wnLSF.to_ulong() << std::endl;
-
-        // DN: day number of week of the new leap second
-        NavBits<8> dn = bits.getLeft<162, 8>();
-        std::cout << "DN: " << dn.to_ulong() << std::endl;
-
-        // delta time due to leap seconds after the new leap second effective
-        NavBits<8> dtLSF = bits.getLeft<66, 8>();
-        std::cout << "dtLSF: " << dtLSF.to_ulong() << std::endl;
-
-        // not relevant, too tiny
-        // A0UTC: clock bias relative to UTC
-        NavBits<32> a0utc = bits.getLeft<90, 22>();
-        a0utc <<= 10;
-        a0utc ^= bits.getLeft<120, 10>();
-        std::cout << a0utc << std::endl;
-
-        // A1UTC: clock rate relative to UTC
-        NavBits<24> a1utc = bits.getLeft<130, 12>();
-        a1utc <<= 12;
-        a1utc ^= bits.getLeft<150, 12>();
-        std::cout << a1utc << std::endl;
-
-
-
-        // case1
-        m_sow = vfra5.front().getSOW();
-        std::cout << "sow: " << m_sow << std::endl;
-        double corr = static_cast<double>(dtLS.to_ulong()) + a0utc.to_double(-30) + a1utc.to_double(-50) * m_sow;
-        std::cout << std::setprecision(20) << "case1: " << corr << std::endl;
-
-        // if we are at a week change SOW may be zero, so we have to set this
-        // to the maximum SOW value, to get the date inside the old week
-        // FIXME: this won't work, because weeknum doesn't get changed. This is
-        // inside Ephemeris... So we can only safe a correction value here!
-        // Which we return later.
-        if (m_sow == 0)
-            m_sow = SECONDS_OF_A_WEEK;
-
-        m_sow = m_sow - static_cast<uint32_t>(std::lround(corr));
-        std::cout << "sow1: " << m_sow << std::endl;
-    }
-
-
     // date of issue of ionospheric model is at page 1 of subframe 1
     // [1] 5.3.3.1 Basic NAV Information, p. 68
     // FIXME: this gets it from subframe 5...
