@@ -25,6 +25,7 @@ class Subframe
     bool m_isGeo;
 
     bool m_isParityFixed;
+    std::size_t m_ParityModifiedCount;
     bool m_isInitialized;
 
 public:
@@ -35,6 +36,7 @@ public:
     NavBits<300> getBits() const;
     void setDateTime(const DateTime &date);
     DateTime getDateTime() const;
+    std::size_t getParityModifiedCount() const;
 
     void setSvID(const SvID &sv);
 

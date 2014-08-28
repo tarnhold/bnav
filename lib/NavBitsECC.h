@@ -106,6 +106,7 @@ public:
     NavBits<len> getBits();
     
     bool isModified() const;
+    std::size_t getModifiedCount() const;
 
 private:
     void checkAndFixAllSubwords();
@@ -270,6 +271,13 @@ bool NavBitsECCWord<len>::isModified() const
     //std::cout << "m_counter: " << m_counter << std::endl;
     return m_counter > 0;
 }
+
+template <std::size_t len>
+std::size_t NavBitsECCWord<len>::getModifiedCount() const
+{
+    return m_counter;
+}
+
 
 }
 

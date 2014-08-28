@@ -23,6 +23,7 @@ Subframe::Subframe()
     , m_pageNum(0)
     , m_isGeo(false)
     , m_isParityFixed(false)
+    , m_ParityModifiedCount(0)
     , m_isInitialized(false)
 {
 }
@@ -35,6 +36,7 @@ Subframe::Subframe(const SvID &sv, const DateTime date, const NavBits<300> &bits
     , m_pageNum(0)
     , m_isGeo(sv.isGeo())
     , m_isParityFixed(false)
+    , m_ParityModifiedCount(0)
     , m_isInitialized(false)
 {
     initialize();
@@ -118,6 +120,11 @@ uint32_t Subframe::getPageNum() const
     return m_pageNum;
 }
 
+std::size_t Subframe::getParityModifiedCount() const
+{
+    return m_ParityModifiedCount;
+}
+
 #if 0
 /**
  * @brief Subframe::forcePageNum Force Subframe to be a specific Pnum.
@@ -145,6 +152,7 @@ bool Subframe::checkAndFixParities()
         // and TOW from sbf file, but better than nothing
         std::cout << "Parity fixed for SOW: " << m_datetime.getSOW() << std::endl;
         m_bits.setLeft(15, ecc1.getBits());
+        m_ParityModifiedCount += ecc1.getModifiedCount();
     }
 
     // fix remaining words
@@ -153,54 +161,63 @@ bool Subframe::checkAndFixParities()
     {
         std::cout << "fixed at 30, 30" << std::endl;
         m_bits.setLeft(30, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<60, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 60, 30" << std::endl;
         m_bits.setLeft(60, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<90, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 90, 30" << std::endl;
         m_bits.setLeft(90, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<120, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 120, 30" << std::endl;
         m_bits.setLeft(120, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<150, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 150, 30" << std::endl;
         m_bits.setLeft(150, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<180, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 180, 30" << std::endl;
         m_bits.setLeft(180, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<210, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 210, 30" << std::endl;
         m_bits.setLeft(210, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<240, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 240, 30" << std::endl;
         m_bits.setLeft(240, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
     ecc = NavBitsECCWord<30>(m_bits.getLeft<270, 30>());
     if (ecc.isModified())
     {
         std::cout << "fixed at 270, 30" << std::endl;
         m_bits.setLeft(270, ecc.getBits());
+        m_ParityModifiedCount += ecc.getModifiedCount();
     }
 
     m_isParityFixed= true;

@@ -1,7 +1,11 @@
 #include <unittest++/UnitTest++.h>
+#include "TestConfig.h"
 
 #include "NavBits.h"
 #include "NavBitsECC.h"
+#include "AsciiReader.h"
+#include "SvID.h"
+#include "Subframe.h"
 
 #include <iostream>
 
@@ -144,4 +148,28 @@ TEST(testNavBitsECCParity15)
         bits.flip(i);
         CHECK(bits.to_ulong() == initialbitval);
     }
+}
+
+TEST(testNavBitsECCWordFiles)
+{
+    bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/parity/wrong-parities-wordone.txt",
+                             bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+
+    std::size_t msgcount = 0, paritycount = 0;
+    bnav::AsciiReaderEntry entry;
+    while (reader.readLine(entry))
+    {
+        if (entry.getSignalType() != bnav::SignalType::BDS_B1)
+            continue;
+
+        bnav::SvID sv(entry.getPRN());
+        CHECK(sv.isGeo());
+        bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+        paritycount += sf.getParityModifiedCount();
+
+        ++msgcount;
+    }
+    CHECK(msgcount == 5);
+    CHECK(paritycount == 1);
+    reader.close();
 }
