@@ -63,6 +63,12 @@ void Subframe::initialize()
     // ensure our FraID is safe
     checkAndFixParityWordOne();
 
+    // fix all remaining words
+    // other than the ICD says, there are no blocks like D2 subframe 4, which
+    // has 72 parity bits at the end of the message. Those pages are as all
+    // other, 30+30+30...
+    checkAndFixParityAll();
+
     // read basic info from NavBits
     parseFrameID();
     parseSOW();
@@ -72,9 +78,6 @@ void Subframe::initialize()
         parsePageNumD2();
     else
         parsePageNumD1();
-
-    // fix all remaining words
-    checkAndFixParityAll();
 
     m_isInitialized = true;
 }
@@ -144,47 +147,78 @@ bool Subframe::checkAndFixParityWordOne()
     // first 15 bits are preamble and 4 bit reserved
     NavBits<15> wordone = m_bits.getLeft<15, 15>();
 
-    NavBitsECC<15> ecc(wordone);
-    ecc.checkAndFixAll();
+    NavBitsECCWord<15> ecc(wordone);
     if (ecc.isModified())
     {
-        // SOW is not this helpful here, because we have an offset between SOW and TOw (from sbf file)
-        std::cerr << "Parity fixed for SOW: " << m_sow << std::endl;
-        wordone = ecc.getBits();
-// FIXME currently only checked, not further used (corrected data should be
-// saved back into NavBits
+        // SOW is not this helpful here, because we have an offset between SOW
+        // and TOW from sbf file, but better than nothing
+        std::cout << "Parity fixed for SOW: " << m_datetime.getSOW() << std::endl;
+        m_bits.setLeft(15, ecc.getBits());
     }
 
-    // TODO
-    m_isParityWordOneFixed = false;
+    m_isParityWordOneFixed = true;
     return m_isParityWordOneFixed;
 }
 
 bool Subframe::checkAndFixParityAll()
 {
-#if 0
-    if (m_isGeo && m_frameID == 5)
+    NavBitsECCWord<30> ecc(m_bits.getLeft<30, 30>());
+    if (ecc.isModified())
     {
-        if ((m_pageNum > 0 && m_pageNum <= 13)
-                && (m_pageNum >= 35 && m_pageNum <= 73))
-        {
-            NavBits<270> remaining = m_bits.getLeft<30, 270>();
-            NavBitsECC<15> ecc(remaining);
-            ecc.checkAndFixAll();
-            if (ecc.isModified())
-            {
-                std::cerr << "Parity fixed for TOW: " << m_tow << std::endl;
-                remaining = ecc.getBits();
-        // FIXME currently only checked, not further used (corrected data should be
-        // saved back into NavBits
-            }
-
-        }
+        std::cout << "fixed at 30, 30" << std::endl;
+        m_bits.setLeft(30, ecc.getBits());
     }
-#endif
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<60, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 60, 30" << std::endl;
+        m_bits.setLeft(60, ecc.getBits());
+    }
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<90, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 90, 30" << std::endl;
+        m_bits.setLeft(90, ecc.getBits());
+    }
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<120, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 120, 30" << std::endl;
+        m_bits.setLeft(120, ecc.getBits());
+    }
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<150, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 150, 30" << std::endl;
+        m_bits.setLeft(150, ecc.getBits());
+    }
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<180, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 180, 30" << std::endl;
+        m_bits.setLeft(180, ecc.getBits());
+    }
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<210, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 210, 30" << std::endl;
+        m_bits.setLeft(210, ecc.getBits());
+    }
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<240, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 240, 30" << std::endl;
+        m_bits.setLeft(240, ecc.getBits());
+    }
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<270, 30>());
+    if (ecc.isModified())
+    {
+        std::cout << "fixed at 270, 30" << std::endl;
+        m_bits.setLeft(270, ecc.getBits());
+    }
 
-    // TODO remaining parities are ignored at the moment
-    m_isParityAllFixed = false;
+    m_isParityAllFixed = true;
+
     return m_isParityAllFixed;
 }
 

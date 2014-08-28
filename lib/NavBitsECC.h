@@ -94,7 +94,7 @@ namespace bnav
  * More than one wrong bit can't be detected by BCH(15,11,1)!
  */
 template <std::size_t len>
-class NavBitsECC
+class NavBitsECCWord
 {
 private:
     NavBits<len> m_bits; ///< raw message bits
@@ -102,19 +102,19 @@ private:
     std::size_t m_counter; ///< how many subwords got fixed
 
 public:
-    NavBitsECC(const NavBits<len> &bits);
-    ~NavBitsECC();
-
-    /*std::vector< subword >*/void splitMessage();
-    std::string mergeMessage(/*std::vector< subword > msglist*/);
-
-    bool checkAndFix(subword &message);
-    //bool checkAndFixParity(const NavBits<len> &message);
-    void checkAndFixAll();
+    NavBitsECCWord(const NavBits<len> &bits);
 
     NavBits<len> getBits();
     
     bool isModified() const;
+
+private:
+    void checkAndFixAllSubwords();
+    /*std::vector< subword >*/void splitWordToSubword();
+    std::string mergeSubwordsToWord(/*std::vector< subword > msglist*/);
+
+    bool checkAndFixSubword(subword &message);
+    //bool checkAndFixParity(const NavBits<len> &message);
 
 };
 
@@ -132,32 +132,30 @@ public:
  *
  */
 template <std::size_t len>
-NavBitsECC<len>::NavBitsECC(const NavBits<len> &bits)
+NavBitsECCWord<len>::NavBitsECCWord(const NavBits<len> &bits)
     : m_bits(bits)
     , m_counter(0)
 {
     // ensure we use only valid templates
     static_assert(len == 15 || len == 30 || len == 90 || len == 150
-                  || len == 250, "invalid NavBits size");
-        
-    //checkAndFixAll();
+                  || len == 270, "invalid NavBits size");
+
+    splitWordToSubword();
+    checkAndFixAllSubwords();
 }
     
-template <std::size_t len>
-NavBitsECC<len>::~NavBitsECC()
-{
-}
-
-
 /*!
- * Splits the message into 11 bit information and 4 bit parity parts (here
+ * Splits the word into 11 bit information and 4 bit parity parts (here
  * called 'subword').
+ *
+ * normal word: 30 bits, 22 information, 8 parity
+ * special words: ...
  *
  * E.g. 11+11+4+4 is handled as an array of (11+4, 11+4).
  *
  */
 template <std::size_t len>
-/*std::vector< subword >*/ void NavBitsECC<len>::splitMessage()
+/*std::vector< subword >*/ void NavBitsECCWord<len>::splitWordToSubword()
 {
     //assert(messagestr.length() % 15 == 0);
 
@@ -224,7 +222,7 @@ template <std::size_t len>
  * TODO: don't use to_string()!
  */
 template <std::size_t len>
-std::string NavBitsECC<len>::mergeMessage(/*std::vector< subword > msglist*/)
+std::string NavBitsECCWord<len>::mergeSubwordsToWord(/*std::vector< subword > msglist*/)
 {
     // merge msg list back to original message
     // only if some parity bits were fixed!
@@ -249,7 +247,7 @@ std::string NavBitsECC<len>::mergeMessage(/*std::vector< subword > msglist*/)
  * Check parity for one single subword (11+4)
  */
 template <std::size_t len>
-bool NavBitsECC<len>::checkAndFix(subword &message)
+bool NavBitsECCWord<len>::checkAndFixSubword(subword &message)
 {
     std::size_t idx = decodeBCH(message);
 
@@ -259,12 +257,12 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
         subword fixed(message xor NavBits<15>(cROMTable[idx]));
         ++m_counter;
 
-#if 0
+//#if 0
         std::cout << "parity check failed" << std::endl;
         std::cout << "old: " << message << std::endl;
         std::cout << "new: " << fixed << std::endl;
         std::cout << std::setw(3) << idx << ": " << NavBits<15>(cROMTable[idx]) << std::endl;
-#endif
+//#endif
 
         message = fixed;
         
@@ -277,14 +275,12 @@ bool NavBitsECC<len>::checkAndFix(subword &message)
 
 
 template <std::size_t len>
-void NavBitsECC<len>::checkAndFixAll(/*const NavBits<len> &message*/)
+void NavBitsECCWord<len>::checkAndFixAllSubwords(/*const NavBits<len> &message*/)
 {
-    splitMessage();
-    
     //for (std::vector< subword >::iterator it = m_msglist.begin(); it != m_msglist.end(); ++it)
     //     checkAndFix(&(*it));
     for (std::size_t i = 0; i < m_msglist.size(); ++i)
-        checkAndFix(m_msglist[i]);
+        checkAndFixSubword(m_msglist[i]);
 
 /*
     // 11+11+...+4+4+...
@@ -300,11 +296,11 @@ void NavBitsECC<len>::checkAndFixAll(/*const NavBits<len> &message*/)
 }
 
 template <std::size_t len>
-NavBits<len> NavBitsECC<len>::getBits()
+NavBits<len> NavBitsECCWord<len>::getBits()
 {
     //std::cout << m_counter << std::endl;
     std::string merge;
-    merge = mergeMessage();
+    merge = mergeSubwordsToWord();
 
     return NavBits<len>(merge);
 }
@@ -315,12 +311,11 @@ NavBits<len> NavBitsECC<len>::getBits()
  * @return true if at least one subword was fixed. false if nothing was changed.
  */
 template <std::size_t len>
-bool NavBitsECC<len>::isModified() const
+bool NavBitsECCWord<len>::isModified() const
 {
     //std::cout << "m_counter: " << m_counter << std::endl;
     return m_counter > 0;
 }
-
 
 }
 

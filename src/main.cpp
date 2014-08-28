@@ -73,6 +73,7 @@ int main(int argc, char **argv)
     std::cout << dt.getIonexDate() << std::endl;
 
     bnav::Ionosphere iono_old;
+    bnav::KlobucharParam klob_old;
 
     bnav::AsciiReaderEntry data;
     while (reader.readLine(data))
@@ -84,18 +85,18 @@ int main(int argc, char **argv)
         bnav::SvID sv(data.getPRN());
 
         // skip non-GEO SVs
-        if (!sv.isGeo())
-            continue;
+//        if (!sv.isGeo())
+//            continue;
 
         bnav::Subframe sf(sv, data.getDateTime(), data.getBits());
 
-#if 0
+//#if 0
         // debug
-        std::cout << "prn: " << data.getPRN() << " wn: " << data.getWeek()
-                  << " tow: " << data.getTOW() << " sow: " << sf.getSOW()
+        std::cout << "prn: " << data.getPRN() << " wn: " << data.getDateTime().getWeekNum()
+                  << " tow: " << data.getDateTime().getSOW() << " sow: " << sf.getSOW()
                   << " fra: " << sf.getFrameID() << " pnum: "
                   << sf.getPageNum() << std::endl;
-#endif
+//#endif
 
         sbstore.addSubframe(sv, sf);
 
@@ -104,9 +105,16 @@ int main(int argc, char **argv)
         if (sfbuf->isEphemerisComplete())
         {
             bnav::SubframeBufferParam bdata = sfbuf->flushEphemerisData();
-            std::cout << "eph complete" << std::endl;
-
+            //std::cout << "eph complete" << std::endl;
+#if 0
             bnav::Ephemeris eph(bdata);
+            bnav::KlobucharParam klob = eph.getKlobucharParam();
+            // LD_LIBRARY_PATH=../lib/ ./bapp -sbf ../../bnav3/tests/data/sbf/CUT12014071724.sbf_SBF_CMPRaw-prn2.txt | grep -v '          0          0          0          0' | grep 'alpha:' -B1 -A1
+            //klob - klob_old;
+            std::cout << eph.getDateOfIssue().getIonexDate() << ":" << eph.getDateOfIssue().getSecondString() << std::endl;
+            std::cout << klob - klob_old << std::endl;
+            klob_old = klob;
+#endif
 #if 0
             ephstore.add(sv, eph);
 #endif
@@ -114,9 +122,9 @@ int main(int argc, char **argv)
         else if (sfbuf->isAlmanacComplete())
         {
             bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
-            std::cout << "almanac complete" << std::endl;
+            //std::cout << "almanac complete" << std::endl;
 
-            bnav::Ionosphere iono(bdata);
+//            bnav::Ionosphere iono(bdata);
 
 #if 0
             // diff only for one single prn
@@ -134,7 +142,7 @@ int main(int argc, char **argv)
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
 
-            ionostore.addIonosphere(sv, iono);
+//            ionostore.addIonosphere(sv, iono);
 #if 0
             bnav::Almanac alm(data);
 
