@@ -25,42 +25,62 @@ std::bitset<len> mirror(const std::bitset<len> &rhs)
 
     return lhs;
 }
-#endif
 
-TEST(testNavBitsECC)
-{
-    //std::bitset<30> bTest("100110010010011101111101010111");
-    bnav::NavBits<30> bTest(  "101111111110000000000011110000");
-
-#if 0
     std::bitset<30> bTestM = mirror(bTest);
     std::cout << "normal:" << bTest << std::endl;
     std::cout << "mirror:" << bTestM << " :" << bTestM[29 - 4] << std::endl;
 #endif
 
-    bnav::NavBits<90> bTest2("111111111110000000000011111111111000000000001111111111100000000000111100001111000011110000");
+// check various bit blocks, if they got split correctly to "subwords" (11+4 bits)
+SUITE(testNavBitsECC_Block)
+{
+    // ParityBlockType = default
+    TEST(testNavBitsECC30)
+    {
+        bnav::NavBits<30> bTest("111111111110000000000011110000");
 
-    bnav::NavBits<150> bTest3("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111000011110000111100001111000011110000");
+        bnav::NavBitsECC<30> ecc(bTest);
+        ecc.checkAndFixAll();
+        CHECK(!ecc.isModified());
 
-    //checkAndFixParity(bTest);
+        // change first bit
+        bTest.flipLeft(0);
+        bnav::NavBitsECC<30> ecc2(bTest);
+        ecc2.checkAndFixAll();
+        CHECK(ecc2.isModified());
+    }
 
-//    std::cout << "-------------2" << std::endl;
+    // ParityBlockType::BITS24
+    TEST(testNavBitsECC90)
+    {
+        bnav::NavBits<90> bTest("111111111110000000000011111111111000000000001111111111100000000000111100001111000011110000");
 
-//    checkAndFixParity(bTest2);
+        bnav::NavBitsECC<90> ecc90(bTest);
+        ecc90.checkAndFixAll();
+        CHECK(!ecc90.isModified());
 
-//    std::cout << "-------------3" << std::endl;
+        // change first bit of subword 1
+        bTest.flipLeft(0);
+        bnav::NavBitsECC<90> ecc902(bTest);
+        ecc902.checkAndFixAll();
+        CHECK(ecc902.isModified());
 
+        // change first bit of subword 2
+        bTest.flipLeft(15);
+        bnav::NavBitsECC<90> ecc903(bTest);
+        ecc903.checkAndFixAll();
+        CHECK(ecc903.isModified());
+    }
 
-    bnav::NavBitsECC<30> ecc(bTest);
-    ecc.checkAndFixAll();
-//    std::cerr << ecc.isModified() << std::endl;
-    //ecc.checkParity();
+    // ParityBlockType::BITS40
+    TEST(testNavBitsECC150)
+    {
+        bnav::NavBits<150> bTest("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111000011110000111100001111000011110000");
 
-
-
-
-//    std::cout << "-------------4" << std::endl;
-
+        bnav::NavBitsECC<150> ecc150(bTest);
+        ecc150.checkAndFixAll();
+        CHECK(!ecc150.isModified());
+    }
 }
 
 // checks if error correction works for every single bit of one word
