@@ -38,6 +38,22 @@ uint32_t lcl_diffTECUValues(const uint32_t t1, const uint32_t t2)
         return t1 - t2;
 }
 
+/**
+ * @brief lcl_calcKlobucharCorrection Calculate Klobuchar correction at position
+ * (phi, lambda). This is only vertical delay, no slant!
+ *
+ * @param klob Klobuchar parameters.
+ * @param time Local time.
+ * @param phi Phi in degrees, east of Greenwich is negative.
+ * @param lambda Lambda in degrees, north of equator is positive.
+ * @return Vertical delay in meters.
+ *
+ * References:
+ * [1] ICD, 5.2.4.7 Ionospheric Delay Model Parameters, pp. 25
+ * [2] Ionospheric Time-Delay Algorithm for Single Frequency GPS Users,
+ *     John. A. Klobuchar, 1987
+ * [3] http://www.navipedia.net/index.php/Klobuchar_Ionospheric_Model
+ */
 double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint32_t time, const double phi, const double lambda)
 {
     assert(time < 86400);
@@ -53,6 +69,7 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
     if (semiphi < -0.416)
         semiphi = -0.416;
 
+    // geomagnetic latitude
     double phim = semiphi + 0.064 * std::cos((semilambda - 1.617)*M_PI);
 
 //    std::cout << "phim: " << phim << std::endl;
@@ -80,14 +97,13 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
 
 //    std::cout << "x: " << x << std::endl;
 
-    double F = 1.0 + 16.0 * std::pow(0.03 , 3);
-//    std::cout <<"F: " << F << std::endl;
     double tiono;
 
-    if (std::fabs(x) < 1.57)
-        tiono = F * (5.0e-9 + amplitude * (1 - std::pow(x, 2)/2 + std::pow(x, 4)/24 ));
+    // ignore slant factor F, because we want vertical delay
+    if (std::fabs(x) < M_PI / 2.0)
+        tiono = 5.0e-9 + amplitude * (1 - std::pow(x, 2)/2 + std::pow(x, 4)/24 );
     else
-        tiono = F * 5.0e-9;
+        tiono = 5.0e-9;
 
     // we have time atm
     return tiono * bnav::SPEED_OF_LIGHT;
