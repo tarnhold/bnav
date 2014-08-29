@@ -51,6 +51,7 @@ int main(int argc, char **argv)
 
     bnav::SubframeBufferStore sbstore;
     bnav::IonosphereStore ionostore;
+    bnav::IonosphereStore ionostoreKlobuchar;
 
 #if 0
     bnav::EphemerisStore ephStore;
@@ -108,13 +109,23 @@ int main(int argc, char **argv)
             //std::cout << "eph complete" << std::endl;
 
             bnav::Ephemeris eph(bdata);
-            bnav::KlobucharParam klob = eph.getKlobucharParam();
-            bnav::Ionosphere ionk(klob, eph.getSOW());
-            //ionk.dump2();
 
-            //std::cout << "  -----------  " << std::endl;
-            //ionk.dump();
-            //iono_old = ionk;
+            // calculate Klobuchar-Model on every change of the model parameters
+            // (every two hours). Otherwise the model changes slightly with each
+            // new SOW, because it's time dependent.
+
+            // FIXME: this is problematic, if we have no data at exactly this
+            // SOW. Maybe if there's data within +2h (positive to get the new
+            // model!) of this fixed date, we could take the model, too.
+            if (eph.getSOW() % 7200 == 0)
+            {
+                std::cout << "Klobuchar Model at SOW: " << eph.getSOW() << std::endl;
+                bnav::KlobucharParam klob = eph.getKlobucharParam();
+                bnav::Ionosphere ionoklob(klob, eph.getSOW());
+
+                ionoklob.dump();
+                ionostoreKlobuchar.addIonosphere(sv, ionoklob);
+            }
 #if 0
             // LD_LIBRARY_PATH=../lib/ ./bapp -sbf ../../bnav3/tests/data/sbf/CUT12014071724.sbf_SBF_CMPRaw-prn2.txt | grep -v '          0          0          0          0' | grep 'alpha:' -B1 -A1
             //klob - klob_old;
