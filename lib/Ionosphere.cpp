@@ -167,7 +167,7 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 
     // ignore slant factor F, because we want vertical delay
     if (std::fabs(localtime - 50400) < period / 4.0)
-        tiono = 5.0e-9 + amplitude * (1 - std::pow(x, 2)/2 + std::pow(x, 4)/24 );
+        tiono = 5.0e-9 + amplitude * std::cos(x);
     else
         tiono = 5.0e-9;
 
