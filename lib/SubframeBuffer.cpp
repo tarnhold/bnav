@@ -48,7 +48,7 @@ bool SubframeBuffer::hasIncompleteData()
  * @param duration Duration of a Subframe.
  */
 void SubframeBuffer::checkLastSOW(uint32_t currentsow, uint32_t duration)
-{    
+{
     // special case: if last SOW is the last of the week
     if ((m_lastsow + duration == SECONDS_OF_A_WEEK) && (currentsow == 0))
     {

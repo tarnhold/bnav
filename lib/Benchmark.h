@@ -22,16 +22,16 @@
 
 class Benchmark
 {
-	std::string m_text;
-	std::chrono::high_resolution_clock::time_point m_begin;
-	std::chrono::high_resolution_clock::time_point m_end;
+    std::string m_text;
+    std::chrono::high_resolution_clock::time_point m_begin;
+    std::chrono::high_resolution_clock::time_point m_end;
 
 public:
-	Benchmark(const std::string &text);
-	~Benchmark();
+    Benchmark(const std::string &text);
+    ~Benchmark();
 
-	void begin();
-	void end();
+    void begin();
+    void end();
 
 };
 

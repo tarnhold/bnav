@@ -95,7 +95,6 @@ private:
     void processD2Page2(const Subframe &sf);
 };
 
-
 // non-members
 #if 0
 std::ostream & operator<<(std::ostream & out, const KlobucharParam & rhs)

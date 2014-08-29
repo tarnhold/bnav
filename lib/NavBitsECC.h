@@ -104,7 +104,7 @@ public:
     NavBitsECCWord(const NavBits<len> &bits);
 
     NavBits<len> getBits();
-    
+
     bool isModified() const;
     std::size_t getModifiedCount() const;
 
@@ -142,7 +142,7 @@ NavBitsECCWord<len>::NavBitsECCWord(const NavBits<len> &bits)
     splitWordToSubword();
     checkAndFixAllSubwords();
 }
-    
+
 /*!
  * Splits the word into 11 bit information and 4 bit parity parts (here
  * called 'subword').
@@ -235,10 +235,10 @@ bool NavBitsECCWord<len>::checkAndFixSubword(subword &message)
 //#endif
 
         message = fixed;
-        
+
         return false;
     }
-    
+
     return true;
 }
 

@@ -140,7 +140,7 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 //    std::cout << "phim: " << phim << std::endl;
 
     //std::cout << "timeb: " << static_cast<int32_t>(4.32 * 1.0e4 * lambda) << " + " << static_cast<int32_t>(time) << std::endl;
-    int32_t localtime =  static_cast<int32_t>(4.32e4 * semilambda) + static_cast<int32_t>(time);
+    int32_t localtime = static_cast<int32_t>(4.32e4 * semilambda) + static_cast<int32_t>(time);
 
     if (localtime > 86400)
         localtime = localtime - 86400;
