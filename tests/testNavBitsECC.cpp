@@ -45,6 +45,8 @@ SUITE(testNavBitsECC_Block)
 
         bnav::NavBitsECCWord<30> ecc(bTest);
         CHECK(!ecc.isModified());
+        // check if bits, which got split into subwords, merge back correctly
+        CHECK(ecc.getBits() == bTest);
 
         // change first bit
         bTest.flipLeft(0);
@@ -56,14 +58,18 @@ SUITE(testNavBitsECC_Block)
     // should split to 30 + 30 -> 11+11+4+4 + 11+11+4+4
     TEST(testNavBitsECC60)
     {
-        bnav::NavBits<60> bTest("111111111110000000000011110000111111111110000000000011110000");
+        const bnav::NavBits<60> bTest("111111111110000000000011110000111111111110000000000011110000");
 
-        bnav::NavBitsECCWord<30> ecc(bTest.getLeft<0, 30>());
+        // we have to check two words, which split into two subwords each
+        const bnav::NavBits<30> word1 = bTest.getLeft<0, 30>();
+        bnav::NavBitsECCWord<30> ecc(word1);
         CHECK(!ecc.isModified());
+        CHECK(ecc.getBits() == word1);
 
-        ecc = bnav::NavBitsECCWord<30>(bTest.getLeft<30, 30>());
-        std::cout << ecc.getBits() << std::endl;
+        const bnav::NavBits<30> word2 = bTest.getLeft<30, 30>();
+        ecc = bnav::NavBitsECCWord<30>(word2);
         CHECK(!ecc.isModified());
+        CHECK(ecc.getBits() == word2);
     }
 
     // block with 24 parity bits at the end
@@ -73,6 +79,7 @@ SUITE(testNavBitsECC_Block)
 
         bnav::NavBitsECCWord<90> ecc90(bTest);
         CHECK(!ecc90.isModified());
+        CHECK(ecc90.getBits() == bTest);
 
         // change first bit of subword 1
         bTest.flipLeft(0);
@@ -88,19 +95,22 @@ SUITE(testNavBitsECC_Block)
     // block with 40 parity bits at the end
     TEST(testNavBitsECC150)
     {
-        bnav::NavBits<150> bTest("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111000011110000111100001111000011110000");
+        const bnav::NavBits<150> bTest("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111000011110000111100001111000011110000");
 
         bnav::NavBitsECCWord<150> ecc150(bTest);
         CHECK(!ecc150.isModified());
+        CHECK(ecc150.getBits() == bTest);
     }
 
     // block with 72 parity bits at the end
     TEST(testNavBitsECC270)
     {
-        bnav::NavBits<270> bTest("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111111111100000000000111100001111000011110000111100001111000011110000111100001111000011110000");
+        const bnav::NavBits<270> bTest("111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111111111100000000000111111111110000000000011111111111000000000001111111111100000000000111100001111000011110000111100001111000011110000111100001111000011110000");
 
         bnav::NavBitsECCWord<270> ecc270(bTest);
         CHECK(!ecc270.isModified());
+        // check if bits, which got split into subwords, merge back correctly
+        CHECK(ecc270.getBits() == bTest);
     }
 }
 
