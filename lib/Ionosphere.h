@@ -4,6 +4,8 @@
 #include "NavBits.h"
 #include "SubframeBuffer.h"
 
+#include "Ephemeris.h" // FIXME: maybe move KlobucharParam here
+
 #include <vector>
 
 namespace bnav
@@ -41,8 +43,10 @@ class Ionosphere
 public:
     Ionosphere();
     Ionosphere(const SubframeBufferParam &sfbuf);
+    Ionosphere(const KlobucharParam &klob, const uint32_t time);
 
     void load(const SubframeBufferParam &sfbuf);
+    void load(const KlobucharParam &klob, const uint32_t sow);
 
     bool hasData() const;
     void setSOW(const uint32_t sow);

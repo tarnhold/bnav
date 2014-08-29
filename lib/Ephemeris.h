@@ -95,7 +95,9 @@ private:
     void processD2Page2(const Subframe &sf);
 };
 
+
 // non-members
+#if 0
 std::ostream & operator<<(std::ostream & out, const KlobucharParam & rhs)
 {
     const std::size_t width = 10;
@@ -113,6 +115,7 @@ std::ostream & operator<<(std::ostream & out, const KlobucharParam & rhs)
         << std::setw(width) << rhs.beta3;
     return out;
 }
+#endif
 
 } // namespace bnav
 

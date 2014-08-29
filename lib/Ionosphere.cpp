@@ -4,6 +4,7 @@
 #include "SubframeBuffer.h"
 
 #include <cmath>
+#include <math.h>
 #include <iostream>
 
 namespace
@@ -35,6 +36,59 @@ uint32_t lcl_diffTECUValues(const uint32_t t1, const uint32_t t2)
         return t2 - t1;
     else
         return t1 - t2;
+}
+
+double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint32_t time, const double phi, const double lambda)
+{
+    assert(time < 86400);
+
+    // convert to semicircle
+    double semiphi = phi / 180.0;
+    double semilambda = lambda / 180.0; // east!
+
+//    std::cout << "phi: " << semiphi << std::endl;
+
+    if (semiphi > 0.416)
+        semiphi = 0.416;
+    if (semiphi < -0.416)
+        semiphi = -0.416;
+
+    double phim = semiphi + 0.064 * std::cos((semilambda - 1.617)*M_PI);
+
+//    std::cout << "phim: " << phim << std::endl;
+
+    //std::cout << "timeb: " << static_cast<int32_t>(4.32 * 1.0e4 * lambda) << " + " << static_cast<int32_t>(time) << std::endl;
+    int32_t time2 =  static_cast<int32_t>(4.32 * 1.0e4 * semilambda) + static_cast<int32_t>(time);
+    if (time2 > 86400)
+        time2 = time2 - 86400;
+    if (time2 < 0)
+        time2 = time2 + 86400;
+
+//    std::cout << "time: " << time2 << std::endl;
+
+    double amplitude = klob.alpha0 + phim * (klob.alpha1 + phim * (klob.alpha2 + phim * klob.alpha3));
+    double period = klob.beta0 + phim * (klob.beta1 + phim * (klob.beta2 + phim * klob.beta3));
+
+    if (amplitude < 0.0)
+        amplitude = 0.0;
+    if (period < 72000.0)
+        period = 72000.0;
+
+    const double x = 2 * M_PI * (time2 - 50400) / period;
+
+//    std::cout << "x: " << x << std::endl;
+
+    double F = 1.0 + 16.0 * std::pow(0.03 , 3);
+//    std::cout <<"F: " << F << std::endl;
+    double tiono;
+
+    if (std::fabs(x) < 1.57)
+        tiono = F * (5.0e-9 + amplitude * (1 - std::pow(x, 2)/2 + std::pow(x, 4)/24 ));
+    else
+        tiono = F * 5.0e-9;
+
+    // we have time atm
+    return tiono * bnav::SPEED_OF_LIGHT;
 }
 
 // [1] 5.3.3.8.2 Grid Ionospheric Vertical Error Index (GIVEI)
@@ -194,6 +248,47 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
 {
     load(sfbuf);
 }
+
+Ionosphere::Ionosphere(const KlobucharParam &klob, const uint32_t time)
+{
+    load(klob, time);
+}
+
+void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
+{
+    assert(sow <= SECONDS_OF_A_WEEK);
+    // strictly speaking we need GPST here, but 16s,... be lazy
+    // we need only time of day, not full SOW
+    uint32_t gpstime = sow % 86400;
+
+    // set model time in BDT
+    m_sow = sow;
+    m_grid.resize(320);
+
+    for (std::size_t row = 10; row > 0; --row)
+    {
+        // we use a single row vector for m_grid
+        // table 0 is IGP <= 160
+        // table 1 is IGP > 160 -> has an offset of 160
+        for (std::size_t table = 0; table <= 1; ++table)
+        {
+            for (std::size_t col = 0; col <= 15; ++col)
+            {
+                // calc IGP num formula: col * 10 + row
+                // + table * 160, to access both IGP tables
+                // array index is then -1
+                std::size_t index = col * 10 + (table * 160) + row - 1;
+
+                /// -1.0, because we are east of Greenwich
+                double lambda = -1.0 * (col * 5.0 + 70);
+                double phi = 1.0 * (row * 5.0 + 5.0) - table * 2.5;
+                double corr = lcl_calcKlobucharCorrection(klob, gpstime, phi, lambda);
+                m_grid[index] = IonoGridInfo(lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ));
+            }
+        }
+    }
+}
+
 
 void Ionosphere::load(const SubframeBufferParam &sfbuf)
 {

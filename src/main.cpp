@@ -85,18 +85,18 @@ int main(int argc, char **argv)
         bnav::SvID sv(data.getPRN());
 
         // skip non-GEO SVs
-//        if (!sv.isGeo())
-//            continue;
+        if (!sv.isGeo())
+            continue;
 
         bnav::Subframe sf(sv, data.getDateTime(), data.getBits());
 
-//#if 0
+#if 0
         // debug
         std::cout << "prn: " << data.getPRN() << " wn: " << data.getDateTime().getWeekNum()
                   << " tow: " << data.getDateTime().getSOW() << " sow: " << sf.getSOW()
                   << " fra: " << sf.getFrameID() << " pnum: "
                   << sf.getPageNum() << std::endl;
-//#endif
+#endif
 
         sbstore.addSubframe(sv, sf);
 
@@ -106,9 +106,16 @@ int main(int argc, char **argv)
         {
             bnav::SubframeBufferParam bdata = sfbuf->flushEphemerisData();
             //std::cout << "eph complete" << std::endl;
-#if 0
+
             bnav::Ephemeris eph(bdata);
             bnav::KlobucharParam klob = eph.getKlobucharParam();
+            bnav::Ionosphere ionk(klob, eph.getSOW());
+            //ionk.dump2();
+
+            //std::cout << "  -----------  " << std::endl;
+            //ionk.dump();
+            //iono_old = ionk;
+#if 0
             // LD_LIBRARY_PATH=../lib/ ./bapp -sbf ../../bnav3/tests/data/sbf/CUT12014071724.sbf_SBF_CMPRaw-prn2.txt | grep -v '          0          0          0          0' | grep 'alpha:' -B1 -A1
             //klob - klob_old;
             std::cout << eph.getDateOfIssue().getIonexDate() << ":" << eph.getDateOfIssue().getSecondString() << std::endl;
@@ -124,7 +131,7 @@ int main(int argc, char **argv)
             bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
-//            bnav::Ionosphere iono(bdata);
+            bnav::Ionosphere iono(bdata);
 
 #if 0
             // diff only for one single prn

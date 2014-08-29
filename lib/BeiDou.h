@@ -6,6 +6,8 @@
 namespace bnav
 {
 
+const double SPEED_OF_LIGHT = 2.99792458e8;
+
 static const uint32_t SECONDS_OF_A_WEEK = 7*24*60*60;
 
 static const uint32_t BDS_PREABMLE = 1810;
