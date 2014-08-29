@@ -73,6 +73,8 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
         amplitude = 0.0;
     if (period < 72000.0)
         period = 72000.0;
+    if (period >= 172800.0)
+        period = 172800.0;
 
     const double x = 2 * M_PI * (time2 - 50400) / period;
 
