@@ -159,6 +159,8 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     if (period >= 172800.0)
         period = 172800.0;
 
+    // offset 50400 is 14h at local time, this is when ionospheric delay
+    // reaches maximum usually
     const double x = 2 * M_PI * (localtime - 50400) / period;
 
 //    std::cout << "x: " << x << std::endl;
