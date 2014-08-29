@@ -6,6 +6,17 @@
 #include <cassert>
 #include <iostream>
 
+// check parity for one word, boilerplate code. we can only use a macro here,
+// because bitset expects a fixed value at compile time
+#define CHECK_PARITY_FOR_WORD(pos) \
+    ecc = NavBitsECCWord<30>(m_bits.getLeft<pos, 30>()); \
+    if (ecc.isModified()) \
+    { \
+        std::cout << "fixed at " << pos << ", 30" << std::endl; \
+        m_bits.setLeft(pos, ecc.getBits()); \
+        m_ParityModifiedCount += ecc.getModifiedCount(); \
+    }
+
 namespace bnav
 {
 
@@ -156,72 +167,18 @@ bool Subframe::checkAndFixParities()
     }
 
     // fix remaining words
-    NavBitsECCWord<30> ecc(m_bits.getLeft<30, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 30, 30" << std::endl;
-        m_bits.setLeft(30, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<60, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 60, 30" << std::endl;
-        m_bits.setLeft(60, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<90, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 90, 30" << std::endl;
-        m_bits.setLeft(90, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<120, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 120, 30" << std::endl;
-        m_bits.setLeft(120, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<150, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 150, 30" << std::endl;
-        m_bits.setLeft(150, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<180, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 180, 30" << std::endl;
-        m_bits.setLeft(180, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<210, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 210, 30" << std::endl;
-        m_bits.setLeft(210, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<240, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 240, 30" << std::endl;
-        m_bits.setLeft(240, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
-    ecc = NavBitsECCWord<30>(m_bits.getLeft<270, 30>());
-    if (ecc.isModified())
-    {
-        std::cout << "fixed at 270, 30" << std::endl;
-        m_bits.setLeft(270, ecc.getBits());
-        m_ParityModifiedCount += ecc.getModifiedCount();
-    }
+    NavBitsECCWord<30> ecc(0);
+    CHECK_PARITY_FOR_WORD(30);
+    CHECK_PARITY_FOR_WORD(60);
+    CHECK_PARITY_FOR_WORD(90);
+    CHECK_PARITY_FOR_WORD(120);
+    CHECK_PARITY_FOR_WORD(150);
+    CHECK_PARITY_FOR_WORD(180);
+    CHECK_PARITY_FOR_WORD(210);
+    CHECK_PARITY_FOR_WORD(240);
+    CHECK_PARITY_FOR_WORD(270);
 
     m_isParityFixed= true;
-
     return m_isParityFixed;
 }
 
