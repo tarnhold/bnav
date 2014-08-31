@@ -11,6 +11,8 @@ namespace bnav
 DateTime::DateTime()
     : m_tsys(TimeSystem::NONE)
     , m_time(boost::posix_time::ptime())
+    , m_weeknum(UINT32_MAX)
+    , m_sow(UINT32_MAX)
 {
 }
 
@@ -24,6 +26,8 @@ DateTime::DateTime()
 DateTime::DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
     : m_tsys(ts)
     , m_time()
+    , m_weeknum(UINT32_MAX)
+    , m_sow(UINT32_MAX)
 {
     setWeekAndSOW(weeknum, sow, millisec);
 }
