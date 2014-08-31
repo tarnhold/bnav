@@ -30,7 +30,7 @@ class Subframe
 
 public:
     Subframe();
-    Subframe(const SvID &sv, const DateTime date, const NavBits<300> &bits);
+    Subframe(const SvID &sv, const DateTime &date, const NavBits<300> &bits);
 
     void setBits(const NavBits<300> &bits);
     NavBits<300> getBits() const;

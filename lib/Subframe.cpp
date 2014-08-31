@@ -39,7 +39,7 @@ Subframe::Subframe()
 {
 }
 
-Subframe::Subframe(const SvID &sv, const DateTime date, const NavBits<300> &bits)
+Subframe::Subframe(const SvID &sv, const DateTime &date, const NavBits<300> &bits)
     : m_bits(bits)
     , m_datetime(date)
     , m_sow(0)
