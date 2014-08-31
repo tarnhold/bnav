@@ -13,6 +13,8 @@
 #include <iostream>
 #include <map>
 
+// FIXME: check ecc counts!
+
 // Test real data
 // Only for data sets from one single PRN
 SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)

@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+// FIXME: check ecc counts!
+
 // Test real data
 SUITE(testSubframe_SBF_Simple)
 {
