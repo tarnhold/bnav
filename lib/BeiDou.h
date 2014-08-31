@@ -11,6 +11,7 @@ constexpr double PI = 3.14159265358979323846;
 constexpr double SPEED_OF_LIGHT = 2.99792458e8;
 
 constexpr uint32_t SECONDS_OF_A_WEEK = 7*24*60*60;
+constexpr uint32_t WEEKNUM_MAX = 8191;
 
 constexpr uint32_t BDS_PREABMLE = 1810;
 
