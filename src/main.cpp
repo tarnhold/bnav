@@ -136,7 +136,7 @@ int main(int argc, char **argv)
                     uint32_t sowFullTwoHour = eph.getSOW() - secondOfTwoHours;
                     bnav::Ionosphere ionoklob(klob, sowFullTwoHour);
 
-                    //ionoklob.dump();
+                    ionoklob.dump();
                     ionostoreKlobuchar.addIonosphere(sv, ionoklob);
 
                     klob_old = klob;

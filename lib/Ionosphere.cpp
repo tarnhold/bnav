@@ -117,8 +117,8 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
  *
  * @param klob Klobuchar parameters.
  * @param time Local time.
- * @param phi Phi in degrees, east of Greenwich is negative.
- * @param lambda Lambda in degrees, north of equator is positive.
+ * @param phi Phi in degrees, west of Greenwich is negative.
+ * @param lambda Lambda in degrees, south of equator is negative.
  * @return Vertical delay in meters.
  *
  * References:
@@ -365,8 +365,8 @@ void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
                 // array index is then -1
                 std::size_t index = col * 10 + (table * 160) + row - 1;
 
-                /// -1.0, because we are east of Greenwich
-                double lambda = -1.0 * (col * 5.0 + 70);
+                /// 1.0, because we are east of Greenwich
+                double lambda = 1.0 * (col * 5.0 + 70);
                 double phi = 1.0 * (row * 5.0 + 5.0) - table * 2.5;
                 double corr = lcl_calcKlobucharCorrectionBDS(klob, gpstime, phi, lambda);
                 m_grid[index] = IonoGridInfo(lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ));
