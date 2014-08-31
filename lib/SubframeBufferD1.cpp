@@ -5,10 +5,6 @@
 namespace bnav
 {
 
-const std::size_t D1_FRAME_SIZE[] = {1, 1, 1, 24, 24};
-// one subframe has a duration of 6s
-const uint32_t D1_SUBFRAME_DURATION = 6;
-
 SubframeBufferD1::SubframeBufferD1()
 {
 }

@@ -17,7 +17,7 @@ namespace
 /*
  * [1] Table 5-2 ROM table list for error correction
  */
-const uint16_t cROMTable[] = {
+constexpr uint16_t cROMTable[] = {
     0x0000, 0x0001, 0x0002, 0x0010, // 0 - 3
     0x0004, 0x0100, 0x0020, 0x0400, // 4 - 7
     0x0008, 0x4000, 0x0200, 0x0080, // 8 - 11

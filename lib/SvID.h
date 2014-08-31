@@ -1,13 +1,12 @@
 #ifndef SVID_H
 #define SVID_H
 
+#include "BeiDou.h"
+
 #include <cstdint>
 
 namespace bnav
 {
-
-static const uint32_t BDS_MAX_PRN = 37;
-static const uint32_t BDS_MAX_PRN_GEO = 5;
 
 /**
  * @brief The SvID class

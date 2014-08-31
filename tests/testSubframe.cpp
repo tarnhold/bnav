@@ -20,7 +20,7 @@ SUITE(testSubframe_SBF_Simple)
         bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn6-fraID.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
-        const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
+        constexpr uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
         std::size_t i = 0;
         bnav::AsciiReaderEntry entry;
@@ -55,7 +55,7 @@ SUITE(testSubframe_SBF_Simple)
         bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn6-fraID.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
-        const uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
+        constexpr uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
         std::size_t i = 0;
         bnav::AsciiReaderEntry entry;
@@ -131,7 +131,7 @@ SUITE(testSubframe_SBF_OneFrame)
         bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn6-oneframe.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
-        const uint32_t sowfirst = 346320;
+        constexpr uint32_t sowfirst = 346320;
 
         std::size_t i = 0;
         std::size_t pnum_fra4 = 0;

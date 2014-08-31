@@ -64,7 +64,7 @@ SUITE(testIonosphere)
         bnav::IonoGridInfo igp;
 
         // GIVEI table converted in 0.1 TECU
-        const uint32_t givei_values[] = {18, 36, 54, 73, 91, 109, 127, 145, 163,
+        constexpr uint32_t givei_values[] = {18, 36, 54, 73, 91, 109, 127, 145, 163,
                                          181, 218, 272, 363, 544, 907, 9999};
 
         for (std::size_t i = 0; i <= 15; ++i)

@@ -1,6 +1,7 @@
 #ifndef SUBFRAMEBUFFER_H
 #define SUBFRAMEBUFFER_H
 
+#include "BeiDou.h"
 #include "Subframe.h"
 
 #include <vector>
