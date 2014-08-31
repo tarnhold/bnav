@@ -52,8 +52,8 @@ KlobucharParam Ephemeris::getKlobucharParam() const
 
 bool Ephemeris::operator==(const Ephemeris &rhs) const
 {
-    return (getDateOfIssue() == rhs.getDateOfIssue());
-            //&& (getKlobucharParam() == rhs.getKlobucharParam());
+    return (getDateOfIssue() == rhs.getDateOfIssue())
+            && (getKlobucharParam() == rhs.getKlobucharParam());
 }
 
 void Ephemeris::loadD1(const SubframeBufferParam &sfbuf)
