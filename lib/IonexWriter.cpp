@@ -7,6 +7,9 @@
 namespace
 {
 
+const std::string author = "TUD/Arnhold";
+const std::string application = "bapp v0.4";
+
 std::string lcl_justifyRight(const std::string &str, const std::string::size_type length, const char padding = ' ')
 {
     // nothing to do
@@ -42,26 +45,41 @@ namespace bnav
 
 IonexWriter::IonexWriter()
 {
-    writeHeader();
+    writeHeader(true);
 }
 
-void IonexWriter::writeHeader()
+void IonexWriter::writeHeader(bool isGIM)
 {
-    // dimension like IGS
-    std::vector<std::string> latitude = {"87.5", "-87.5", "-2.5"};
-    std::vector<std::string> longitude = {"-180.0", "180.0", "5.0"};
+    std::vector<std::string> latitude, longitude, description;
+
+    if (isGIM)
+    {
+        // dimension like IGS
+        latitude = {"87.5", "-87.5", "-2.5"};
+        longitude = {"-180.0", "180.0", "5.0"};
+        description = {
+            "BeiDou Ionospheric Map (CIM), Klobuchar model",
+            "Gridded GIM, based upon 8 parameter Klobuchar parameters.",
+            "Vertical ionospheric delay, elevation set to 90 degrees",
+            "For calculation details see:",
+            "BDS ICD 2.0, 5.2.4.7 Ionospheric Delay Model Param., 2013",
+        };
+    }
+    else
+    {
+        // regional model, CIM
+        latitude = {"55.0", "7.5", "-2.5"};
+        longitude = {"70.0", "145.0", "5.0"};
+        description = {
+            "BeiDou Ionospheric Map, regional grid",
+            "Read from D2 navigation message.",
+            "BDS ICD 2.0, 5.3.3.8 Ionospheric Grid Information, 2013",
+        };
+    }
 
     // BeiDou specific
     std::vector<std::string> height = {"475.0", "475.0", "0.0"};
     std::string radius = "6478.0";
-
-    std::vector<std::string> description = {
-        "BeiDou Ionospheric Map (CIM), Klobuchar model",
-        "Gridded GIM, based upon 8 parameter Klobuchar parameters.",
-        "Vertical ionospheric delay, elevation set to 90 degrees",
-        "For calculation details see:",
-        "BDS ICD 2.0, 5.2.4.7 Ionospheric Delay Model Param., 2013",
-    };
 
     std::cout << lcl_justifyRight("1.0", 8) << lcl_justifyLeft("", 12)
               << lcl_justifyLeft("IONOSPHERE MAPS", 20)
@@ -69,8 +87,8 @@ void IonexWriter::writeHeader()
               << "IONEX VERSION / TYPE" << std::endl;
 
 
-    std::cout << lcl_justifyLeft("bapp v0.4", 20)
-              << lcl_justifyLeft("TUD/Arnhold", 20)
+    std::cout << lcl_justifyLeft(application, 20)
+              << lcl_justifyLeft(author, 20)
               << lcl_justifyLeft("PSEUDODATE", 20)
               << "PGM / RUN BY / DATE" << std::endl;
 

@@ -10,7 +10,7 @@ public:
     IonexWriter();
 
 private:
-    void writeHeader();
+    void writeHeader(bool isGIM);
 };
 
 } // namespace bnav
