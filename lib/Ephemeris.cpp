@@ -115,38 +115,57 @@ void Ephemeris::processD2Page2(const Subframe &sf)
 {
     assert(sf.getPageNum() == 2);
     NavBits<300> bits = sf.getBits();
+    NavBits<64> allbits;
 
     // alpha0
     NavBits<8> kval = bits.getLeft<46, 6>();
     kval <<= 2;
     kval ^= bits.getLeft<60, 2>();
+    allbits = kval;
     m_klob.alpha0 = kval.to_double(-30);
     // alpha1
     kval = bits.getLeft<62, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
     m_klob.alpha1 = kval.to_double(-27);
     // alpha2
     kval = bits.getLeft<70, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
     m_klob.alpha2 = kval.to_double(-24);
     // alpha3
     kval = bits.getLeft<78, 4>();
     kval <<= 4;
     kval ^= bits.getLeft<90, 4>();
+    allbits <<= 8;
+    allbits ^= kval;
     m_klob.alpha3 = kval.to_double(-24);
 
     // beta0
     kval = bits.getLeft<94, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
     m_klob.beta0 = kval.to_double(11);
     // beta1
     kval = bits.getLeft<102, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
     m_klob.beta1 = kval.to_double(14);
     // beta2
     kval = bits.getLeft<110, 2>();
     kval <<= 6;
     kval ^= bits.getLeft<120, 6>();
+    allbits <<= 8;
+    allbits ^= kval;
     m_klob.beta2 = kval.to_double(16);
     // beta3
     kval = bits.getLeft<126, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
     m_klob.beta3 = kval.to_double(16);
+
+    // save raw bits to avoid floating point comparisons
+    m_klob.rawbits = allbits;
 }
 
 } // namespace bnav

@@ -11,6 +11,7 @@ namespace bnav
 
 struct KlobucharParam
 {
+    NavBits<64> rawbits;
     double alpha0;
     double alpha1;
     double alpha2;
@@ -21,7 +22,8 @@ struct KlobucharParam
     double beta3;
 
     KlobucharParam()
-        : alpha0(0.0)
+        : rawbits(0)
+        , alpha0(0.0)
         , alpha1(0.0)
         , alpha2(0.0)
         , alpha3(0.0)
@@ -35,6 +37,7 @@ struct KlobucharParam
     KlobucharParam operator-(const KlobucharParam &rhs)
     {
         KlobucharParam ret;
+        // rawbits are zero by default, leave it this way
         ret.alpha0 = std::fabs(alpha0 - rhs.alpha0);
         ret.alpha1 = std::fabs(alpha1 - rhs.alpha1);
         ret.alpha2 = std::fabs(alpha2 - rhs.alpha2);
@@ -47,20 +50,20 @@ struct KlobucharParam
         return ret;
     }
 
-#if 0
-    // floating point comparisons...
     bool operator==(const KlobucharParam &rhs)
     {
-        return (alpha0 == rhs.alpha0)
-                && (alpha1 == rhs.alpha1)
-                && (alpha2 == rhs.alpha2)
-                && (alpha3 == rhs.alpha3)
-                && (beta0 == rhs.beta0)
-                && (beta1 == rhs.beta1)
-                && (beta2 == rhs.beta2)
-                && (beta3 == rhs.beta3);
+        // avoid floating point comparisons by using the raw bits
+        // if rawbits are zero, assume this is a differenced set (operator-)
+        // split up into two 32 bits block, because ulong is only 32 bit
+        return (rawbits.getLeft<0, 32>().to_ulong() != 0)
+                && (rawbits.getLeft<0, 32>().to_ulong() != 0)
+                && (rawbits == rhs.rawbits);
     }
-#endif
+
+    bool operator!=(const KlobucharParam &rhs)
+    {
+        return !(*this == rhs);
+    }
 };
 
 class Ephemeris

@@ -73,6 +73,7 @@ int main(int argc, char **argv)
     std::cout << dt.getMonthNameShort() << std::endl;
     std::cout << dt.getIonexDate() << std::endl;
 
+    uint32_t twoHourCountOld = UINT32_MAX;
     bnav::Ionosphere iono_old;
     bnav::KlobucharParam klob_old;
 
@@ -110,29 +111,37 @@ int main(int argc, char **argv)
 
             bnav::Ephemeris eph(bdata);
 
-            // calculate Klobuchar-Model on every change of the model parameters
-            // (every two hours). Otherwise the model changes slightly with each
-            // new SOW, because it's time dependent.
-
-            // FIXME: this is problematic, if we have no data at exactly this
-            // SOW. Maybe if there's data within +2h (positive to get the new
-            // model!) of this fixed date, we could take the model, too.
-            if (eph.getSOW() % 7200 == 0)
+            // Model is updated at every full two hour (00:00, 02:00, 04:00,...).
+            // Try to get at least one model within this time frame. It may
+            // be the case, that there is no data until 01:50, but with this
+            // we can grep the model within the last 10 minutes of transmission.
+            uint32_t twoHourCount = eph.getSOW() / 7200;
+            if (twoHourCount != twoHourCountOld)
             {
-                std::cout << "Klobuchar Model at SOW: " << eph.getSOW() << std::endl;
+                twoHourCountOld = twoHourCount;
                 bnav::KlobucharParam klob = eph.getKlobucharParam();
-                bnav::Ionosphere ionoklob(klob, eph.getSOW());
 
-                ionoklob.dump();
-                ionostoreKlobuchar.addIonosphere(sv, ionoklob);
+                // Take only one new model.
+                if (klob != klob_old)
+                {
+                    std::cout << "New Klobuchar Model at SOW: " << eph.getSOW() << std::endl;
+
+                    // If we get a model at 01:50 we need to correct the SOW down to
+                    // 00:00, because this was the date of issue for this model.
+                    // We calculate the Klobuchar model only on every change of the
+                    // model parameters (every two hours). Otherwise the model
+                    // slightly changes with each new SOW, because it's dependent
+                    // on the local time.
+                    uint32_t secondOfTwoHours = eph.getSOW() % 7200;
+                    uint32_t sowFullTwoHour = eph.getSOW() - secondOfTwoHours;
+                    bnav::Ionosphere ionoklob(klob, sowFullTwoHour);
+
+                    //ionoklob.dump();
+                    ionostoreKlobuchar.addIonosphere(sv, ionoklob);
+
+                    klob_old = klob;
+                }
             }
-#if 0
-            // LD_LIBRARY_PATH=../lib/ ./bapp -sbf ../../bnav3/tests/data/sbf/CUT12014071724.sbf_SBF_CMPRaw-prn2.txt | grep -v '          0          0          0          0' | grep 'alpha:' -B1 -A1
-            //klob - klob_old;
-            std::cout << eph.getDateOfIssue().getIonexDate() << ":" << eph.getDateOfIssue().getSecondString() << std::endl;
-            std::cout << klob - klob_old << std::endl;
-            klob_old = klob;
-#endif
 #if 0
             ephstore.add(sv, eph);
 #endif

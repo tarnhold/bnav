@@ -61,6 +61,7 @@ void IonosphereStore::addIonosphere(const SvID &sv, const Ionosphere &iono)
     // ensure it got added
     assert(it != m_store.end());
 
+    // FIXME: warn if there's already an entry at this time!
     it->second[iono.getSOW()] = iono;
 
     //std::cout << "exists" << std::endl;
