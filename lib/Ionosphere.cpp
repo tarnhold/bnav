@@ -11,7 +11,7 @@ namespace
 
 uint32_t lcl_convertMeterToTECU(const double value, const double freq)
 {
-    assert(value >= 0);
+    assert(value >= 0 && value < 100);
     // 1 TECU is 1.0e16 el/m2
     // IONEX refers to 0.1 TECU, so we need to multiply * 10
     return static_cast<uint32_t>(std::lround((value * (freq * freq) / 40.3) / 1.0e16 * 10));
@@ -74,8 +74,7 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
 
 //    std::cout << "phim: " << phim << std::endl;
 
-    //std::cout << "timeb: " << static_cast<int32_t>(4.32 * 1.0e4 * lambda) << " + " << static_cast<int32_t>(time) << std::endl;
-    int32_t time2 =  static_cast<int32_t>(4.32 * 1.0e4 * semilambda) + static_cast<int32_t>(time);
+    int32_t time2 =  static_cast<int32_t>(std::lround(4.32e4 * semilambda)) + static_cast<int32_t>(time);
     if (time2 > 86400)
         time2 = time2 - 86400;
     if (time2 < 0)
@@ -138,8 +137,7 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 
 //    std::cout << "phim: " << phim << std::endl;
 
-    //std::cout << "timeb: " << static_cast<int32_t>(4.32 * 1.0e4 * lambda) << " + " << static_cast<int32_t>(time) << std::endl;
-    int32_t localtime = static_cast<int32_t>(4.32e4 * semilambda) + static_cast<int32_t>(time);
+    int32_t localtime = static_cast<int32_t>(std::lround(4.32e4 * semilambda)) + static_cast<int32_t>(time);
 
     if (localtime > 86400)
         localtime = localtime - 86400;
