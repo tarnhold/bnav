@@ -1,6 +1,7 @@
 #include "AsciiReader.h"
 #include "BeiDou.h"
 #include "Ephemeris.h"
+#include "IonexWriter.h"
 #include "Ionosphere.h"
 #include "IonosphereStore.h"
 #include "Subframe.h"
@@ -177,6 +178,8 @@ int main(int argc, char **argv)
         }
     }
     reader.close();
+
+    bnav::IonexWriter iw;
 
     if (sbstore.hasIncompleteData())
         std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;
