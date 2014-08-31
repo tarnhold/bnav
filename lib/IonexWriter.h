@@ -1,16 +1,39 @@
 #ifndef IONEXWRITER_H
 #define IONEXWRITER_H
 
+#include <fstream>
+#include <string>
+
 namespace bnav
 {
 
 class IonexWriter
 {
+    std::ofstream m_outfile; ///< Output file stream
+    std::string m_filename; ///< File name
+    bool m_isGIM; ///< Write GIM or Regional model
+
 public:
     IonexWriter();
+    IonexWriter(const char *filename, const bool isGIM = true);
+    IonexWriter(const std::string &filename, const bool isGIM = true);
+    ~IonexWriter();
+
+    void open(const char *filename);
+    void open(const std::string &filename);
+
+    bool isOpen() const;
+
+    bool isGIM() const;
+    void setGIM(const bool isGIM = true);
+
+    void writeHeader();
+    void writeData(/* parameter foo */);
+
+    void close();
 
 private:
-    void writeHeader(bool isGIM);
+    void finalizeData();
 };
 
 } // namespace bnav

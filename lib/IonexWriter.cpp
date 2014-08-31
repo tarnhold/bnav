@@ -1,5 +1,6 @@
 #include "IonexWriter.h"
 
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -44,15 +45,77 @@ namespace bnav
 {
 
 IonexWriter::IonexWriter()
+    : m_outfile()
+    , m_filename()
+    , m_isGIM(true)
 {
-    writeHeader(true);
 }
 
-void IonexWriter::writeHeader(bool isGIM)
+IonexWriter::IonexWriter(const char *filename, const bool isGIM)
+    : m_outfile()
+    , m_filename(filename)
+    , m_isGIM(isGIM)
+{
+    open(filename);
+}
+
+
+IonexWriter::IonexWriter(const std::string &filename, const bool isGIM)
+    : IonexWriter(filename.c_str(), isGIM)
+{
+}
+
+IonexWriter::~IonexWriter()
+{
+    // automatically close object on destruction
+    if (isOpen())
+        m_outfile.close();
+}
+
+void IonexWriter::open(const char *filename)
+{
+    // ensure there is no open file stream
+    assert(!isOpen());
+
+    m_filename = filename;
+    m_outfile.open(filename, std::ofstream::out);
+}
+
+void IonexWriter::open(const std::string &filename)
+{
+    open(filename.c_str());
+}
+
+void IonexWriter:close()
+{
+    // ensure file stream is opened
+    assert(isOpen());
+
+    finalizeData();
+
+    m_outfile.close();
+}
+
+bool IonexWriter::isOpen() const
+{
+    return m_outfile.is_open();
+}
+
+bool IonexWriter::isGIM() const
+{
+    return m_isGIM;
+}
+
+void IonexWriter::setGIM(const bool isGIM)
+{
+    m_isGIM = isGIM;
+}
+
+void IonexWriter::writeHeader()
 {
     std::vector<std::string> latitude, longitude, description;
 
-    if (isGIM)
+    if (m_isGIM)
     {
         // dimension like IGS
         latitude = {"87.5", "-87.5", "-2.5"};
@@ -150,8 +213,11 @@ void IonexWriter::writeHeader(bool isGIM)
 
     std::cout << lcl_justifyLeft("", 60)
               << lcl_justifyLeft("END OF HEADER", 20) << std::endl;
+}
 
-
+void IonexWriter::finalizeData()
+{
+    // write END OF TEC MAP stuff
 }
 
 } // namespace bnav

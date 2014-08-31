@@ -179,7 +179,18 @@ int main(int argc, char **argv)
     }
     reader.close();
 
-    bnav::IonexWriter iw;
+#if 0
+    std::string ionexfilename = argv[2];
+    //ionexfilename = /// aus YYYYMMDD o.ae. zusammensetzen
+    bnav::IonexWriter writer(filename, true);
+    if (!writer.isOpen())
+        std::perror(("Error: Could not open file: " + filename).c_str());
+
+    writer.writerHeader();
+    for (auto it = ionostore.begin(); it != ionostore.end(); ++it)
+        writer.writeData(it);
+    writer.close();
+#endif
 
     if (sbstore.hasIncompleteData())
         std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;
