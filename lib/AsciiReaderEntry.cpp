@@ -30,16 +30,16 @@ namespace
 static std::string extractData(const std::string &line, const std::string &keyword)
 {
     // example: tow 310190 PRN 5 len 10 [data 09e345e3 ...]
-    const std::size_t pos = line.find(keyword);
+    const std::size_t pos { line.find(keyword) };
 
     // keyword not found
     if (pos == std::string::npos)
         throw std::invalid_argument("keyword \"" + keyword + "\" not found");
 
     // start of 310190
-    const std::size_t pos_start = pos + keyword.length();
+    const std::size_t pos_start { pos + keyword.length() };
     // find next whitespace after 310190
-    const std::size_t pos_end = line.find(' ', pos_start);
+    const std::size_t pos_end { line.find(' ', pos_start) };
 
     if (pos_start == std::string::npos || pos_end == std::string::npos)
         throw std::invalid_argument("invalid data line");
@@ -115,7 +115,7 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     // parse tow and prn fields
     try
     {
-        uint32_t tow = std::stoul(extractData(line, "tow "));
+        uint32_t tow { std::stoul(extractData(line, "tow ")) };
         // FIXME: m_week has to be set, but jps doesn't contain this data
         m_datetime = DateTime(TimeSystem::GPST, 0, tow);
 
@@ -131,15 +131,15 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     m_sigtype = SignalType::BDS_B1;
 
     // get data field
-    const std::string strdata("data ");
-    const std::size_t pos = line.find(strdata);
+    const std::string strdata { "data " };
+    const std::size_t pos { line.find(strdata) };
     if (pos == std::string::npos)
     {
         std::cerr << "Malformed data line. Wrong format?" << std::endl;
         exit(1);
     }
 
-    std::string hexdata = line.substr(pos + strdata.length());
+    std::string hexdata { line.substr(pos + strdata.length()) };
 
     // remove whitespaces from hex data
     hexdata.erase( std::remove_if(hexdata.begin(), hexdata.end(), isspace), hexdata.end() );
@@ -153,9 +153,9 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     NavBits<320> navbits320;
     for (std::size_t i = 0; i <= hexdata.length() - 2; i=i+2)
     {
-        const uint32_t hexval = std::stoul(hexdata.substr(i, 2), nullptr, 16);
-        const std::size_t bsize = 8;
-        const NavBits<bsize> bitblock(hexval);
+        const uint32_t hexval { std::stoul(hexdata.substr(i, 2), nullptr, 16) };
+        const std::size_t bsize { 8 };
+        const NavBits<bsize> bitblock { hexval };
 
         // shift 8 bytes to the left and fill the right side
         navbits320 <<= bsize;
@@ -166,7 +166,7 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     }
 
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
-    NavBits<20> lastblock(navbits320.getLeft<300, 20>());
+    NavBits<20> lastblock { navbits320.getLeft<300, 20>() };
     assert(lastblock.to_ulong() == 0);
 
     m_bits = navbits320.getLeft<0, 300>();
@@ -191,7 +191,7 @@ AsciiReaderEntrySBF::AsciiReaderEntrySBF(const std::string &line)
 
 void AsciiReaderEntrySBF::readLine(const std::string &line)
 {
-    static const uint32_t SBF_SVID_OFFSET_BEIDOU = 140;
+    static const uint32_t SBF_SVID_OFFSET_BEIDOU { 140 };
 
     // one line looks like:
     // 345605000,1801,145,1,28,3795932449 2099070704 0 0 0 0 0 0 0 1
@@ -232,9 +232,9 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
      * D1: 20s
      * D2: 14.4s + frameID * 0.6s
      */
-    uint32_t tow = std::stoul(splitline[0]);
-    uint32_t week = std::stoul(splitline[1]);
-    uint32_t millisec = tow % 1000;
+    uint32_t tow { std::stoul(splitline[0]) };
+    uint32_t week { std::stoul(splitline[1]) };
+    uint32_t millisec { tow % 1000 };
     tow = (tow - millisec) / 1000;
     m_datetime = DateTime(bnav::TimeSystem::GPST, week, tow, millisec);
 
@@ -242,7 +242,7 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
     m_prn = std::stoul(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
 
     // determine signal type - yes, Septentrio saves both B1 and B2
-    const uint32_t sigtype = std::stoul(splitline[4]);
+    const uint32_t sigtype { std::stoul(splitline[4]) };
 
     if (sigtype == 28)
         m_sigtype = SignalType::BDS_B1;
@@ -259,9 +259,9 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
     NavBits<320> navbits320;
     for (std::vector<std::string>::iterator it = splitbits.begin(); it < splitbits.end(); ++it)
     {
-        const uint32_t val = std::stoul(*it);
-        const std::size_t bsize = 32;
-        const NavBits<bsize> bitblock(val);
+        const uint32_t val { std::stoul(*it) };
+        const std::size_t bsize { 32 };
+        const NavBits<bsize> bitblock { val };
 
         // shift 32 bytes to the left and fill the right side
         navbits320 <<= bsize;
@@ -275,8 +275,8 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
     // For whatever reason the last bit inside the SBF data is set to one
     // ignore this bit, by removing it with -1.
     // Older data may have set this last bit to zero, so handle correctly, too.
-    uint32_t lastbits = std::stoul(splitbits[9]);
-    NavBits<32> lastblock(lastbits > 0 ? lastbits - 1 : lastbits);
+    uint32_t lastbits { std::stoul(splitbits[9]) };
+    NavBits<32> lastblock { lastbits > 0 ? lastbits - 1 : lastbits };
     lastblock <<= 12; // ignore the 12 msb which contain information
     assert(lastblock.to_ulong() == 0);
 

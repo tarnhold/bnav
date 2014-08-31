@@ -36,6 +36,7 @@ IonosphereStore::~IonosphereStore()
 void IonosphereStore::addSvID(const SvID &sv)
 {
     //std::pair
+    // use initializer list
     m_store[sv][0] = Ionosphere();
     //m_store.emplace(sv, std::pair<uint32_t, Ionosphere*>(0, new Ionosphere()));
     //m_store.emplace(sv, );

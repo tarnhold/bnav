@@ -25,9 +25,9 @@ SubframeBufferD1::~SubframeBufferD1()
  */
 void SubframeBufferD1::addSubframe(const Subframe &sf)
 {
-    const std::size_t fraid = sf.getFrameID();
-    const std::size_t pnum = sf.getPageNum();
-    const uint32_t sow = sf.getSOW();
+    const std::size_t fraid { sf.getFrameID() };
+    const std::size_t pnum { sf.getPageNum() };
+    const uint32_t sow { sf.getSOW() };
 
     checkLastSOW(sow, D1_SUBFRAME_DURATION);
     m_lastsow = sow;

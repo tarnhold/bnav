@@ -127,17 +127,17 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     assert(time < 86400);
 
     // convert to semicircle
-    double semiphi = phi / 180.0;
-    double semilambda = lambda / 180.0;
+    double semiphi { phi / 180.0 };
+    double semilambda { lambda / 180.0 };
 
 //    std::cout << "phi: " << semiphi << std::endl;
 
     // chinese don't do geomagnetic latitude
-    double phim = semiphi;
+    double phim { semiphi };
 
 //    std::cout << "phim: " << phim << std::endl;
 
-    int32_t localtime = static_cast<int32_t>(std::lround(4.32e4 * semilambda)) + static_cast<int32_t>(time);
+    int32_t localtime { static_cast<int32_t>(std::lround(4.32e4 * semilambda)) + static_cast<int32_t>(time) };
 
     if (localtime > 86400)
         localtime = localtime - 86400;
@@ -146,8 +146,8 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 
 //    std::cout << "time: " << time2 << std::endl;
 
-    double amplitude = klob.alpha0 + phim * (klob.alpha1 + phim * (klob.alpha2 + phim * klob.alpha3));
-    double period = klob.beta0 + phim * (klob.beta1 + phim * (klob.beta2 + phim * klob.beta3));
+    double amplitude { klob.alpha0 + phim * (klob.alpha1 + phim * (klob.alpha2 + phim * klob.alpha3)) };
+    double period { klob.beta0 + phim * (klob.beta1 + phim * (klob.beta2 + phim * klob.beta3)) };
 
     if (amplitude < 0.0)
         amplitude = 0.0;
@@ -158,7 +158,7 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 
     // offset 50400 is 14h at local time, this is when ionospheric delay
     // reaches maximum usually
-    const double x = 2 * bnav::PI * (localtime - 50400) / period;
+    const double x = { 2 * bnav::PI * (localtime - 50400) / period };
 
 //    std::cout << "x: " << x << std::endl;
 
@@ -175,7 +175,7 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 }
 
 // [1] 5.3.3.8.2 Grid Ionospheric Vertical Error Index (GIVEI)
-const double GIVEI_LOOKUP_TABLE[] = { 0.3, 0.6, 0.9, 1.2,
+constexpr double GIVEI_LOOKUP_TABLE[] { 0.3, 0.6, 0.9, 1.2,
                                       1.5, 1.8, 2.1, 2.4,
                                       2.7, 3.0, 3.6, 4.5,
                                       6.0, 9.0, 15.0, 45.0};
@@ -197,10 +197,10 @@ bnav::NavBits<13> lcl_parsePageIon(const bnav::NavBits<300> &bits)
     // one Ion element is 13 bits long
     assert(msb_len + lsb_len == 13);
 
-    bnav::NavBits<13> iono = bits.getLeft<msb, msb_len>();
+    bnav::NavBits<13> iono { bits.getLeft<msb, msb_len>() };
     iono <<= lsb_len;
     // add lsb part to iono
-    bnav::NavBits<lsb_len> lsbits = bits.getLeft<lsb, lsb_len>();
+    bnav::NavBits<lsb_len> lsbits { bits.getLeft<lsb, lsb_len>() };
     iono ^= lsbits;
 
     return iono;
@@ -242,9 +242,9 @@ void IonoGridInfo::load(const NavBits<13> &bits)
 {
     // [1] 5.3.2 D2 NAV Message Detailed structure, p. 50
     // first 9 bits are dt
-    NavBits<9> bitsdt = bits.getLeft<0, 9>();
+    NavBits<9> bitsdt { bits.getLeft<0, 9>() };
     // last 4 bits are givei
-    NavBits<4> bitsgivei = bits.getLeft<9, 4>();
+    NavBits<4> bitsgivei { bits.getLeft<9, 4>() };
 
     loadVerticalDelay(bitsdt);
     loadGivei(bitsgivei);
@@ -255,7 +255,7 @@ void IonoGridInfo::load(const NavBits<13> &bits)
 
 void IonoGridInfo::loadVerticalDelay(const NavBits<9> &bits)
 {
-    uint32_t dtraw = bits.to_ulong();
+    uint32_t dtraw { bits.to_ulong() };
     // maximum value is 63.875m, which is 511 when scaled by 0.125
     assert(dtraw >= 0 && dtraw <= 511);
     // convert to TECU
@@ -264,14 +264,14 @@ void IonoGridInfo::loadVerticalDelay(const NavBits<9> &bits)
     else
     {
         // metric
-        double dt = dtraw * 0.125;
+        double dt { dtraw * 0.125 };
         m_dtTECU = lcl_convertMeterToTECU(dt, BDS_B1I_FREQ);
     }
 }
 
 void IonoGridInfo::loadGivei(const NavBits<4> &bits)
 {
-    uint32_t givei = bits.to_ulong();
+    uint32_t givei { bits.to_ulong() };
     assert(givei >= 0 && givei <= 15);
 
     // according to the ICD there are no invalid values, but invalid dt values
@@ -311,8 +311,8 @@ bool IonoGridInfo::operator==(const IonoGridInfo &rhs) const
 
 IonoGridInfo IonoGridInfo::operator-(const IonoGridInfo &rhs) const
 {
-    uint32_t dvdel = lcl_diffTECUValues(getVerticalDelay_TECU(), rhs.getVerticalDelay_TECU());
-    uint32_t dgive = lcl_diffTECUValues(getGive_TECU(), rhs.getGive_TECU());
+    uint32_t dvdel { lcl_diffTECUValues(getVerticalDelay_TECU(), rhs.getVerticalDelay_TECU()) };
+    uint32_t dgive { lcl_diffTECUValues(getGive_TECU(), rhs.getGive_TECU()) };
 
     return IonoGridInfo(dvdel, dgive);
 }
@@ -415,10 +415,10 @@ void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t
 {
     for (std::size_t i = startpage; i < startpage + 13; ++i)
     {
-        uint32_t pnum = vfra5[i].getPageNum();
+        uint32_t pnum { vfra5[i].getPageNum() };
         assert(pnum == i + 1);
 
-        NavBits<300> bits = vfra5[i].getBits();
+        NavBits<300> bits { vfra5[i].getBits() };
 
         // page 13 ash 73 have reserved bits at the end of message
         parseIonospherePage(bits, pnum == 13 || pnum == 73);

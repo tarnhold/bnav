@@ -87,7 +87,7 @@ void Ephemeris::loadD2(const SubframeBufferParam &sfbuf)
 void Ephemeris::processD2Page1(const Subframe &sf)
 {
     assert(sf.getPageNum() == 1);
-    NavBits<300> bits = sf.getBits();
+    NavBits<300> bits { sf.getBits() };
 
     // date of issue of ionospheric model is at page 1 of subframe 1
     // [1] 5.3.3.1 Basic NAV Information, p. 68
@@ -114,7 +114,7 @@ void Ephemeris::processD2Page1(const Subframe &sf)
 void Ephemeris::processD2Page2(const Subframe &sf)
 {
     assert(sf.getPageNum() == 2);
-    NavBits<300> bits = sf.getBits();
+    NavBits<300> bits { sf.getBits() };
     NavBits<64> allbits;
 
     // alpha0

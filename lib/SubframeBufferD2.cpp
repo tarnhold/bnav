@@ -23,9 +23,9 @@ SubframeBufferD2::~SubframeBufferD2()
  */
 void SubframeBufferD2::addSubframe(const Subframe &sf)
 {
-    const std::size_t fraid = sf.getFrameID();
-    const std::size_t pnum = sf.getPageNum();
-    const uint32_t sow = sf.getSOW();
+    const std::size_t fraid { sf.getFrameID() };
+    const std::size_t pnum { sf.getPageNum() };
+    const uint32_t sow { sf.getSOW() };
 
     if (fraid == 1)
         checkLastSOW(sow, D2_FRAME_DURATION);
@@ -94,9 +94,8 @@ bool SubframeBufferD2::isAlmanacComplete() const
 
 SubframeBufferParam SubframeBufferD2::flushEphemerisData()
 {
-    SubframeVectorVector ephdata;
     // D2: all ephemeris data is inside subframe 1
-    ephdata.push_back(m_buffer[0]);
+    SubframeVectorVector ephdata { m_buffer[0] };
 
     // ensure correct data sets, should not be possible!
     assert(m_buffer[0].front().getPageNum() == 1);
@@ -109,8 +108,7 @@ SubframeBufferParam SubframeBufferD2::flushEphemerisData()
 
 SubframeBufferParam SubframeBufferD2::flushAlmanacData()
 {
-    SubframeVectorVector almdata;
-    almdata.push_back(m_buffer[4]);
+    SubframeVectorVector almdata { m_buffer[4] };
 
     // ensure correct data sets, should not be possible!
     assert(m_buffer[4].front().getPageNum() == 1);

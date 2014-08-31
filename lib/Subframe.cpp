@@ -156,7 +156,7 @@ bool Subframe::checkAndFixParities()
 {
     // second 15 bits of word one need to be checked
     // first 15 bits are preamble and 4 bit reserved
-    NavBitsECCWord<15> ecc1(m_bits.getLeft<15, 15>());
+    NavBitsECCWord<15> ecc1 { m_bits.getLeft<15, 15>() };
     if (ecc1.isModified())
     {
         // SOW is not this helpful here, because we have an offset between SOW
@@ -199,7 +199,7 @@ bool Subframe::operator==(const Subframe &rhs)
  */
 bool Subframe::isPreambleOk() const
 {
-    NavBits<11> pre = m_bits.getLeft<0, 11>();
+    NavBits<11> pre { m_bits.getLeft<0, 11>() };
 
     // (11100010010)bin is (1810)dec
     return pre.to_ulong() == BDS_PREABMLE;
@@ -212,7 +212,7 @@ bool Subframe::isPreambleOk() const
  */
 void Subframe::parseFrameID()
 {
-    NavBits<3> fraID = m_bits.getLeft<15, 3>();
+    NavBits<3> fraID { m_bits.getLeft<15, 3>() };
 //    std::cout << m_bits.getLeft<15, 3>() << " fraID: " << fraID << " : " << fraID.to_ulong() << std::endl;
 
     m_frameID = fraID.to_ulong();
@@ -228,18 +228,18 @@ void Subframe::parseFrameID()
  */
 void Subframe::parseSOW()
 {
-    NavBits<8> sow1 = m_bits.getLeft<18, 8>();
-    NavBits<12> sow2 = m_bits.getLeft<30, 12>();
+    NavBits<8> sow1 { m_bits.getLeft<18, 8>() };
+    NavBits<12> sow2 { m_bits.getLeft<30, 12>() };
 
     // merge both sow parts
-    NavBits<20> sow(sow1);
+    NavBits<20> sow { sow1 };
     sow <<= 12;
     sow ^= sow2;
 
     m_sow = sow.to_ulong();
 
     // SOW between 0 and 604800 are valid
-    assert(m_sow >= 0 && m_sow < 60*60*24*7);
+    assert(m_sow >= 0 && m_sow < SECONDS_OF_A_WEEK);
 }
 
 /**
@@ -257,7 +257,7 @@ void Subframe::parsePageNumD1()
     if (m_frameID > 3)
     {
         // Pnum
-        NavBits<7> pnum = m_bits.getLeft<43, 7>();
+        NavBits<7> pnum { m_bits.getLeft<43, 7>() };
         m_pageNum = pnum.to_ulong();
         assert(m_pageNum > 0 && m_pageNum <= 24);
     }
@@ -279,7 +279,7 @@ void Subframe::parsePageNumD2()
     if (m_frameID == 1)
     {
         // Pnum1
-        NavBits<4> pnum = m_bits.getLeft<42, 4>();
+        NavBits<4> pnum { m_bits.getLeft<42, 4>() };
         m_pageNum = pnum.to_ulong();
         assert(m_pageNum > 0 && m_pageNum <= 10);
     }
@@ -289,14 +289,14 @@ void Subframe::parsePageNumD2()
     else if (m_frameID == 2)
     {
         // Pnum2
-        NavBits<4> pnum = m_bits.getLeft<43, 4>();
+        NavBits<4> pnum { m_bits.getLeft<43, 4>() };
         m_pageNum = pnum.to_ulong();
         assert(m_pageNum > 0 && m_pageNum <= 6);
     }
     else if (m_frameID == 5)
     {
         // Pnum
-        NavBits<7> pnum = m_bits.getLeft<43, 7>();
+        NavBits<7> pnum { m_bits.getLeft<43, 7>() };
         m_pageNum = pnum.to_ulong();
         assert(m_pageNum > 0 && m_pageNum <= 120);
     }

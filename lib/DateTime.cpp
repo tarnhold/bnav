@@ -53,7 +53,7 @@ void DateTime::setTimeSystem(const TimeSystem ts)
 void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
 {
     assert(weeknum <= WEEKNUM_MAX);
-    assert(sow <= SECONDS_OF_A_WEEK);
+    assert(sow < SECONDS_OF_A_WEEK);
     assert(millisec < INT32_MAX);
     boost::gregorian::date d0;
 
