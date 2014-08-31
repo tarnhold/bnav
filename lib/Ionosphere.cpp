@@ -342,7 +342,6 @@ Ionosphere::Ionosphere(const KlobucharParam &klob, const uint32_t time)
 void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
 {
     assert(sow <= SECONDS_OF_A_WEEK);
-    // strictly speaking we need GPST here, but 16s,... be lazy
     // we need only time of day, not full SOW
     uint32_t gpstime = sow % 86400;
 
