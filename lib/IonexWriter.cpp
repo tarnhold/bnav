@@ -86,7 +86,7 @@ void IonexWriter::open(const std::string &filename)
     open(filename.c_str());
 }
 
-void IonexWriter:close()
+void IonexWriter::close()
 {
     // ensure file stream is opened
     assert(isOpen());

@@ -4,7 +4,6 @@
 #include "SubframeBuffer.h"
 
 #include <cmath>
-#include <math.h>
 #include <iostream>
 
 namespace
@@ -71,7 +70,7 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
         semiphi = -0.416;
 
     // geomagnetic latitude
-    double phim = semiphi + 0.064 * std::cos((semilambda - 1.617)*M_PI);
+    double phim = semiphi + 0.064 * std::cos((semilambda - 1.617)*bnav::PI);
 
 //    std::cout << "phim: " << phim << std::endl;
 
@@ -94,14 +93,14 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
     if (period >= 172800.0)
         period = 172800.0;
 
-    const double x = 2 * M_PI * (time2 - 50400) / period;
+    const double x = 2 * bnav::PI * (time2 - 50400) / period;
 
 //    std::cout << "x: " << x << std::endl;
 
     double tiono;
 
     // ignore slant factor F, because we want vertical delay
-    if (std::fabs(x) < M_PI / 2.0)
+    if (std::fabs(x) < bnav::PI / 2.0)
         tiono = 5.0e-9 + amplitude * (1 - std::pow(x, 2)/2 + std::pow(x, 4)/24 );
     else
         tiono = 5.0e-9;
@@ -161,7 +160,7 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 
     // offset 50400 is 14h at local time, this is when ionospheric delay
     // reaches maximum usually
-    const double x = 2 * M_PI * (localtime - 50400) / period;
+    const double x = 2 * bnav::PI * (localtime - 50400) / period;
 
 //    std::cout << "x: " << x << std::endl;
 

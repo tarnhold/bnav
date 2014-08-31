@@ -46,8 +46,8 @@ static inline std::size_t decodeBCH(const subword &message)
 
         d3 = d2;
         d2 = d1;
-        d1 = d0 xor buf;
-        d0 = message[i-1] xor buf;
+        d1 = d0 ^ buf;
+        d0 = message[i-1] ^ buf;
     }
 
     // put all together
@@ -71,11 +71,11 @@ uint8_t encodeBCH(const NavBits<11> &information)
     for (std::size_t i = information.size(); i > 0; --i)
     {
         // save old d3 state
-        bool buf = d3 xor information[i-1];
+        bool buf = d3 ^ information[i-1];
 
         d3 = d2;
         d2 = d1;
-        d1 = d0 xor buf;
+        d1 = d0 ^ buf;
         d0 = buf;
     }
 
@@ -224,7 +224,7 @@ bool NavBitsECCWord<len>::checkAndFixSubword(subword &message)
     // fix parity
     if (idx > 0)
     {
-        subword fixed(message xor NavBits<15>(cROMTable[idx]));
+        subword fixed(message ^ NavBits<15>(cROMTable[idx]));
         ++m_counter;
 
 //#if 0
