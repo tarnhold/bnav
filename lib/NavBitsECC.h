@@ -17,7 +17,7 @@ namespace
 /*
  * [1] Table 5-2 ROM table list for error correction
  */
-constexpr uint16_t cROMTable[] = {
+constexpr uint16_t cROMTable[] {
     0x0000, 0x0001, 0x0002, 0x0010, // 0 - 3
     0x0004, 0x0100, 0x0020, 0x0400, // 4 - 7
     0x0008, 0x4000, 0x0200, 0x0080, // 8 - 11
@@ -158,7 +158,7 @@ void NavBitsECCWord<len>::splitWordToSubword()
 {
     static_assert(len % 15 == 0, "invalid size");
 
-    const std::size_t num = len / 15;
+    const std::size_t num { len / 15 };
     m_msglist.resize(num);
 
     // special case, if argument is NavBits<15>, we could just skip all the
@@ -171,8 +171,8 @@ void NavBitsECCWord<len>::splitWordToSubword()
 
     for (std::size_t i = 0; i < num; ++i)
     {
-        std::size_t startinfo = 11*i;
-        std::size_t startpar = 11*num + 4*i;
+        std::size_t startinfo { 11*i };
+        std::size_t startpar { 11*num + 4*i };
 
         NavBits<15> submessage;
 
@@ -219,12 +219,12 @@ std::string NavBitsECCWord<len>::mergeSubwordsToWord()
 template <std::size_t len>
 bool NavBitsECCWord<len>::checkAndFixSubword(subword &message)
 {
-    std::size_t idx = decodeBCH(message);
+    std::size_t idx { decodeBCH(message) };
 
     // fix parity
     if (idx > 0)
     {
-        subword fixed(message ^ NavBits<15>(cROMTable[idx]));
+        subword fixed { message ^ NavBits<15>(cROMTable[idx]) };
         ++m_counter;
 
 //#if 0
@@ -254,8 +254,7 @@ void NavBitsECCWord<len>::checkAndFixAllSubwords()
 template <std::size_t len>
 NavBits<len> NavBitsECCWord<len>::getBits()
 {
-    std::string merge;
-    merge = mergeSubwordsToWord();
+    std::string merge { mergeSubwordsToWord() };
 
     return NavBits<len>(merge);
 }

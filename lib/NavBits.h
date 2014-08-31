@@ -254,7 +254,7 @@ public:
      */
     double to_double(const int32_t scale_pow2 = 0) const
     {
-        double scale = std::pow(2, scale_pow2);
+        double scale { std::pow(2, scale_pow2) };
         NavBits<1> sign = getLeft<0, 1>();
         NavBits<dim - 1> value = getLeft<1, dim - 1>();
 

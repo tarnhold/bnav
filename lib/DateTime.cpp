@@ -89,7 +89,7 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
 void DateTime::setToCurrentDateTimeUTC()
 {
    // get the current time from the clock -- one second resolution
-   boost::posix_time::ptime now = boost::posix_time::second_clock::universal_time();
+   boost::posix_time::ptime now { boost::posix_time::second_clock::universal_time() };
 
    m_tsys = TimeSystem::UTC;
    m_time = now;
@@ -129,7 +129,7 @@ uint32_t DateTime::getSOW() const
  */
 uint32_t DateTime::getDay() const
 {
-    boost::gregorian::date d = m_time.date();
+    boost::gregorian::date d { m_time.date() };
     return d.day();
 }
 
@@ -139,7 +139,7 @@ uint32_t DateTime::getDay() const
  */
 uint32_t DateTime::getMonth() const
 {
-    boost::gregorian::date d = m_time.date();
+    boost::gregorian::date d { m_time.date() };
     return d.month();
 }
 
@@ -149,7 +149,7 @@ uint32_t DateTime::getMonth() const
  */
 uint32_t DateTime::getYear() const
 {
-    boost::gregorian::date d = m_time.date();
+    boost::gregorian::date d { m_time.date() };
     return d.year();
 }
 
@@ -159,7 +159,7 @@ uint32_t DateTime::getYear() const
  */
 std::string DateTime::getHourString() const
 {
-    boost::posix_time::time_duration t = m_time.time_of_day();
+    boost::posix_time::time_duration t { m_time.time_of_day() };
     std::stringstream ss;
     ss << std::setw(2) << std::setfill('0') << t.hours();
     return ss.str();
@@ -171,7 +171,7 @@ std::string DateTime::getHourString() const
  */
 std::string DateTime::getMinuteString() const
 {
-    boost::posix_time::time_duration t = m_time.time_of_day();
+    boost::posix_time::time_duration t { m_time.time_of_day() };
     std::stringstream ss;
     ss << std::setw(2) << std::setfill('0') << t.minutes();
     return ss.str();
@@ -183,7 +183,7 @@ std::string DateTime::getMinuteString() const
  */
 std::string DateTime::getSecondString() const
 {
-    boost::posix_time::time_duration t = m_time.time_of_day();
+    boost::posix_time::time_duration t { m_time.time_of_day() };
     std::stringstream ss;
     ss << std::setw(2) << std::setfill('0') << t.seconds();
     return ss.str();
@@ -195,7 +195,7 @@ std::string DateTime::getSecondString() const
  */
 std::string DateTime::getMonthNameShort() const
 {
-    boost::gregorian::date d = m_time.date();
+    boost::gregorian::date d { m_time.date() };
     return d.month().as_short_string();
 }
 

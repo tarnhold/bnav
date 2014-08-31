@@ -8,8 +8,8 @@
 namespace
 {
 
-const std::string author = "TUD/Arnhold";
-const std::string application = "bapp v0.4";
+const std::string author { "TUD/Arnhold" };
+const std::string application { "bapp v0.4" };
 
 std::string lcl_justifyRight(const std::string &str, const std::string::size_type length, const char padding = ' ')
 {
@@ -141,8 +141,8 @@ void IonexWriter::writeHeader()
     }
 
     // BeiDou specific
-    std::vector<std::string> height = {"475.0", "475.0", "0.0"};
-    std::string radius = "6478.0";
+    std::vector<std::string> height {"475.0", "475.0", "0.0"};
+    std::string radius { "6478.0" };
 
     std::cout << lcl_justifyRight("1.0", 8) << lcl_justifyLeft("", 12)
               << lcl_justifyLeft("IONOSPHERE MAPS", 20)
