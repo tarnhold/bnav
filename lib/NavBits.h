@@ -46,8 +46,7 @@ public:
     NavBits<dim>& operator<<=(std::size_t shift);
     bool operator==(const NavBits<dim> &rhs);
 
-    void setLeft(std::size_t index);
-    void setLeft(std::size_t index, bool value);
+    void setLeft(std::size_t index, bool value = true);
 
     template<std::size_t len>
     void setLeft(std::size_t index, const NavBits<len> &bits);
@@ -210,16 +209,6 @@ template<std::size_t dim>
 bool NavBits<dim>::operator==(const NavBits<dim> &rhs)
 {
     return m_bitset == rhs.getBits();
-}
-
-/**
- * @brief setLeft Set bit at position index starting from the left to true.
- * @param index index of the bit starting from the left.
- */
-template<std::size_t dim>
-void NavBits<dim>::setLeft(std::size_t index)
-{
-    m_bitset.set(m_bitset.size() - 1 - index);
 }
 
 /**
