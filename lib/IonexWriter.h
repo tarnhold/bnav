@@ -17,8 +17,8 @@ class IonexWriter : private boost::noncopyable
 
 public:
     IonexWriter();
-    IonexWriter(const char *filename, const bool isGIM = true);
-    IonexWriter(const std::string &filename, const bool isGIM = true);
+    IonexWriter(const char *filename, const bool gim = true);
+    IonexWriter(const std::string &filename, const bool gim = true);
     ~IonexWriter();
 
     void open(const char *filename);
@@ -27,7 +27,7 @@ public:
     bool isOpen() const;
 
     bool isGIM() const;
-    void setGIM(const bool isGIM = true);
+    void setGIM(const bool gim = true);
 
     void writeHeader();
     void writeData(/* parameter foo */);
