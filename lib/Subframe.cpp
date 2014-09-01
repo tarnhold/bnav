@@ -239,7 +239,7 @@ void Subframe::parseSOW()
     m_sow = sow.to_ulong();
 
     // SOW between 0 and 604800 are valid
-    assert(m_sow >= 0 && m_sow < SECONDS_OF_A_WEEK);
+    assert(m_sow < SECONDS_OF_A_WEEK);
 }
 
 /**

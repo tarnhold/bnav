@@ -259,7 +259,7 @@ void IonoGridInfo::loadVerticalDelay(const NavBits<9> &bits)
 {
     uint32_t dtraw { bits.to_ulong() };
     // maximum value is 63.875m, which is 511 when scaled by 0.125
-    assert(dtraw >= 0 && dtraw <= 511);
+    assert(dtraw <= 511);
     // convert to TECU
     if (dtraw >= 510)
         m_dtTECU =  9999;
@@ -274,7 +274,7 @@ void IonoGridInfo::loadVerticalDelay(const NavBits<9> &bits)
 void IonoGridInfo::loadGivei(const NavBits<4> &bits)
 {
     uint32_t givei { bits.to_ulong() };
-    assert(givei >= 0 && givei <= 15);
+    assert(givei <= 15);
 
     // according to the ICD there are no invalid values, but invalid dt values
     // get GIVEI 15, so set this to invalid, too
