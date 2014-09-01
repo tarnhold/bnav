@@ -72,7 +72,7 @@ protected:
     void checkLastSOW(uint32_t currentsow, uint32_t duration);
 };
 
-class SubframeBufferD1 : public SubframeBuffer
+class SubframeBufferD1 final : public SubframeBuffer
 {
 public:
     SubframeBufferD1();
@@ -90,7 +90,7 @@ public:
     void clearAlmanacData();
 };
 
-class SubframeBufferD2 : public SubframeBuffer
+class SubframeBufferD2 final : public SubframeBuffer
 {
 public:
     SubframeBufferD2();

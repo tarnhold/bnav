@@ -31,7 +31,7 @@ public:
 };
 
 // Type for JPS style files
-class AsciiReaderEntryJPS : public AsciiReaderEntry
+class AsciiReaderEntryJPS final : public AsciiReaderEntry
 {
 public:
     AsciiReaderEntryJPS();
@@ -41,7 +41,7 @@ public:
 };
 
 // Type for SBF style files
-class AsciiReaderEntrySBF : public AsciiReaderEntry
+class AsciiReaderEntrySBF final : public AsciiReaderEntry
 {
 public:
     AsciiReaderEntrySBF();
