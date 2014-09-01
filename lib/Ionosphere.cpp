@@ -156,17 +156,19 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     if (period >= 172800.0)
         period = 172800.0;
 
-    // offset 50400 is 14h at local time, this is when ionospheric delay
-    // reaches maximum usually
-    const double x = { 2 * bnav::PI * (localtime - 50400) / period };
-
-//    std::cout << "x: " << x << std::endl;
-
     double tiono;
 
     // ignore slant factor F, because we want vertical delay
-    if (std::abs(localtime - 50400) < period / 4.0)
+    if (std::abs(localtime - 50400) < (period / 4.0))
+    {
+        // offset 50400 is 14h at local time, this is when ionospheric delay
+        // reaches maximum usually
+        const double x = { 2 * bnav::PI * (localtime - 50400) / period };
+
+        //std::cout << "x: " << x << std::endl;
+
         tiono = 5.0e-9 + amplitude * std::cos(x);
+    }
     else
         tiono = 5.0e-9;
 
@@ -224,18 +226,18 @@ IonoGridInfo::IonoGridInfo()
 {
 }
 
-IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
-    : IonoGridInfo()
-{
-    load(bits);
-}
-
 IonoGridInfo::IonoGridInfo(const uint32_t vertdelay, const uint32_t rms)
     : IonoGridInfo()
 {
     m_isValid = true;
     m_dtTECU = vertdelay;
     m_giveTECU = rms;
+}
+
+IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
+    : IonoGridInfo()
+{
+    load(bits);
 }
 
 void IonoGridInfo::load(const NavBits<13> &bits)
@@ -341,7 +343,7 @@ void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
 {
     assert(sow <= SECONDS_OF_A_WEEK);
     // we need only time of day, not full SOW
-    uint32_t gpstime = sow % 86400;
+    uint32_t secofday = sow % 86400;
 
     // set model time in BDT
     m_sow = sow;
@@ -362,10 +364,11 @@ void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
                 std::size_t index = col * 10 + (table * 160) + row - 1;
 
                 /// 1.0, because we are east of Greenwich
-                double lambda = 1.0 * (col * 5.0 + 70);
-                double phi = 1.0 * (row * 5.0 + 5.0) - table * 2.5;
-                double corr = lcl_calcKlobucharCorrectionBDS(klob, gpstime, phi, lambda);
-                m_grid[index] = IonoGridInfo(lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ));
+                double lambda { 1.0 * (col * 5.0 + 70) };
+                double phi { 1.0 * (row * 5.0 + 5.0) - table * 2.5 };
+                double corr { lcl_calcKlobucharCorrectionBDS(klob, secofday, phi, lambda) };
+                IonoGridInfo info { lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ) };
+                m_grid[index] = info;
             }
         }
     }

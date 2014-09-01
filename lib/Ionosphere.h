@@ -19,8 +19,8 @@ class IonoGridInfo
 
 public:
      IonoGridInfo();
+     IonoGridInfo(const uint32_t vertdelay, const uint32_t rms = 0);
      IonoGridInfo(const NavBits<13> &bits);
-     IonoGridInfo(const uint32_t vertdelay, const uint32_t rms);
 
      void load(const NavBits<13> &bits);
 
