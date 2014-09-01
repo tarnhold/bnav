@@ -53,7 +53,10 @@ void DateTime::setTimeSystem(const TimeSystem ts)
 void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
 {
     assert(weeknum <= WEEKNUM_MAX);
-    assert(sow < SECONDS_OF_A_WEEK);
+    // lets allow SOW values greater than SECONDS_OF_A_WEEK to give some comfort
+    // use int32 max instead, because we cast down to int. This means we could
+    // increment weeks only by SOW for 7101 weeks. This should be enough.
+    assert(sow < INT32_MAX);
     assert(millisec < INT32_MAX);
     boost::gregorian::date d0;
 
