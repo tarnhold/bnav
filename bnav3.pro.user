@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.2.0, 2014-08-31T20:07:00. -->
+<!-- Written by QtCreator 3.2.0, 2014-09-01T19:27:51. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -92,7 +92,7 @@
      </valuemap>
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.2">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProcessStep.Arguments">| sed s/error:/warning:/ 1&gt;&amp;2</value>
+      <value type="QString" key="ProjectExplorer.ProcessStep.Arguments"> 2&gt;&amp;1 | sed &quot;s/error:/warning:/&quot; | sed &quot;s/^tests: //g&quot; 1&gt;&amp;2</value>
       <value type="QString" key="ProjectExplorer.ProcessStep.Command">/home/thomas/Dropbox/projects/build-bnav3-Desktop-Debug/tests/tests</value>
       <value type="QString" key="ProjectExplorer.ProcessStep.WorkingDirectory">%{buildDir}</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Custom Process Step</value>
