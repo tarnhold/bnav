@@ -21,8 +21,8 @@ SubframeBufferStore::SubframeBufferStore()
  */
 SubframeBufferStore::~SubframeBufferStore()
 {
-    for (auto it = m_store.begin(); it != m_store.end(); ++it)
-        delete it->second;
+    for (auto elem : m_store)
+        delete elem.second;
 }
 
 /**
@@ -93,9 +93,9 @@ SubframeBuffer* SubframeBufferStore::getSubframeBuffer(const SvID &sv)
  */
 bool SubframeBufferStore::hasIncompleteData() const
 {
-    for (auto it = m_store.cbegin(); it != m_store.cend(); ++it)
+    for (auto elem : m_store)
     {
-        if (it->second->hasIncompleteData())
+        if (elem.second->hasIncompleteData())
             return true;
     }
 
