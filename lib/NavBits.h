@@ -15,7 +15,6 @@ namespace bnav
 
 template<std::size_t dim> class NavBits
 {
-protected:
     std::bitset<dim> m_bitset;
 
 public:
