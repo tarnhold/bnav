@@ -4,10 +4,12 @@
 #include <fstream>
 #include <string>
 
+#include <boost/noncopyable.hpp>
+
 namespace bnav
 {
 
-class IonexWriter
+class IonexWriter : private boost::noncopyable
 {
     std::ofstream m_outfile; ///< Output file stream
     std::string m_filename; ///< File name
