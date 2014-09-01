@@ -51,17 +51,17 @@ IonexWriter::IonexWriter()
 {
 }
 
-IonexWriter::IonexWriter(const char *filename, const bool isGIM)
+IonexWriter::IonexWriter(const char *filename, const bool gim)
     : m_outfile()
     , m_filename(filename)
-    , m_isGIM(isGIM)
+    , m_isGIM(gim)
 {
     open(filename);
 }
 
 
-IonexWriter::IonexWriter(const std::string &filename, const bool isGIM)
-    : IonexWriter(filename.c_str(), isGIM)
+IonexWriter::IonexWriter(const std::string &filename, const bool gim)
+    : IonexWriter(filename.c_str(), gim)
 {
 }
 
@@ -106,9 +106,9 @@ bool IonexWriter::isGIM() const
     return m_isGIM;
 }
 
-void IonexWriter::setGIM(const bool isGIM)
+void IonexWriter::setGIM(const bool gim)
 {
-    m_isGIM = isGIM;
+    m_isGIM = gim;
 }
 
 void IonexWriter::writeHeader()
