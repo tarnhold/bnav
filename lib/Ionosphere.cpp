@@ -229,15 +229,20 @@ IonoGridInfo::IonoGridInfo()
 IonoGridInfo::IonoGridInfo(const uint32_t vertdelay, const uint32_t rms)
     : IonoGridInfo()
 {
-    m_isValid = true;
-    m_dtTECU = vertdelay;
-    m_giveTECU = rms;
+    load(vertdelay, rms);
 }
 
 IonoGridInfo::IonoGridInfo(const NavBits<13> &bits)
     : IonoGridInfo()
 {
     load(bits);
+}
+
+void IonoGridInfo::load(const uint32_t vertdelay, const uint32_t rms)
+{
+    m_isValid = true;
+    m_dtTECU = vertdelay;
+    m_giveTECU = rms;
 }
 
 void IonoGridInfo::load(const NavBits<13> &bits)

@@ -22,6 +22,7 @@ public:
      IonoGridInfo(const uint32_t vertdelay, const uint32_t rms = 0);
      IonoGridInfo(const NavBits<13> &bits);
 
+     void load(const uint32_t vertdelay, const uint32_t rms = 0);
      void load(const NavBits<13> &bits);
 
      uint32_t getVerticalDelay_TECU() const;
