@@ -168,4 +168,22 @@ void Ephemeris::processD2Page2(const Subframe &sf)
     m_klob.rawbits = allbits;
 }
 
+std::ostream & operator<<(std::ostream & out, const KlobucharParam & rhs)
+{
+    const std::size_t width = 10;
+    out << std::setprecision(4);
+    out << "alpha: "
+        << std::setw(width) << rhs.alpha0 << " "
+        << std::setw(width) << rhs.alpha1 << " "
+        << std::setw(width) << rhs.alpha2 << " "
+        << std::setw(width) << rhs.alpha3;
+    out << std::endl;
+    out << " beta: "
+        << std::setw(width) << rhs.beta0 << " "
+        << std::setw(width) << rhs.beta1 << " "
+        << std::setw(width) << rhs.beta2 << " "
+        << std::setw(width) << rhs.beta3;
+    return out;
+}
+
 } // namespace bnav
