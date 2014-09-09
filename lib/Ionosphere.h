@@ -39,6 +39,7 @@ private:
 class Ionosphere
 {
     uint32_t m_sow;
+    std::vector<IonoGridInfo> m_grid;
     std::vector<IonoGridInfo> m_grid_chinese;
 
 public:
@@ -60,6 +61,8 @@ public:
 
     bool operator==(const Ionosphere &iono) const;
 
+    void chineseToEuropean();
+    void dumpEuropean(bool rms = false);
     void dump(bool rms = false);
     void dump2(bool rms = false);
 

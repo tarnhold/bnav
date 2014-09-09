@@ -475,6 +475,31 @@ bool Ionosphere::operator==(const Ionosphere &iono) const
     return (iono.getGrid() == m_grid_chinese);
 }
 
+void Ionosphere::chineseToEuropean()
+{
+    std::cout << "DoI: " << m_sow << std::endl;
+
+    m_grid.clear();
+
+    for (std::size_t row = 10; row > 0; --row)
+    {
+        // we use a single row vector for m_grid
+        // table 0 is IGP <= 160
+        // table 1 is IGP > 160 -> has an offset of 160
+        for (std::size_t table = 0; table <= 1; ++table)
+        {
+            for (std::size_t col = 0; col <= 15; ++col)
+            {
+                // calc IGP num formula: col * 10 + row
+                // + table * 160, to access both IGP tables
+                // array index is then -1
+                std::size_t index = col * 10 + (table * 160) + row - 1;
+                m_grid.push_back(m_grid_chinese[index]);
+            }
+        }
+    }
+}
+
 /**
  * @brief Ionosphere::dump Dump complete IGP table.
  * @param rms Whether to print vertical delay or its RMS (GIVEI).
@@ -500,6 +525,28 @@ void Ionosphere::dump(bool rms)
             }
             std::cout << std::endl;
         }
+    }
+}
+
+void Ionosphere::dumpEuropean(bool rms)
+{
+    std::cout << "DoI: " << m_sow << std::endl;
+
+    chineseToEuropean();
+
+    for (std::size_t row = 0; row < 20; ++row)
+    {
+        // we use a single row vector for m_grid
+        for (std::size_t col = 0; col <= 15; ++col)
+        {
+            // calc IGP num formula: col * 10 + row
+            // + table * 160, to access both IGP tables
+            // array index is then -1
+            std::size_t index = row * 16 + col;
+            std::cout << std::setw(5)
+                      << (rms ? m_grid[index].getGive_TECU() : m_grid[index].getVerticalDelay_TECU());
+        }
+        std::cout << std::endl;
     }
 }
 
