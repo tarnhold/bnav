@@ -39,7 +39,7 @@ private:
 class Ionosphere
 {
     uint32_t m_sow;
-    std::vector<IonoGridInfo> m_grid;
+    std::vector<IonoGridInfo> m_grid_chinese;
 
 public:
     Ionosphere();
