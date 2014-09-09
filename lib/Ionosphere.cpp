@@ -37,78 +37,6 @@ uint32_t lcl_diffTECUValues(const uint32_t t1, const uint32_t t2)
         return t1 - t2;
 }
 
-#if 0
-/**
- * @brief lcl_calcKlobucharCorrection Calculate Klobuchar correction at position
- * (phi, lambda). This is only vertical delay, no slant!
- *
- * @param klob Klobuchar parameters.
- * @param time Local time.
- * @param phi Phi in degrees, east of Greenwich is negative.
- * @param lambda Lambda in degrees, north of equator is positive.
- * @return Vertical delay in meters.
- *
- * References:
- * [1] ICD, 5.2.4.7 Ionospheric Delay Model Parameters, pp. 25
- * [2] Ionospheric Time-Delay Algorithm for Single Frequency GPS Users,
- *     John. A. Klobuchar, 1987
- * [3] http://www.navipedia.net/index.php/Klobuchar_Ionospheric_Model
- */
-double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint32_t time, const double phi, const double lambda)
-{
-    assert(time < 86400);
-
-    // convert to semicircle
-    double semiphi = phi / 180.0;
-    double semilambda = lambda / 180.0; // east!
-
-//    std::cout << "phi: " << semiphi << std::endl;
-
-    if (semiphi > 0.416)
-        semiphi = 0.416;
-    if (semiphi < -0.416)
-        semiphi = -0.416;
-
-    // geomagnetic latitude
-    double phim = semiphi + 0.064 * std::cos((semilambda - 1.617)*bnav::PI);
-
-//    std::cout << "phim: " << phim << std::endl;
-
-    int32_t time2 =  static_cast<int32_t>(std::lround(4.32e4 * semilambda)) + static_cast<int32_t>(time);
-    if (time2 > 86400)
-        time2 = time2 - 86400;
-    if (time2 < 0)
-        time2 = time2 + 86400;
-
-//    std::cout << "time: " << time2 << std::endl;
-
-    double amplitude = klob.alpha0 + phim * (klob.alpha1 + phim * (klob.alpha2 + phim * klob.alpha3));
-    double period = klob.beta0 + phim * (klob.beta1 + phim * (klob.beta2 + phim * klob.beta3));
-
-    if (amplitude < 0.0)
-        amplitude = 0.0;
-    if (period < 72000.0)
-        period = 72000.0;
-    if (period >= 172800.0)
-        period = 172800.0;
-
-    const double x = 2 * bnav::PI * (time2 - 50400) / period;
-
-//    std::cout << "x: " << x << std::endl;
-
-    double tiono;
-
-    // ignore slant factor F, because we want vertical delay
-    if (std::fabs(x) < bnav::PI / 2.0)
-        tiono = 5.0e-9 + amplitude * (1 - std::pow(x, 2)/2 + std::pow(x, 4)/24 );
-    else
-        tiono = 5.0e-9;
-
-    // we have time atm
-    return tiono * bnav::SPEED_OF_LIGHT;
-}
-#endif
-
 /**
  * @brief lcl_calcKlobucharCorrectionBDS Calculate Klobuchar correction at position
  * (phi, lambda). This is only vertical delay, no slant!
@@ -121,6 +49,9 @@ double lcl_calcKlobucharCorrection(const bnav::KlobucharParam &klob, const uint3
  *
  * References:
  * [1] ICD, 5.2.4.7 Ionospheric Delay Model Parameters, pp. 25
+ * [2] Ionospheric Time-Delay Algorithm for Single Frequency GPS Users,
+ *     John. A. Klobuchar, 1987
+ * [3] http://www.navipedia.net/index.php/Klobuchar_Ionospheric_Model
  */
 double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const uint32_t time, const double phi, const double lambda)
 {
