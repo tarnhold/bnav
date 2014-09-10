@@ -325,27 +325,22 @@ void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
     m_sow = sow;
     m_grid.resize(320);
 
-    for (std::size_t row = 10; row > 0; --row)
+    for (std::size_t row = 0; row < 20; ++row)
     {
         // we use a single row vector for m_grid
-        // table 0 is IGP <= 160
-        // table 1 is IGP > 160 -> has an offset of 160
-        for (std::size_t table = 0; table <= 1; ++table)
+        for (std::size_t col = 0; col <= 15; ++col)
         {
-            for (std::size_t col = 0; col <= 15; ++col)
-            {
-                // calc IGP num formula: col * 10 + row
-                // + table * 160, to access both IGP tables
-                // array index is then -1
-                std::size_t index = col * 10 + (table * 160) + row - 1;
+            // calc IGP num formula: col * 10 + row
+            // + table * 160, to access both IGP tables
+            // array index is then -1
+            std::size_t index = row * 16 + col;
 
-                /// 1.0, because we are east of Greenwich
-                double lambda { 1.0 * (col * 5.0 + 70) };
-                double phi { 1.0 * (row * 5.0 + 5.0) - table * 2.5 };
-                double corr { lcl_calcKlobucharCorrectionBDS(klob, secofday, phi, lambda) };
-                IonoGridInfo info { lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ) };
-                m_grid[index] = info;
-            }
+            /// 1.0, because we are east of Greenwich
+            double lambda { 1.0 * (70 + col * 5.0) };
+            double phi { 1.0 * (55.0 - row * 2.5) };
+            double corr { lcl_calcKlobucharCorrectionBDS(klob, secofday, phi, lambda) };
+            IonoGridInfo info { lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ) };
+            m_grid[index] = info;
         }
     }
 }

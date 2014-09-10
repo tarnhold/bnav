@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 
                     //std::cout << klob << std::endl;
 
-                    //ionoklob.dump();
+                    ionoklob.dump();
                     ionostoreKlobuchar.addIonosphere(sv, ionoklob);
 
                     klob_old = klob;
