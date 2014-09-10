@@ -295,35 +295,85 @@ IonoGridInfo IonoGridInfo::operator-(const IonoGridInfo &rhs) const
     return IonoGridInfo(dvdel, dgive);
 }
 
+IonoGridDimension::IonoGridDimension()
+    : latitude_north(0)
+    , latitude_south(0)
+    , latitude_spacing(0)
+    , longitude_west(0)
+    , longitude_east(0)
+    , longitude_spacing(0)
+{
+}
+
+IonoGridDimension::IonoGridDimension(const double latnorth, const double latsouth, const double latspace,
+                  const double longwest, const double longeast, const double longspace)
+    : latitude_north(latnorth)
+    , latitude_south(latsouth)
+    , latitude_spacing(latspace)
+    , longitude_west(longwest)
+    , longitude_east(longeast)
+    , longitude_spacing(longspace)
+{
+    assert(latitude_north > latitude_south);
+    assert(longitude_east > longitude_west);
+    assert(latitude_spacing < 0);
+    assert(longitude_spacing > 0);
+}
+
+std::size_t IonoGridDimension::getItemCountLatitude() const
+{
+    assert(latitude_spacing != 0.0);
+    std::cout << "lat max: " << latitude_north << " min: " << latitude_south << " space: " << latitude_spacing << std::endl;
+    // add 0.5 because the compiler will always truncate
+    // +1 because latmin and latmax are counting, too
+    return static_cast<std::size_t>(std::fabs((latitude_north - latitude_south) / latitude_spacing) + 0.5) + 1;
+}
+
+std::size_t IonoGridDimension::getItemCountLongitude() const
+{
+    assert(longitude_spacing != 0.0);
+    std::cout << "long max: " << longitude_west << " min: " << longitude_east << " space: " << longitude_spacing << std::endl;
+    return static_cast<std::size_t>(std::fabs((longitude_west - longitude_east) / longitude_spacing) + 0.5) + 1;
+}
+
 /**
  * @brief The Ionosphere class
  *
  * Stores IGP data into a single row vector.
  */
 Ionosphere::Ionosphere()
-    : m_sow(0)
+    : m_datetime()
+    , m_grid()
+    , m_griddim()
 {
 }
 
-Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf)
+Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf, const uint32_t weeknum)
+    : Ionosphere()
 {
-    load(sfbuf);
+    load(sfbuf, weeknum);
 }
 
-Ionosphere::Ionosphere(const KlobucharParam &klob, const uint32_t time)
+Ionosphere::Ionosphere(const KlobucharParam &klob, const DateTime &datetime)
+    : Ionosphere()
 {
-    load(klob, time);
+    load(klob, datetime);
 }
 
-void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
+void Ionosphere::load(const KlobucharParam &klob, const DateTime &datetime)
 {
-    assert(sow <= SECONDS_OF_A_WEEK);
     // we need only time of day, not full SOW
-    uint32_t secofday = sow % 86400;
+    uint32_t secofday = datetime.getSOW() % 86400;
 
     // set model time in BDT
-    m_sow = sow;
+    m_datetime = datetime;
     m_grid.resize(320);
+    m_griddim = IonoGridDimension(55.0, 7.5, -2.5, 70.0, 145.0, 5.0);
+
+#if 0
+    // this would be global
+    m_griddim = IonoGridDimension(87.5, -87.5, -2.5, -180.0, 180.0, 5.0);
+#endif
 
     for (std::size_t row = 0; row < 20; ++row)
     {
@@ -346,7 +396,7 @@ void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
 }
 
 
-void Ionosphere::load(const SubframeBufferParam &sfbuf)
+void Ionosphere::load(const SubframeBufferParam &sfbuf, const uint32_t weeknum)
 {
     // ensure correct type
     assert(sfbuf.type == SubframeBufferType::D2_ALMANAC);
@@ -371,11 +421,14 @@ void Ionosphere::load(const SubframeBufferParam &sfbuf)
     assert(grid_chinese.size() == 320);
 
     m_grid = lcl_convertChineseToEuropeanGrid(grid_chinese);
+    m_griddim = IonoGridDimension(55.0, 7.5, -2.5, 70.0, 145.0, 5.0);
 
     // date of issue of ionospheric model is at page 1 of subframe 1
     // [1] 5.3.3.1 Basic NAV Information, p. 68
-    // FIXME: this gets it from subframe 5...
-    m_sow = vfra5.front().getSOW();
+    // This gets it from subframe 5 page 1, which is ok, because for D2
+    // subframes 1-5 have the same SOW.
+    m_datetime.setTimeSystem(TimeSystem::BDT);
+    m_datetime.setWeekAndSOW(weeknum, vfra5.front().getSOW());
 }
 
 /**
@@ -453,18 +506,21 @@ bool Ionosphere::hasData() const
     return m_grid.size() == 320;
 }
 
-void Ionosphere::setSOW(const uint32_t sow)
+/**
+ * @brief Ionosphere::setDateOfIssue Set issue date of ionospheric model.
+ */
+void Ionosphere::setDateOfIssue(const DateTime &datetime)
 {
-    m_sow = sow;
+    m_datetime = datetime;
 }
 
 /**
- * @brief Ionosphere::getSOW Get issue date of ionospheric model.
+ * @brief Ionosphere::getDateOfIssue Get issue date of ionospheric model.
  * @return SOW.
  */
-uint32_t Ionosphere::getSOW() const
+DateTime Ionosphere::getDateOfIssue() const
 {
-    return m_sow;
+    return m_datetime;
 }
 
 /**
@@ -484,6 +540,16 @@ void Ionosphere::setGrid(const std::vector<IonoGridInfo> &rhs)
         m_grid.push_back(*it);
 }
 
+void Ionosphere::setGridDimension(const IonoGridDimension &igd)
+{
+    m_griddim = igd;
+}
+
+IonoGridDimension Ionosphere::getGridDimension() const
+{
+    return m_griddim;
+}
+
 Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
 {
     Ionosphere diff;
@@ -492,7 +558,7 @@ Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
     assert(m_grid.size() == gridrhs.size());
 
     // use SOW from current Ionosphere
-    diff.setSOW(m_sow);
+    diff.setDateOfIssue(m_datetime);
 
     for (std::size_t i = 0; i < m_grid.size(); ++i)
     {
@@ -520,7 +586,7 @@ bool Ionosphere::operator==(const Ionosphere &iono) const
  */
 void Ionosphere::dump(bool rms)
 {
-    std::cout << "DoI: " << m_sow << std::endl;
+    std::cout << "DoI: " << m_datetime.getSOW() << std::endl;
 
     for (std::size_t row = 0; row < 20; ++row)
     {

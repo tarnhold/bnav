@@ -3,6 +3,7 @@
 
 #include "NavBits.h"
 #include "SubframeBuffer.h"
+#include "DateTime.h"
 
 #include "Ephemeris.h" // FIXME: maybe move KlobucharParam here
 
@@ -10,6 +11,23 @@
 
 namespace bnav
 {
+
+struct IonoGridDimension
+{
+    double latitude_north;
+    double latitude_south;
+    double latitude_spacing;
+    double longitude_west;
+    double longitude_east;
+    double longitude_spacing;
+
+    IonoGridDimension();
+    IonoGridDimension(const double latnorth, const double latsouth, const double latspace,
+                      const double longwest, const double longeast, const double longspace);
+
+    std::size_t getItemCountLatitude() const;
+    std::size_t getItemCountLongitude() const;
+};
 
 class IonoGridInfo
 {
@@ -38,23 +56,27 @@ private:
 
 class Ionosphere
 {
-    uint32_t m_sow;
+    DateTime m_datetime;
     std::vector<IonoGridInfo> m_grid;
+    IonoGridDimension m_griddim;
 
 public:
     Ionosphere();
-    Ionosphere(const SubframeBufferParam &sfbuf);
-    Ionosphere(const KlobucharParam &klob, const uint32_t time);
+    Ionosphere(const SubframeBufferParam &sfbuf, const uint32_t weeknum);
+    Ionosphere(const KlobucharParam &klob, const DateTime &datetime);
 
-    void load(const SubframeBufferParam &sfbuf);
-    void load(const KlobucharParam &klob, const uint32_t sow);
+    void load(const SubframeBufferParam &sfbuf, const uint32_t weeknum);
+    void load(const KlobucharParam &klob, const DateTime &datetime);
 
     bool hasData() const;
-    void setSOW(const uint32_t sow);
-    uint32_t getSOW() const;
+    void setDateOfIssue(const DateTime &datetime);
+    DateTime getDateOfIssue() const;
 
     void setGrid(const std::vector<IonoGridInfo> &rhs);
     std::vector<IonoGridInfo> getGrid() const;
+
+    void setGridDimension(const IonoGridDimension &igd);
+    IonoGridDimension getGridDimension() const;
 
     Ionosphere diffToModel(const Ionosphere &rhs);
 

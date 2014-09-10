@@ -43,7 +43,7 @@ bnav::DateTime lcl_extractDateFromFilename(const std::string &filename)
     // add time to get a ISO date YYYYMMDDTHHMMSS
     filename_date += "T000000";
 
-    return bnav::DateTime(filename_date);
+    return bnav::DateTime(bnav::TimeSystem::BDT, filename_date);
 }
 
 /**
@@ -109,6 +109,7 @@ int main(int argc, char **argv)
     const bnav::DateTime dtfilename { lcl_extractDateFromFilename(filename) };
     const std::string station { lcl_extractStationFromFilename(filename) };
 
+    uint32_t weeknum {0};
     uint32_t twoHourCountOld = UINT32_MAX;
     bnav::Ionosphere iono_old;
     bnav::KlobucharParam klob_old;
@@ -146,6 +147,9 @@ int main(int argc, char **argv)
             //std::cout << "eph complete" << std::endl;
 
             bnav::Ephemeris eph(bdata);
+            // store weeknum, because it's only present in Ephemeris data, we
+            // need this for Ionosphere, too.
+            weeknum = eph.getWeekNum();
 
             // Model is updated at every full two hour (00:00, 02:00, 04:00,...).
             // Try to get at least one model within this time frame. It may
@@ -170,7 +174,8 @@ int main(int argc, char **argv)
                     // on the local time.
                     uint32_t secondOfTwoHours = eph.getSOW() % 7200;
                     uint32_t sowFullTwoHour = eph.getSOW() - secondOfTwoHours;
-                    bnav::Ionosphere ionoklob(klob, sowFullTwoHour);
+                    bnav::DateTime ephdate { bnav::TimeSystem::BDT, weeknum, sowFullTwoHour };
+                    bnav::Ionosphere ionoklob(klob, ephdate);
 
                     //std::cout << klob << std::endl;
 
@@ -189,9 +194,12 @@ int main(int argc, char **argv)
             const bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
-            bnav::Ionosphere iono(bdata);
+            if (weeknum != 0)
+            {
 
-#if 0
+            bnav::Ionosphere iono(bdata, weeknum);
+
+//#if 0
             // diff only for one single prn
             if (sv.getPRN() == 2)
             {
@@ -201,7 +209,7 @@ int main(int argc, char **argv)
                 iono.dump();
                 iono_old = iono;
             }
-#endif
+//#endif
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
@@ -211,21 +219,23 @@ int main(int argc, char **argv)
             bnav::Almanac alm(data);
 
 #endif
+            }
         }
     }
     reader.close();
 
 
 //#if 0
-    std::string ionexfilename = station + dtfilename.getISODate() + ".ionex";
+    // overwrites without warnings
+    std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
     std::cout << ionexfilename << std::endl;
     bnav::IonexWriter writer(ionexfilename, true);
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 
-    writer.writeHeader();
-//    for (auto it = ionostore.begin(); it != ionostore.end(); ++it)
-//        writer.writeData(it);
+    // write all models from prn2
+    const auto prn2data = ionostore.getItemsBySv(bnav::SvID(2));
+    writer.writeAll(prn2data);
     writer.close();
 //#endif
 

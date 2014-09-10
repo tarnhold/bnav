@@ -27,22 +27,6 @@ IonosphereStore::~IonosphereStore()
 }
 
 /**
- * @brief IonosphereStore::addSvID Add Ionosphere to the storage.
- *
- * Determines the type of storage by SvID.
- *
- * @param sv The SvID.
- */
-void IonosphereStore::addSvID(const SvID &sv)
-{
-    //std::pair
-    // use initializer list
-    m_store[sv][0] = Ionosphere();
-    //m_store.emplace(sv, std::pair<uint32_t, Ionosphere*>(0, new Ionosphere()));
-    //m_store.emplace(sv, );
-}
-
-/**
  * @brief IonosphereStore::addIonosphere Add a Ionosphere to the storage.
  *
  * Automatically adds a new storage object, if a given SvID is not known.
@@ -52,20 +36,23 @@ void IonosphereStore::addSvID(const SvID &sv)
  */
 void IonosphereStore::addIonosphere(const SvID &sv, const Ionosphere &iono)
 {
+#if 0
     auto it = m_store.find(sv);
 
-    // initialize SV, if not present in store
     if (it == m_store.end())
-        addSvID(sv);
-
-    it = m_store.find(sv);
-    // ensure it got added
-    assert(it != m_store.end());
-
-    // FIXME: warn if there's already an entry at this time!
-    it->second[iono.getSOW()] = iono;
-
+        // initialize SV, if not present in store
+        m_store[sv].emplace(iono.getDateOfIssue(), iono);
+    else
+        // FIXME: warn if there's already an entry at this time!
+        it->second[iono.getDateOfIssue()] = iono;
+#endif
+    m_store[sv][iono.getDateOfIssue()] = iono;
     //std::cout << "exists" << std::endl;
+}
+
+std::map<DateTime, Ionosphere> IonosphereStore::getItemsBySv(const SvID &sv)
+{
+    return m_store[sv];
 }
 
 /**
@@ -73,19 +60,20 @@ void IonosphereStore::addIonosphere(const SvID &sv, const Ionosphere &iono)
  * @param sv The SvID.
  * @return Pointer to Ionosphere for SV.
  */
-#if 0
-Ionosphere* IonosphereStore::getIonosphere(const SvID /* &sv */)
+Ionosphere IonosphereStore::getIonosphere(const SvID &sv, const DateTime &datetime)
 {
-
+#if 0
     auto it = m_store.find(sv);
 
     if (it != m_store.end())
         return it->second;
-
-    assert(false); // who called this before adding the data?!
-
-    return NULL;
-}
 #endif
+
+    return m_store[sv][datetime];
+
+    //assert(false); // who called this before adding the data?!
+
+ //   return NULL;
+}
 
 } // namespace bnav

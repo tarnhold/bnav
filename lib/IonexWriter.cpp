@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include <vector>
 
 namespace
@@ -10,6 +11,10 @@ namespace
 
 const std::string author { "TUD/Arnhold" };
 const std::string application { "bapp v0.4" };
+
+// BeiDou specific
+const std::vector<std::string> height {"475.0", "475.0", "0.0"};
+const std::string radius { "6478.0" };
 
 std::string lcl_justifyRight(const std::string &str, const std::string::size_type length, const char padding = ' ')
 {
@@ -39,6 +44,25 @@ std::string lcl_justifyLeft(const std::string &str, const std::string::size_type
     return str + std::string(length - str.length(), padding);
 }
 
+/// Wrapper for double values, converted to string as fixed values, e.g. 7.0
+std::string lcl_justifyRight(const double num, const std::string::size_type length, const int32_t precision, const char padding = ' ')
+{
+    std::stringstream ss;
+    ss << std::setprecision(precision) << std::fixed << num;
+
+    return lcl_justifyRight(ss.str(), length, padding);
+}
+
+#if 0
+std::string lcl_justifyLeft(const double num, const std::string::size_type length, const int32_t precision, const char padding = ' ')
+{
+    std::stringstream ss;
+    ss << std::setprecision(precision) << std::fixed << num;
+
+    return lcl_justifyLeft(ss.str(), length, padding);
+}
+#endif
+
 }
 
 namespace bnav
@@ -47,7 +71,9 @@ namespace bnav
 IonexWriter::IonexWriter()
     : m_outfile()
     , m_filename()
-    , m_isGIM(true)
+    , m_isGIM(false)
+    , m_isHeaderWritten(false)
+    , m_tecmapcount(0)
 {
 }
 
@@ -55,6 +81,8 @@ IonexWriter::IonexWriter(const char *filename, const bool gim)
     : m_outfile()
     , m_filename(filename)
     , m_isGIM(gim)
+    , m_isHeaderWritten(false)
+    , m_tecmapcount(0)
 {
     open(filename);
 }
@@ -90,9 +118,6 @@ void IonexWriter::close()
 {
     // ensure file stream is opened
     assert(isOpen());
-
-    finalizeData();
-
     m_outfile.close();
 }
 
@@ -111,16 +136,19 @@ void IonexWriter::setGIM(const bool gim)
     m_isGIM = gim;
 }
 
-void IonexWriter::writeHeader()
+/// called from writeData, because we need at least one data record to get
+/// all information of the map.
+void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &lastion, const std::size_t mapcount, const int32_t interval)
 {
     assert(isOpen());
-    std::vector<std::string> latitude, longitude, description;
+    std::vector<std::string> /*latitude, longitude,*/ description;
 
+    // FIXME: long/lat needs to be extracted from firstion!
     if (m_isGIM)
     {
         // dimension like IGS
-        latitude = {"87.5", "-87.5", "-2.5"};
-        longitude = {"-180.0", "180.0", "5.0"};
+        //latitude = {"87.5", "-87.5", "-2.5"};
+        //longitude = {"-180.0", "180.0", "5.0"};
         description = {
             "BeiDou Ionospheric Map (CIM), Klobuchar model",
             "Gridded GIM, based upon 8 parameter Klobuchar parameters.",
@@ -132,18 +160,14 @@ void IonexWriter::writeHeader()
     else
     {
         // regional model, CIM
-        latitude = {"55.0", "7.5", "-2.5"};
-        longitude = {"70.0", "145.0", "5.0"};
+        //latitude = {"55.0", "7.5", "-2.5"};
+        //longitude = {"70.0", "145.0", "5.0"};
         description = {
             "BeiDou Ionospheric Map, regional grid",
             "Read from D2 navigation message.",
             "BDS ICD 2.0, 5.3.3.8 Ionospheric Grid Information, 2013",
         };
     }
-
-    // BeiDou specific
-    std::vector<std::string> height {"475.0", "475.0", "0.0"};
-    std::string radius { "6478.0" };
 
     m_outfile << lcl_justifyRight("1.0", 8) << lcl_justifyLeft("", 12)
               << lcl_justifyLeft("IONOSPHERE MAPS", 20)
@@ -160,13 +184,33 @@ void IonexWriter::writeHeader()
         m_outfile << lcl_justifyLeft(*it, 60)
                   << lcl_justifyLeft("DESCRIPTION", 20) << std::endl;
 
-    // EPOCH OF FIRST MAP
-    // EPOCH OF LAST MAP
+    DateTime dtfirst = firstion.getDateOfIssue();
+    m_outfile << lcl_justifyRight(dtfirst.getYearString(), 6)
+              << lcl_justifyRight(dtfirst.getMonthString(), 6)
+              << lcl_justifyRight(dtfirst.getDayString(), 6)
+              << lcl_justifyRight(dtfirst.getHourString(), 6)
+              << lcl_justifyRight(dtfirst.getMinuteString(), 6)
+              << lcl_justifyRight(dtfirst.getSecondString(), 6)
+              << lcl_justifyRight("", 24)
+              << lcl_justifyLeft("EPOCH OF FIRST MAP", 20)
+              << std::endl;
 
-    m_outfile << lcl_justifyRight("7200", 6) << lcl_justifyLeft("", 54)
+    DateTime dtlast = lastion.getDateOfIssue();
+    m_outfile << lcl_justifyRight(dtlast.getYearString(), 6)
+              << lcl_justifyRight(dtlast.getMonthString(), 6)
+              << lcl_justifyRight(dtlast.getDayString(), 6)
+              << lcl_justifyRight(dtlast.getHourString(), 6)
+              << lcl_justifyRight(dtlast.getMinuteString(), 6)
+              << lcl_justifyRight(dtlast.getSecondString(), 6)
+              << lcl_justifyRight("", 24)
+              << lcl_justifyLeft("EPOCH OF LAST MAP", 20)
+              << std::endl;
+
+    m_outfile << lcl_justifyRight(std::to_string(interval), 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("INTERVAL", 20) << std::endl;
 
-    // # OF MAPS IN FILE
+    m_outfile << lcl_justifyRight(std::to_string(mapcount), 6) << lcl_justifyLeft("", 54)
+              << lcl_justifyLeft("# OF MAPS IN FILE", 20) << std::endl;
 
     m_outfile << lcl_justifyLeft("", 2) << lcl_justifyLeft("NONE", 58)
               << lcl_justifyLeft("MAPPING FUNCTION", 20) << std::endl;
@@ -192,17 +236,18 @@ void IonexWriter::writeHeader()
               << lcl_justifyLeft("", 40)
               << lcl_justifyLeft("HGT1 / HGT2 / DHGT", 20) << std::endl;
 
+    const IonoGridDimension igd = firstion.getGridDimension();
     m_outfile << lcl_justifyLeft("", 2)
-              << lcl_justifyRight(latitude[0], 6)
-              << lcl_justifyRight(latitude[1], 6)
-              << lcl_justifyRight(latitude[2], 6)
+              << lcl_justifyRight(igd.latitude_north, 6, 1)
+              << lcl_justifyRight(igd.latitude_south, 6, 1)
+              << lcl_justifyRight(igd.latitude_spacing, 6, 1)
               << lcl_justifyLeft("", 40)
               << lcl_justifyLeft("LAT1 / LAT2 / DLAT", 20) << std::endl;
 
     m_outfile << lcl_justifyLeft("", 2)
-              << lcl_justifyRight(longitude[0], 6)
-              << lcl_justifyRight(longitude[1], 6)
-              << lcl_justifyRight(longitude[2], 6)
+              << lcl_justifyRight(igd.longitude_west, 6, 1)
+              << lcl_justifyRight(igd.longitude_east, 6, 1)
+              << lcl_justifyRight(igd.longitude_spacing, 6, 1)
               << lcl_justifyLeft("", 40)
               << lcl_justifyLeft("LON1 / LON2 / DLON", 20) << std::endl;
 
@@ -214,11 +259,117 @@ void IonexWriter::writeHeader()
 
     m_outfile << lcl_justifyLeft("", 60)
               << lcl_justifyLeft("END OF HEADER", 20) << std::endl;
+
+    m_isHeaderWritten = true;
 }
 
-void IonexWriter::finalizeData()
+/**
+ * @brief IonexWriter::writeAll Master mind method, writes header, records and
+ * finalizes the file.
+ * @param data Ionospheric models.
+ */
+void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
 {
-    // write END OF TEC MAP stuff
+    Ionosphere firstion = data.begin()->second;
+    Ionosphere secondion = (++data.begin())->second;
+    Ionosphere lastion = data.rbegin()->second;
+
+    // estimate interval between two data records
+    boost::posix_time::time_duration interval {
+        secondion.getDateOfIssue() - firstion.getDateOfIssue() };
+
+    // write header
+    writeHeader(firstion, lastion, data.size(), interval.total_seconds());
+
+    // run through all models
+    for (auto it = data.begin(); it != data.end(); ++it)
+        writeRecord(*it);
+
+    // finalize file
+    finalize();
+}
+
+void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
+{
+    assert(isOpen());
+    assert(m_isHeaderWritten);
+
+    ++m_tecmapcount;
+
+   // for (auto it = data.begin(); it != data.end(); ++it)
+   // {
+        std::cout << "blubber: " << data.second.getDateOfIssue().getISODate() << std::endl;
+   // }
+
+    IonoGridDimension igd = data.second.getGridDimension();
+    std::vector<IonoGridInfo> grid = data.second.getGrid();
+    DateTime dt = data.second.getDateOfIssue();
+
+    const std::size_t colcount = igd.getItemCountLongitude();
+    const std::size_t rowcount = igd.getItemCountLatitude();
+    std::cout << "rowcount: " << rowcount << std::endl;
+    // set an arbitrary limit
+    assert(colcount < 360);
+    assert(rowcount < 360);
+
+    // at the moment only 16 entries are supported, if we need more,
+    // we have to insert a break after every 16 enries
+    assert(colcount <= 16);
+
+    // START OF TEC MAP: with index number
+    m_outfile << lcl_justifyRight(std::to_string(m_tecmapcount), 6)
+              << lcl_justifyRight("", 54)
+              << lcl_justifyLeft("START OF TEC MAP", 20)
+              << std::endl;
+
+    // EPOCH OF CURRENT MAP
+    m_outfile << lcl_justifyRight(dt.getYearString(), 6)
+              << lcl_justifyRight(dt.getMonthString(), 6)
+              << lcl_justifyRight(dt.getDayString(), 6)
+              << lcl_justifyRight(dt.getHourString(), 6)
+              << lcl_justifyRight(dt.getMinuteString(), 6)
+              << lcl_justifyRight(dt.getSecondString(), 6)
+              << lcl_justifyRight("", 24)
+              << lcl_justifyLeft("EPOCH OF CURRENT MAP", 20)
+              << std::endl;
+
+    std::size_t index = 0;
+    for (std::size_t row = 0; row < rowcount; ++row)
+    {
+        // header of one latitude record
+        m_outfile << "  "
+                  << lcl_justifyRight(igd.latitude_north + row * igd.latitude_spacing, 6, 1)
+                  << lcl_justifyRight(igd.longitude_west, 6, 1)
+                  << lcl_justifyRight(igd.longitude_east, 6, 1)
+                  << lcl_justifyRight(igd.longitude_spacing, 6, 1)
+                  << lcl_justifyRight(height[0], 6)
+                  << lcl_justifyRight("", 28)
+                  << lcl_justifyLeft("LAT/LON1/LON2/DLON/H", 20)
+                  << std::endl;
+
+        // data
+        for (std::size_t col = 0; col < colcount; ++col)
+        {
+            m_outfile << std::setw(5) << grid[index].getVerticalDelay_TECU();
+            ++index;
+        }
+
+        m_outfile << std::endl;
+    }
+
+    // END OF TEC MAP: with index number
+    m_outfile << lcl_justifyRight(std::to_string(m_tecmapcount), 6)
+              << lcl_justifyRight("", 54)
+              << lcl_justifyLeft("END OF TEC MAP", 20)
+              << std::endl;
+}
+
+void IonexWriter::finalize()
+{
+    assert(m_tecmapcount != 0);
+    m_outfile << lcl_justifyRight("", 60)
+              << lcl_justifyLeft("END OF FILE", 20)
+              << std::endl;
 }
 
 } // namespace bnav
