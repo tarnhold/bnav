@@ -31,7 +31,7 @@ static void usage()
 bnav::DateTime lcl_extractDateFromFilename(const std::string &filename)
 {
     std::string filename_date;
-    std::size_t lastslash = filename.find_last_of('/');
+    const std::size_t lastslash = filename.find_last_of('/');
 
     if (lastslash != std::string::npos)
         // dir/filename.ext
@@ -46,6 +46,26 @@ bnav::DateTime lcl_extractDateFromFilename(const std::string &filename)
     return bnav::DateTime(filename_date);
 }
 
+/**
+ * @brief lcl_extractStationFromFilename Extract station name from file name.
+ * @param filename Filename string in IGS format.
+ * @return Station name as string.
+ */
+std::string lcl_extractStationFromFilename(const std::string &filename)
+{
+    std::string station;
+    const std::size_t lastslash = filename.find_last_of('/');
+
+    if (lastslash != std::string::npos)
+        // dir/filename.ext
+        station = filename.substr(lastslash + 1, 4);
+    else
+        // filename.ext
+        station = filename.substr(0, 4);
+
+    return station;
+}
+
 int main(int argc, char **argv)
 {
     // require at least two parameters
@@ -56,7 +76,7 @@ int main(int argc, char **argv)
     }
 
     // parse first argument
-    std::string arg = argv[1];
+    const std::string arg = argv[1];
     bnav::AsciiReaderType filetype(bnav::AsciiReaderType::NONE);
     if (arg == "-jps")
         filetype = bnav::AsciiReaderType::TEXT_CONVERTED_JPS;
@@ -70,7 +90,7 @@ int main(int argc, char **argv)
     }
 
     // Open file and parse lines
-    std::string filename = argv[2];
+    const std::string filename = argv[2];
     bnav::AsciiReader reader(filename, filetype);
     if (!reader.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
@@ -86,9 +106,8 @@ int main(int argc, char **argv)
     // extract date from filename, so we have a clue which data we want
     // to extract from the file (it's possible that there is more than
     // one day data in the file.
-    bnav::DateTime dtfilename { lcl_extractDateFromFilename(filename) };
-    (void) dtfilename;
-    //std::cout << dt1.getIonexDate() << std::endl;
+    const bnav::DateTime dtfilename { lcl_extractDateFromFilename(filename) };
+    const std::string station { lcl_extractStationFromFilename(filename) };
 
     uint32_t twoHourCountOld = UINT32_MAX;
     bnav::Ionosphere iono_old;
@@ -101,7 +120,7 @@ int main(int argc, char **argv)
         if (data.getSignalType() != bnav::SignalType::BDS_B1)
             continue;
 
-        bnav::SvID sv(data.getPRN());
+        const bnav::SvID sv(data.getPRN());
 
         // skip non-GEO SVs
         if (!sv.isGeo())
@@ -123,7 +142,7 @@ int main(int argc, char **argv)
 
         if (sfbuf->isEphemerisComplete())
         {
-            bnav::SubframeBufferParam bdata = sfbuf->flushEphemerisData();
+            const bnav::SubframeBufferParam bdata = sfbuf->flushEphemerisData();
             //std::cout << "eph complete" << std::endl;
 
             bnav::Ephemeris eph(bdata);
@@ -167,10 +186,10 @@ int main(int argc, char **argv)
         }
         else if (sfbuf->isAlmanacComplete())
         {
-            bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
+            const bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
-//            bnav::Ionosphere iono(bdata);
+            bnav::Ionosphere iono(bdata);
 
 #if 0
             // diff only for one single prn
@@ -187,7 +206,7 @@ int main(int argc, char **argv)
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
 
-//            ionostore.addIonosphere(sv, iono);
+            ionostore.addIonosphere(sv, iono);
 #if 0
             bnav::Almanac alm(data);
 
@@ -196,18 +215,19 @@ int main(int argc, char **argv)
     }
     reader.close();
 
-#if 0
-    std::string ionexfilename = argv[2];
-    //ionexfilename = /// aus YYYYMMDD o.ae. zusammensetzen
-    bnav::IonexWriter writer(filename, true);
+
+//#if 0
+    std::string ionexfilename = station + dtfilename.getISODate() + ".ionex";
+    std::cout << ionexfilename << std::endl;
+    bnav::IonexWriter writer(ionexfilename, true);
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 
-    writer.writerHeader();
-    for (auto it = ionostore.begin(); it != ionostore.end(); ++it)
-        writer.writeData(it);
+    writer.writeHeader();
+//    for (auto it = ionostore.begin(); it != ionostore.end(); ++it)
+//        writer.writeData(it);
     writer.close();
-#endif
+//#endif
 
     if (sbstore.hasIncompleteData())
         std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;

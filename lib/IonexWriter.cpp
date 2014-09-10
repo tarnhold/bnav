@@ -113,6 +113,7 @@ void IonexWriter::setGIM(const bool gim)
 
 void IonexWriter::writeHeader()
 {
+    assert(isOpen());
     std::vector<std::string> latitude, longitude, description;
 
     if (m_isGIM)
@@ -144,74 +145,74 @@ void IonexWriter::writeHeader()
     std::vector<std::string> height {"475.0", "475.0", "0.0"};
     std::string radius { "6478.0" };
 
-    std::cout << lcl_justifyRight("1.0", 8) << lcl_justifyLeft("", 12)
+    m_outfile << lcl_justifyRight("1.0", 8) << lcl_justifyLeft("", 12)
               << lcl_justifyLeft("IONOSPHERE MAPS", 20)
               << lcl_justifyLeft("BDS", 20)
               << "IONEX VERSION / TYPE" << std::endl;
 
 
-    std::cout << lcl_justifyLeft(application, 20)
+    m_outfile << lcl_justifyLeft(application, 20)
               << lcl_justifyLeft(author, 20)
               << lcl_justifyLeft("PSEUDODATE", 20)
               << "PGM / RUN BY / DATE" << std::endl;
 
     for (auto it = description.cbegin(); it != description.end(); ++it)
-        std::cout << lcl_justifyLeft(*it, 60)
+        m_outfile << lcl_justifyLeft(*it, 60)
                   << lcl_justifyLeft("DESCRIPTION", 20) << std::endl;
 
     // EPOCH OF FIRST MAP
     // EPOCH OF LAST MAP
 
-    std::cout << lcl_justifyRight("7200", 6) << lcl_justifyLeft("", 54)
+    m_outfile << lcl_justifyRight("7200", 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("INTERVAL", 20) << std::endl;
 
     // # OF MAPS IN FILE
 
-    std::cout << lcl_justifyLeft("", 2) << lcl_justifyLeft("NONE", 58)
+    m_outfile << lcl_justifyLeft("", 2) << lcl_justifyLeft("NONE", 58)
               << lcl_justifyLeft("MAPPING FUNCTION", 20) << std::endl;
 
     // minimum elevation: 0.0 is unknown
-    std::cout << lcl_justifyRight("0.0", 8) << lcl_justifyLeft("", 52)
+    m_outfile << lcl_justifyRight("0.0", 8) << lcl_justifyLeft("", 52)
               << lcl_justifyLeft("ELEVATION CUTOFF", 20) << std::endl;
 
     // blank line: theoretical model
-    std::cout << lcl_justifyLeft("", 60)
+    m_outfile << lcl_justifyLeft("", 60)
               << lcl_justifyLeft("OBSERVABLES USED", 20) << std::endl;
 
-    std::cout << lcl_justifyRight(radius, 8) << lcl_justifyLeft("", 52)
+    m_outfile << lcl_justifyRight(radius, 8) << lcl_justifyLeft("", 52)
               << lcl_justifyLeft("BASE RADIUS", 20) << std::endl;
 
-    std::cout << lcl_justifyRight("2", 6) << lcl_justifyLeft("", 54)
+    m_outfile << lcl_justifyRight("2", 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("MAP DIMENSION", 20) << std::endl;
 
-    std::cout << lcl_justifyLeft("", 2)
+    m_outfile << lcl_justifyLeft("", 2)
               << lcl_justifyRight(height[0], 6)
               << lcl_justifyRight(height[1], 6)
               << lcl_justifyRight(height[2], 6)
               << lcl_justifyLeft("", 40)
               << lcl_justifyLeft("HGT1 / HGT2 / DHGT", 20) << std::endl;
 
-    std::cout << lcl_justifyLeft("", 2)
+    m_outfile << lcl_justifyLeft("", 2)
               << lcl_justifyRight(latitude[0], 6)
               << lcl_justifyRight(latitude[1], 6)
               << lcl_justifyRight(latitude[2], 6)
               << lcl_justifyLeft("", 40)
               << lcl_justifyLeft("LAT1 / LAT2 / DLAT", 20) << std::endl;
 
-    std::cout << lcl_justifyLeft("", 2)
+    m_outfile << lcl_justifyLeft("", 2)
               << lcl_justifyRight(longitude[0], 6)
               << lcl_justifyRight(longitude[1], 6)
               << lcl_justifyRight(longitude[2], 6)
               << lcl_justifyLeft("", 40)
               << lcl_justifyLeft("LON1 / LON2 / DLON", 20) << std::endl;
 
-    std::cout << lcl_justifyRight("-1", 6) << lcl_justifyLeft("", 54)
+    m_outfile << lcl_justifyRight("-1", 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("EXPONENT", 20) << std::endl;
 
-    std::cout << lcl_justifyLeft("TEC values in 0.1 tec units; 9999, if no value available", 60)
+    m_outfile << lcl_justifyLeft("TEC values in 0.1 tec units; 9999, if no value available", 60)
               << lcl_justifyLeft("COMMENT", 20) << std::endl;
 
-    std::cout << lcl_justifyLeft("", 60)
+    m_outfile << lcl_justifyLeft("", 60)
               << lcl_justifyLeft("END OF HEADER", 20) << std::endl;
 }
 
