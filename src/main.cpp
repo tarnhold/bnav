@@ -156,7 +156,10 @@ int main(int argc, char **argv)
             // be the case, that there is no data until 01:50, but with this
             // we can grep the model within the last 10 minutes of transmission.
             uint32_t twoHourCount = eph.getSOW() / 7200;
-            if (twoHourCount != twoHourCountOld)
+            // FIXME: we take only PRN 2 data here, if we would like to
+            // replace missing data of prn 2 with other geos we have to
+            // think about IonosphereStore, which stores in depending on SvID!
+            if (sv.getPRN() == 2 && twoHourCount != twoHourCountOld)
             {
                 twoHourCountOld = twoHourCount;
                 bnav::KlobucharParam klob = eph.getKlobucharParam();
@@ -178,8 +181,8 @@ int main(int argc, char **argv)
                     bnav::Ionosphere ionoklob(klob, ephdate);
 
                     //std::cout << klob << std::endl;
-
                     ionoklob.dump();
+                    std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << std::endl;
                     ionostoreKlobuchar.addIonosphere(sv, ionoklob);
 
                     klob_old = klob;
@@ -194,12 +197,12 @@ int main(int argc, char **argv)
             const bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
+#if 0
             if (weeknum != 0)
             {
 
             bnav::Ionosphere iono(bdata, weeknum);
 
-//#if 0
             // diff only for one single prn
             if (sv.getPRN() == 2)
             {
@@ -209,17 +212,15 @@ int main(int argc, char **argv)
                 iono.dump();
                 iono_old = iono;
             }
-//#endif
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
 
             ionostore.addIonosphere(sv, iono);
-#if 0
-            bnav::Almanac alm(data);
 
-#endif
+            //bnav::Almanac alm(data);
             }
+#endif
         }
     }
     reader.close();
@@ -229,12 +230,13 @@ int main(int argc, char **argv)
     // overwrites without warnings
     std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
     std::cout << ionexfilename << std::endl;
-    bnav::IonexWriter writer(ionexfilename, true);
+    bnav::IonexWriter writer(ionexfilename);
+    writer.setKlobuchar();
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 
     // write all models from prn2
-    const auto prn2data = ionostore.getItemsBySv(bnav::SvID(2));
+    const auto prn2data = ionostoreKlobuchar.getItemsBySv(bnav::SvID(2));
     writer.writeAll(prn2data);
     writer.close();
 //#endif

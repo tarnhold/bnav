@@ -17,14 +17,14 @@ class IonexWriter : private boost::noncopyable
 {
     std::ofstream m_outfile; ///< Output file stream
     std::string m_filename; ///< File name
-    bool m_isGIM; ///< Write GIM or Regional model
+    bool m_isKlobuchar; ///< Write Klobuchar or regional model
     bool m_isHeaderWritten;
     std::size_t m_tecmapcount; ///< Index of current TEC map
 
 public:
     IonexWriter();
-    IonexWriter(const char *filename, const bool gim = false);
-    IonexWriter(const std::string &filename, const bool gim = false);
+    IonexWriter(const char *filename, const bool klobuchar = false);
+    IonexWriter(const std::string &filename, const bool klobuchar = false);
     ~IonexWriter();
 
     void open(const char *filename);
@@ -32,8 +32,8 @@ public:
 
     bool isOpen() const;
 
-    bool isGIM() const;
-    void setGIM(const bool gim = true);
+    bool isKlobuchar() const;
+    void setKlobuchar(const bool klobuchar = true);
 
     void writeAll(const std::map<DateTime, Ionosphere> &data);
 

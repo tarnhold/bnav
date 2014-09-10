@@ -16,6 +16,19 @@ const std::string application { "bapp v0.4" };
 const std::vector<std::string> height {"475.0", "475.0", "0.0"};
 const std::string radius { "6478.0" };
 
+const std::vector<std::string> description_klobuchar = {
+    "BeiDou Ionospheric Map (CIM), Klobuchar model",
+    "Gridded GIM, based upon 8 parameter Klobuchar parameters.",
+    "Vertical ionospheric delay, elevation set to 90 degrees",
+    "For calculation details see:",
+    "BDS ICD 2.0, 5.2.4.7 Ionospheric Delay Model Param., 2013"
+};
+const std::vector<std::string> description_regional = {
+    "BeiDou Ionospheric Map, regional grid",
+    "Read from D2 navigation message.",
+    "BDS ICD 2.0, 5.3.3.8 Ionospheric Grid Information, 2013"
+};
+
 std::string lcl_justifyRight(const std::string &str, const std::string::size_type length, const char padding = ' ')
 {
     // nothing to do
@@ -71,16 +84,16 @@ namespace bnav
 IonexWriter::IonexWriter()
     : m_outfile()
     , m_filename()
-    , m_isGIM(false)
+    , m_isKlobuchar(false)
     , m_isHeaderWritten(false)
     , m_tecmapcount(0)
 {
 }
 
-IonexWriter::IonexWriter(const char *filename, const bool gim)
+IonexWriter::IonexWriter(const char *filename, const bool klobuchar)
     : m_outfile()
     , m_filename(filename)
-    , m_isGIM(gim)
+    , m_isKlobuchar(klobuchar)
     , m_isHeaderWritten(false)
     , m_tecmapcount(0)
 {
@@ -88,8 +101,8 @@ IonexWriter::IonexWriter(const char *filename, const bool gim)
 }
 
 
-IonexWriter::IonexWriter(const std::string &filename, const bool gim)
-    : IonexWriter(filename.c_str(), gim)
+IonexWriter::IonexWriter(const std::string &filename, const bool klobuchar)
+    : IonexWriter(filename.c_str(), klobuchar)
 {
 }
 
@@ -126,14 +139,14 @@ bool IonexWriter::isOpen() const
     return m_outfile.is_open();
 }
 
-bool IonexWriter::isGIM() const
+bool IonexWriter::isKlobuchar() const
 {
-    return m_isGIM;
+    return m_isKlobuchar;
 }
 
-void IonexWriter::setGIM(const bool gim)
+void IonexWriter::setKlobuchar(const bool klobuchar)
 {
-    m_isGIM = gim;
+    m_isKlobuchar = klobuchar;
 }
 
 /// called from writeData, because we need at least one data record to get
@@ -141,33 +154,6 @@ void IonexWriter::setGIM(const bool gim)
 void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &lastion, const std::size_t mapcount, const int32_t interval)
 {
     assert(isOpen());
-    std::vector<std::string> /*latitude, longitude,*/ description;
-
-    // FIXME: long/lat needs to be extracted from firstion!
-    if (m_isGIM)
-    {
-        // dimension like IGS
-        //latitude = {"87.5", "-87.5", "-2.5"};
-        //longitude = {"-180.0", "180.0", "5.0"};
-        description = {
-            "BeiDou Ionospheric Map (CIM), Klobuchar model",
-            "Gridded GIM, based upon 8 parameter Klobuchar parameters.",
-            "Vertical ionospheric delay, elevation set to 90 degrees",
-            "For calculation details see:",
-            "BDS ICD 2.0, 5.2.4.7 Ionospheric Delay Model Param., 2013",
-        };
-    }
-    else
-    {
-        // regional model, CIM
-        //latitude = {"55.0", "7.5", "-2.5"};
-        //longitude = {"70.0", "145.0", "5.0"};
-        description = {
-            "BeiDou Ionospheric Map, regional grid",
-            "Read from D2 navigation message.",
-            "BDS ICD 2.0, 5.3.3.8 Ionospheric Grid Information, 2013",
-        };
-    }
 
     m_outfile << lcl_justifyRight("1.0", 8) << lcl_justifyLeft("", 12)
               << lcl_justifyLeft("IONOSPHERE MAPS", 20)
@@ -180,6 +166,7 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
               << lcl_justifyLeft("PSEUDODATE", 20)
               << "PGM / RUN BY / DATE" << std::endl;
 
+    const std::vector<std::string> description { m_isKlobuchar ? description_klobuchar : description_regional };
     for (auto it = description.cbegin(); it != description.end(); ++it)
         m_outfile << lcl_justifyLeft(*it, 60)
                   << lcl_justifyLeft("DESCRIPTION", 20) << std::endl;
