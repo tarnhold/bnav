@@ -18,6 +18,15 @@ DateTime::DateTime()
 }
 
 /**
+ * @brief DateTime::DateTime Construct from ISO date string.
+ */
+DateTime::DateTime(const std::string &isostr)
+    : DateTime()
+{
+    setISODateTime(isostr);
+}
+
+/**
  * @brief DateTime::DateTime Set date and time from weeknum and SOw.
  * @param ts TimeSystem, to which weeknum, SOW and millisec refer.
  * @param weeknum Weeks since reference epoch.
@@ -84,6 +93,21 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
     m_time = t0 + boost::gregorian::weeks(static_cast<int>(weeknum))
             + boost::posix_time::seconds(static_cast<int>(sow))
             + boost::posix_time::milliseconds(static_cast<int>(millisec));
+}
+
+/**
+ * @brief DateTime::setISODateTime Set date and time from ISO string.
+ * @param isostr String in format YYYYMMDDTHHMMSS.
+ */
+void DateTime::setISODateTime(const std::string &isostr)
+{
+    // ensure ISO date YYYYMMDDTHHMMSS
+    assert(isostr.length() == 15);
+    assert(isostr[8] == 'T');
+    boost::posix_time::ptime date { boost::posix_time::from_iso_string(isostr) };
+
+    m_tsys = TimeSystem::UTC;
+    m_time = date;
 }
 
 /**

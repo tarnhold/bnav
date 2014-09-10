@@ -27,11 +27,13 @@ class DateTime
 
 public:
     DateTime();
+    DateTime(const std::string &isostr);
     DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t sow, const uint32_t millisec = 0);
 
     void setTimeSystem(const TimeSystem ts);
     void setToCurrentDateTimeUTC();
     void setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const uint32_t millisec = 0);
+    void setISODateTime(const std::string &isostr);
 
     TimeSystem getTimeSystem() const;
     boost::posix_time::ptime get_ptime() const;

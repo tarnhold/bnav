@@ -21,6 +21,29 @@ static void usage()
             << std::endl;
 }
 
+/**
+ * @brief lcl_extractDateTimeFromFilename Extract date and time from file name.
+ * @param filename Filename string in IGS format.
+ * @return DateTime object.
+ */
+bnav::DateTime lcl_extractDateFromFilename(const std::string &filename)
+{
+    std::string filename_date;
+    std::size_t lastslash = filename.find_last_of('/');
+
+    if (lastslash != std::string::npos)
+        // dir/filename.ext
+        filename_date = filename.substr(lastslash + 5, 8);
+    else
+        // filename.ext
+        filename_date = filename.substr(4, 8);
+
+    // add time to get a ISO date YYYYMMDDTHHMMSS
+    filename_date += "T000000";
+
+    return bnav::DateTime(filename_date);
+}
+
 int main(int argc, char **argv)
 {
     // require at least two parameters
@@ -58,21 +81,12 @@ int main(int argc, char **argv)
     bnav::EphemerisStore ephStore;
 #endif
 
-
-    bnav::DateTime dt;
-//    dt.setToCurrentDateTimeUTC();
-    /*
-    std::cout << dt.getMonthNameShort() << std::endl;
-    std::cout << dt.getIonexDate() << std::endl;
-
-    dt.setWeekAndSOW(0, 0);
-    std::cout << dt.getMonthNameShort() << std::endl;
-    std::cout << dt.getIonexDate() << std::endl;
-*/
-    dt.setTimeSystem(bnav::TimeSystem::GPST);
-    dt.setWeekAndSOW(1801, 0);
-    std::cout << dt.getMonthNameShort() << std::endl;
-    std::cout << dt.getIonexDate() << std::endl;
+    // extract date from filename, so we have a clue which data we want
+    // to extract from the file (it's possible that there is more than
+    // one day data in the file.
+    bnav::DateTime dtfilename { lcl_extractDateFromFilename(filename) };
+    (void) dtfilename;
+    //std::cout << dt1.getIonexDate() << std::endl;
 
     uint32_t twoHourCountOld = UINT32_MAX;
     bnav::Ionosphere iono_old;
@@ -154,9 +168,9 @@ int main(int argc, char **argv)
             bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
-            bnav::Ionosphere iono(bdata);
+//            bnav::Ionosphere iono(bdata);
 
-//#if 0
+#if 0
             // diff only for one single prn
             if (sv.getPRN() == 2)
             {
@@ -166,7 +180,7 @@ int main(int argc, char **argv)
                 iono.dump();
                 iono_old = iono;
             }
-//#endif
+#endif
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
