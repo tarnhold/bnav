@@ -20,8 +20,11 @@ DateTime::DateTime()
 /**
  * @brief DateTime::DateTime Construct from ISO date string.
  */
-DateTime::DateTime(const std::string &isostr)
-    : DateTime()
+DateTime::DateTime(const TimeSystem ts, const std::string &isostr)
+    : m_tsys(ts)
+    , m_time(boost::posix_time::ptime())
+    , m_weeknum(UINT32_MAX)
+    , m_sow(UINT32_MAX)
 {
     setISODateTime(isostr);
 }
@@ -67,12 +70,15 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
     // increment weeks only by SOW for 7101 weeks. This should be enough.
     assert(sow < INT32_MAX);
     assert(millisec < INT32_MAX);
+
+    // safe original values, but if SOW is greater than one week, put this
+    // part into weeknum.
+    m_sow = sow % SECONDS_OF_A_WEEK;
+    m_weeknum = weeknum + sow / SECONDS_OF_A_WEEK;
+    assert(m_sow < SECONDS_OF_A_WEEK);
+    assert(m_weeknum <= WEEKNUM_MAX);
+
     boost::gregorian::date d0;
-
-    // safe original values, too
-    m_weeknum = weeknum;
-    m_sow = sow;
-
     if (m_tsys == TimeSystem::BDT)
     {
         // Weeknum starts on 00:00:00 Jan, 1, 2006 BDT
@@ -101,12 +107,12 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
  */
 void DateTime::setISODateTime(const std::string &isostr)
 {
+    assert(m_tsys != TimeSystem::NONE);
     // ensure ISO date YYYYMMDDTHHMMSS
     assert(isostr.length() == 15);
     assert(isostr[8] == 'T');
     boost::posix_time::ptime date { boost::posix_time::from_iso_string(isostr) };
 
-    m_tsys = TimeSystem::UTC;
     m_time = date;
 }
 
@@ -142,11 +148,17 @@ boost::posix_time::ptime DateTime::get_ptime() const
 
 uint32_t DateTime::getWeekNum() const
 {
+    // at the moment it's possible that there is no weeknum set
+    // see: setCurrentDateTimeUTC and setISODateTime
+    assert(m_weeknum != UINT32_MAX);
     return m_weeknum;
 }
 
 uint32_t DateTime::getSOW() const
 {
+    // at the moment it's possible that there is no sow set
+    // see: setCurrentDateTimeUTC and setISODateTime
+    assert(m_sow != UINT32_MAX);
     return m_sow;
 }
 
@@ -291,6 +303,12 @@ std::string DateTime::getIonexDate() const
 bool DateTime::operator==(const DateTime &rhs) const
 {
     return (m_tsys == rhs.getTimeSystem()) && (m_time == rhs.get_ptime());
+}
+
+bool DateTime::operator<(const DateTime &rhs) const
+{
+    assert(m_tsys == rhs.getTimeSystem());
+    return m_time < rhs.get_ptime();
 }
 
 } // namespace bnav

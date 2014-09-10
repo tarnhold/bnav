@@ -27,7 +27,7 @@ class DateTime
 
 public:
     DateTime();
-    DateTime(const std::string &isostr);
+    DateTime(const TimeSystem ts, const std::string &isostr);
     DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t sow, const uint32_t millisec = 0);
 
     void setTimeSystem(const TimeSystem ts);
@@ -59,6 +59,7 @@ public:
     std::string getIonexDate() const;
 
     bool operator==(const DateTime &rhs) const;
+    bool operator<(const DateTime &rhs) const;
 };
 
 } // namespace bnav
