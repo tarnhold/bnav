@@ -11,6 +11,8 @@
 
 #include "DateTime.h"
 
+#include <cstdlib>
+
 static void usage()
 {
     std::cout
@@ -50,7 +52,7 @@ int main(int argc, char **argv)
     if (argc != 3)
     {
         usage();
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // parse first argument
@@ -64,7 +66,7 @@ int main(int argc, char **argv)
     {
         std::cerr << "Warning: Unknown argument: " << arg << std::endl;
         usage();
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Open file and parse lines
@@ -210,6 +212,6 @@ int main(int argc, char **argv)
     if (sbstore.hasIncompleteData())
         std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
