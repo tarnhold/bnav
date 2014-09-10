@@ -9,6 +9,12 @@
 namespace
 {
 
+// [1] 5.3.3.8.2 Grid Ionospheric Vertical Error Index (GIVEI)
+constexpr double GIVEI_LOOKUP_TABLE[] { 0.3, 0.6, 0.9, 1.2,
+                                      1.5, 1.8, 2.1, 2.4,
+                                      2.7, 3.0, 3.6, 4.5,
+                                      6.0, 9.0, 15.0, 45.0};
+
 uint32_t lcl_convertMeterToTECU(const double value, const double freq)
 {
     assert(value >= 0 && value < 100);
@@ -107,11 +113,45 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     return tiono * bnav::SPEED_OF_LIGHT;
 }
 
-// [1] 5.3.3.8.2 Grid Ionospheric Vertical Error Index (GIVEI)
-constexpr double GIVEI_LOOKUP_TABLE[] { 0.3, 0.6, 0.9, 1.2,
-                                      1.5, 1.8, 2.1, 2.4,
-                                      2.7, 3.0, 3.6, 4.5,
-                                      6.0, 9.0, 15.0, 45.0};
+/**
+ * @brief lcl_convertChineseToEuropeanGrid Convert chinese numbering to european
+ * numbering. Chinese is column-wise bottom up from the left. European is
+ * row-wise from top to bottom.
+ *
+ * Chinese (IGP <=160)     European
+ *
+ * 10  20 30 .. 160             1   2   3 ..  16
+ * ..  .. .. ..  ..            17  18  19 ..  32
+ *  3  13 23 ..  ..            ..  ..  .. ..  ..
+ *  2  12 22 ..  ..           144  ..  .. .. 160
+ *  1  11 21 .. 151
+ *
+ * @param grid_chinese Grid in chinese format, see ICD p. 72.
+ */
+std::vector<bnav::IonoGridInfo> lcl_convertChineseToEuropeanGrid(std::vector<bnav::IonoGridInfo> grid_chinese)
+{
+    std::vector<bnav::IonoGridInfo> grid;
+
+    for (std::size_t row = 10; row > 0; --row)
+    {
+        // we use a single row vector for m_grid
+        // table 0 is IGP <= 160
+        // table 1 is IGP > 160 -> has an offset of 160
+        for (std::size_t table = 0; table <= 1; ++table)
+        {
+            for (std::size_t col = 0; col <= 15; ++col)
+            {
+                // calc IGP num formula: col * 10 + row
+                // + table * 160, to access both IGP tables
+                // array index is then -1
+                std::size_t index = col * 10 + (table * 160) + row - 1;
+                grid.push_back(grid_chinese[index]);
+            }
+        }
+    }
+
+    return grid;
+}
 
 /**
  * Parse an 13 bit ionospheric info element (dt and givei), which is splitted by
@@ -253,46 +293,6 @@ IonoGridInfo IonoGridInfo::operator-(const IonoGridInfo &rhs) const
     uint32_t dgive { lcl_diffTECUValues(getGive_TECU(), rhs.getGive_TECU()) };
 
     return IonoGridInfo(dvdel, dgive);
-}
-
-/**
- * @brief lcl_convertChineseToEuropeanGrid Convert chinese numbering to european
- * numbering. Chinese is column-wise bottom up from the left. European is
- * row-wise from top to bottom.
- *
- * Chinese (IGP <=160)     European
- *
- * 10  20 30 .. 160             1   2   3 ..  16
- * ..  .. .. ..  ..            17  18  19 ..  32
- *  3  13 23 ..  ..            ..  ..  .. ..  ..
- *  2  12 22 ..  ..           144  ..  .. .. 160
- *  1  11 21 .. 151
- *
- * @param grid_chinese Grid in chinese format, see ICD p. 72.
- */
-std::vector<IonoGridInfo> lcl_convertChineseToEuropeanGrid(std::vector<IonoGridInfo> grid_chinese)
-{
-    std::vector<IonoGridInfo> grid;
-
-    for (std::size_t row = 10; row > 0; --row)
-    {
-        // we use a single row vector for m_grid
-        // table 0 is IGP <= 160
-        // table 1 is IGP > 160 -> has an offset of 160
-        for (std::size_t table = 0; table <= 1; ++table)
-        {
-            for (std::size_t col = 0; col <= 15; ++col)
-            {
-                // calc IGP num formula: col * 10 + row
-                // + table * 160, to access both IGP tables
-                // array index is then -1
-                std::size_t index = col * 10 + (table * 160) + row - 1;
-                grid.push_back(grid_chinese[index]);
-            }
-        }
-    }
-
-    return grid;
 }
 
 /**
