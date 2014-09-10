@@ -181,6 +181,48 @@ uint32_t DateTime::getYear() const
 }
 
 /**
+ * @brief DateTime::getDayString Return day padded with zero.
+ * @return Day as string.
+ */
+std::string DateTime::getDayString() const
+{
+    std::stringstream ss;
+    ss << std::setw(2) << std::setfill('0') << getDay();
+    return ss.str();
+}
+
+/**
+ * @brief DateTime::getMonthString Return month padded with zero.
+ * @return Month as string.
+ */
+std::string DateTime::getMonthString() const
+{
+    std::stringstream ss;
+    ss << std::setw(2) << std::setfill('0') << getMonth();
+    return ss.str();
+}
+
+/**
+ * @brief DateTime::getYearString Return year padded with zero.
+ * @return Year as string.
+ */
+std::string DateTime::getYearString() const
+{
+    std::stringstream ss;
+    ss << std::setw(2) << std::setfill('0') << getYear();
+    return ss.str();
+}
+
+/**
+ * @brief DateTime::getISODate Return ISO date YYYYMMDD
+ * @return ISO date as string.
+ */
+std::string DateTime::getISODate() const
+{
+    return std::string(getYearString() + getMonthString() + getDayString());
+}
+
+/**
  * @brief DateTime::getHourString Return hours padded with zero.
  * @return Hours as string.
  */

@@ -45,12 +45,17 @@ public:
     uint32_t getMonth() const;
     uint32_t getYear() const;
 
+    std::string getDayString() const;
+    std::string getMonthString() const;
+    std::string getYearString() const;
+
     std::string getHourString() const;
     std::string getMinuteString() const;
     std::string getSecondString() const;
 
     std::string getMonthNameShort() const;
 
+    std::string getISODate() const;
     std::string getIonexDate() const;
 
     bool operator==(const DateTime &rhs) const;
