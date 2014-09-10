@@ -14,6 +14,8 @@ QMAKE_CXXFLAGS += -std=c++11 \
         -Wdocumentation \
         #-Weverything \
         -Wno-c++98-compat \
+        -Wno-c++98-compat-pedantic \
+        -Wno-padded \
         -fmessage-length=0 \
         -fno-common \
 

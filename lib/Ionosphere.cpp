@@ -256,6 +256,46 @@ IonoGridInfo IonoGridInfo::operator-(const IonoGridInfo &rhs) const
 }
 
 /**
+ * @brief lcl_convertChineseToEuropeanGrid Convert chinese numbering to european
+ * numbering. Chinese is column-wise bottom up from the left. European is
+ * row-wise from top to bottom.
+ *
+ * Chinese (IGP <=160)     European
+ *
+ * 10  20 30 .. 160             1   2   3 ..  16
+ * ..  .. .. ..  ..            17  18  19 ..  32
+ *  3  13 23 ..  ..            ..  ..  .. ..  ..
+ *  2  12 22 ..  ..           144  ..  .. .. 160
+ *  1  11 21 .. 151
+ *
+ * @param grid_chinese Grid in chinese format, see ICD p. 72.
+ */
+std::vector<IonoGridInfo> lcl_convertChineseToEuropeanGrid(std::vector<IonoGridInfo> grid_chinese)
+{
+    std::vector<IonoGridInfo> grid;
+
+    for (std::size_t row = 10; row > 0; --row)
+    {
+        // we use a single row vector for m_grid
+        // table 0 is IGP <= 160
+        // table 1 is IGP > 160 -> has an offset of 160
+        for (std::size_t table = 0; table <= 1; ++table)
+        {
+            for (std::size_t col = 0; col <= 15; ++col)
+            {
+                // calc IGP num formula: col * 10 + row
+                // + table * 160, to access both IGP tables
+                // array index is then -1
+                std::size_t index = col * 10 + (table * 160) + row - 1;
+                grid.push_back(grid_chinese[index]);
+            }
+        }
+    }
+
+    return grid;
+}
+
+/**
  * @brief The Ionosphere class
  *
  * Stores IGP data into a single row vector.
@@ -283,7 +323,7 @@ void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
 
     // set model time in BDT
     m_sow = sow;
-    m_grid_chinese.resize(320);
+    m_grid.resize(320);
 
     for (std::size_t row = 10; row > 0; --row)
     {
@@ -304,7 +344,7 @@ void Ionosphere::load(const KlobucharParam &klob, const uint32_t sow)
                 double phi { 1.0 * (row * 5.0 + 5.0) - table * 2.5 };
                 double corr { lcl_calcKlobucharCorrectionBDS(klob, secofday, phi, lambda) };
                 IonoGridInfo info { lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ) };
-                m_grid_chinese[index] = info;
+                m_grid[index] = info;
             }
         }
     }
@@ -318,22 +358,24 @@ void Ionosphere::load(const SubframeBufferParam &sfbuf)
     // ensure there is one subframe
     assert(sfbuf.data.size() == 1);
 
-    // if there was already data loaded
-    m_grid_chinese.clear();
-
     SubframeVector vfra5 = sfbuf.data[0];
     // ensure there are all pages
     assert(vfra5.size() == 120);
 
+    // store grid data into single column vector with 320 elements
+    std::vector<IonoGridInfo> grid_chinese;
+
     // Pnum 1 to 13 of Frame 5
-    processPageBlock(vfra5, 0);
+    processPageBlock(vfra5, 0, grid_chinese);
     // ensure we have all IGPs
-    assert(m_grid_chinese.size() == 160);
+    assert(grid_chinese.size() == 160);
 
     // Pnum 61 to 73 of Frame 5
-    processPageBlock(vfra5, 60);
+    processPageBlock(vfra5, 60, grid_chinese);
     // ensure we have all IGPs
-    assert(m_grid_chinese.size() == 320);
+    assert(grid_chinese.size() == 320);
+
+    m_grid = lcl_convertChineseToEuropeanGrid(grid_chinese);
 
     // date of issue of ionospheric model is at page 1 of subframe 1
     // [1] 5.3.3.1 Basic NAV Information, p. 68
@@ -350,7 +392,7 @@ void Ionosphere::load(const SubframeBufferParam &sfbuf)
  * @param vfra5 SubframeVector of all 120 pages of frame 5.
  * @param startpage Index where the block starts.
  */
-void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t startpage)
+void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t startpage, std::vector<IonoGridInfo> &grid_chinese)
 {
     for (std::size_t i = startpage; i < startpage + 13; ++i)
     {
@@ -360,7 +402,7 @@ void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t
         NavBits<300> bits { vfra5[i].getBits() };
 
         // page 13 ash 73 have reserved bits at the end of message
-        parseIonospherePage(bits, pnum == 13 || pnum == 73);
+        parseIonospherePage(bits, pnum == 13 || pnum == 73, grid_chinese);
 
         //std::cout << "pnum: " << pnum << std::endl;
     }
@@ -371,47 +413,49 @@ void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t
  * @param bits message NavBits.
  * @param lastpage true, if this is page 13 or 73.
  */
-void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage)
+void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage, std::vector<IonoGridInfo> &grid_chinese)
 {
     // Ion1
-    m_grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<50, 2, 60, 11>(bits)));
+    grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<50, 2, 60, 11>(bits)));
     // Ion2
-    m_grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<71, 11, 90, 2>(bits)));
+    grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<71, 11, 90, 2>(bits)));
     // Ion3
-    m_grid_chinese.push_back(IonoGridInfo(bits.getLeft<92, 13>()));
+    grid_chinese.push_back(IonoGridInfo(bits.getLeft<92, 13>()));
     // Ion4
-    m_grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<105, 7, 120, 6>(bits)));
+    grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<105, 7, 120, 6>(bits)));
 
     // page 13 and 73 have no more data, bail out
     if (lastpage)
         return;
 
     // Ion5
-    m_grid_chinese.push_back(IonoGridInfo(bits.getLeft<126, 13>()));
+    grid_chinese.push_back(IonoGridInfo(bits.getLeft<126, 13>()));
     // Ion6
-    m_grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<139, 3, 150, 10>(bits)));
+    grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<139, 3, 150, 10>(bits)));
     // Ion7
-    m_grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<160, 12, 180, 1>(bits)));
+    grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<160, 12, 180, 1>(bits)));
     // Ion8
-    m_grid_chinese.push_back(IonoGridInfo(bits.getLeft<181, 13>()));
+    grid_chinese.push_back(IonoGridInfo(bits.getLeft<181, 13>()));
     // Ion9
-    m_grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<194, 8, 210, 5>(bits)));
+    grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<194, 8, 210, 5>(bits)));
     // Ion10
-    m_grid_chinese.push_back(IonoGridInfo(bits.getLeft<215, 13>()));
+    grid_chinese.push_back(IonoGridInfo(bits.getLeft<215, 13>()));
     // Ion11
-    m_grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<228, 4, 240, 9>(bits)));
+    grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<228, 4, 240, 9>(bits)));
     // Ion12
-    m_grid_chinese.push_back(IonoGridInfo(bits.getLeft<249, 13>()));
+    grid_chinese.push_back(IonoGridInfo(bits.getLeft<249, 13>()));
     // Ion13
-    m_grid_chinese.push_back(IonoGridInfo(bits.getLeft<270, 13>()));
+    grid_chinese.push_back(IonoGridInfo(bits.getLeft<270, 13>()));
 
     //std::cout << "iono: " << iono << std::endl;
-    //std::cout << "dt: " << m_grid.back().get_dt() << " givei: " << m_grid.back().get_give_index() << " give: " << m_grid.back().get_give() << std::endl;
+    //std::cout << "dt: " << grid_chinese.back().get_dt()
+    //          << " givei: " << grid_chinese.back().get_give_index()
+    //          << " give: " << grid_chinese.back().get_give() << std::endl;
 }
 
 bool Ionosphere::hasData() const
 {
-    return m_grid_chinese.size() == 320;
+    return m_grid.size() == 320;
 }
 
 void Ionosphere::setSOW(const uint32_t sow)
@@ -434,15 +478,15 @@ uint32_t Ionosphere::getSOW() const
  */
 std::vector<IonoGridInfo> Ionosphere::getGrid() const
 {
-    return m_grid_chinese;
+    return m_grid;
 }
 
 void Ionosphere::setGrid(const std::vector<IonoGridInfo> &rhs)
 {
     assert(rhs.size() == 320);
-    m_grid_chinese.clear();
+    m_grid.clear();
     for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
-        m_grid_chinese.push_back(*it);
+        m_grid.push_back(*it);
 }
 
 Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
@@ -450,14 +494,14 @@ Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
     Ionosphere diff;
     std::vector<IonoGridInfo> vdiff;
     std::vector<IonoGridInfo> gridrhs = rhs.getGrid();
-    assert(m_grid_chinese.size() == gridrhs.size());
+    assert(m_grid.size() == gridrhs.size());
 
     // use SOW from current Ionosphere
     diff.setSOW(m_sow);
 
-    for (std::size_t i = 0; i < m_grid_chinese.size(); ++i)
+    for (std::size_t i = 0; i < m_grid.size(); ++i)
     {
-        vdiff.push_back(m_grid_chinese[i] - gridrhs[i]);
+        vdiff.push_back(m_grid[i] - gridrhs[i]);
     }
     diff.setGrid(vdiff);
 
@@ -471,33 +515,8 @@ Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
  */
 bool Ionosphere::operator==(const Ionosphere &iono) const
 {
-    assert(iono.getGrid().size() == m_grid_chinese.size());
-    return (iono.getGrid() == m_grid_chinese);
-}
-
-void Ionosphere::chineseToEuropean()
-{
-    std::cout << "DoI: " << m_sow << std::endl;
-
-    m_grid.clear();
-
-    for (std::size_t row = 10; row > 0; --row)
-    {
-        // we use a single row vector for m_grid
-        // table 0 is IGP <= 160
-        // table 1 is IGP > 160 -> has an offset of 160
-        for (std::size_t table = 0; table <= 1; ++table)
-        {
-            for (std::size_t col = 0; col <= 15; ++col)
-            {
-                // calc IGP num formula: col * 10 + row
-                // + table * 160, to access both IGP tables
-                // array index is then -1
-                std::size_t index = col * 10 + (table * 160) + row - 1;
-                m_grid.push_back(m_grid_chinese[index]);
-            }
-        }
-    }
+    assert(iono.getGrid().size() == m_grid.size());
+    return (iono.getGrid() == m_grid);
 }
 
 /**
@@ -507,32 +526,6 @@ void Ionosphere::chineseToEuropean()
 void Ionosphere::dump(bool rms)
 {
     std::cout << "DoI: " << m_sow << std::endl;
-    for (std::size_t row = 10; row > 0; --row)
-    {
-        // we use a single row vector for m_grid
-        // table 0 is IGP <= 160
-        // table 1 is IGP > 160 -> has an offset of 160
-        for (std::size_t table = 0; table <= 1; ++table)
-        {
-            for (std::size_t col = 0; col <= 15; ++col)
-            {
-                // calc IGP num formula: col * 10 + row
-                // + table * 160, to access both IGP tables
-                // array index is then -1
-                std::size_t index = col * 10 + (table * 160) + row - 1;
-                std::cout << std::setw(5)
-                          << (rms ? m_grid_chinese[index].getGive_TECU() : m_grid_chinese[index].getVerticalDelay_TECU());
-            }
-            std::cout << std::endl;
-        }
-    }
-}
-
-void Ionosphere::dumpEuropean(bool rms)
-{
-    std::cout << "DoI: " << m_sow << std::endl;
-
-    chineseToEuropean();
 
     for (std::size_t row = 0; row < 20; ++row)
     {
@@ -545,44 +538,6 @@ void Ionosphere::dumpEuropean(bool rms)
             std::size_t index = row * 16 + col;
             std::cout << std::setw(5)
                       << (rms ? m_grid[index].getGive_TECU() : m_grid[index].getVerticalDelay_TECU());
-        }
-        std::cout << std::endl;
-    }
-}
-
-/**
- * @brief Ionosphere::dump2 Dump two IGP tables (<=160 and >160).
- */
-void Ionosphere::dump2(bool rms)
-{
-    std::cout << "DoI: " << m_sow << std::endl;
-    std::cout << "IGP <= 160" << std::endl;
-    // IGP <= 160
-    for (std::size_t row = 10; row > 0; --row)
-    {
-        for (std::size_t col = 0; col <= 15; ++col)
-        {
-            // calc IGP num formula: col * 10 + row
-            // array index is then -1
-            std::size_t index = col * 10 + row - 1;
-            std::cout << std::setw(5)
-                      << (rms ? m_grid_chinese[index].getGive_TECU() : m_grid_chinese[index].getVerticalDelay_TECU());
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << std::endl;
-    std::cout << "IGP > 160" << std::endl;
-    // IGP > 160
-    for (std::size_t row = 170; row > 160; --row)
-    {
-        for (std::size_t col = 0; col <= 15; ++col)
-        {
-            // calc IGP num formula: col * 10 + row
-            // array index is then -1
-            std::size_t index = col * 10 + row - 1;
-            std::cout << std::setw(5)
-                      << (rms ? m_grid_chinese[index].getGive_TECU() : m_grid_chinese[index].getVerticalDelay_TECU());
         }
         std::cout << std::endl;
     }

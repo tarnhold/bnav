@@ -137,7 +137,9 @@ int main(int argc, char **argv)
                     uint32_t sowFullTwoHour = eph.getSOW() - secondOfTwoHours;
                     bnav::Ionosphere ionoklob(klob, sowFullTwoHour);
 
-                    ionoklob.dump();
+                    //std::cout << klob << std::endl;
+
+                    //ionoklob.dump();
                     ionostoreKlobuchar.addIonosphere(sv, ionoklob);
 
                     klob_old = klob;
@@ -154,18 +156,17 @@ int main(int argc, char **argv)
 
             bnav::Ionosphere iono(bdata);
 
-#if 0
+//#if 0
             // diff only for one single prn
             if (sv.getPRN() == 2)
             {
-                if (iono_old.hasData())
-                    iono.diffToModel(iono_old).dump();
+//                if (iono_old.hasData())
+//                    iono.diffToModel(iono_old).dump();
 
+                iono.dump();
                 iono_old = iono;
             }
-#endif
-
-            //iono.dump();
+//#endif
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;

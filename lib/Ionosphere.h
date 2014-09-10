@@ -40,7 +40,6 @@ class Ionosphere
 {
     uint32_t m_sow;
     std::vector<IonoGridInfo> m_grid;
-    std::vector<IonoGridInfo> m_grid_chinese;
 
 public:
     Ionosphere();
@@ -61,14 +60,11 @@ public:
 
     bool operator==(const Ionosphere &iono) const;
 
-    void chineseToEuropean();
-    void dumpEuropean(bool rms = false);
     void dump(bool rms = false);
-    void dump2(bool rms = false);
 
 private:
-    void processPageBlock(const SubframeVector &vfra5, const std::size_t startpage);
-    void parseIonospherePage(const NavBits<300> &bits, bool lastpage);
+    void processPageBlock(const SubframeVector &vfra5, const std::size_t startpage, std::vector<IonoGridInfo> &grid_chinese);
+    void parseIonospherePage(const NavBits<300> &bits, bool lastpage, std::vector<IonoGridInfo> &grid_chinese);
 };
 
 } // namespace bnav
