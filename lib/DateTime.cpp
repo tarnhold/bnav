@@ -311,4 +311,18 @@ bool DateTime::operator<(const DateTime &rhs) const
     return m_time < rhs.get_ptime();
 }
 
+boost::posix_time::time_duration DateTime::operator-(const DateTime &rhs) const
+{
+    assert(m_tsys == rhs.getTimeSystem());
+    boost::posix_time::time_duration td;
+
+    // avoid negative time duration
+    if (m_time < rhs.get_ptime())
+        td = rhs.get_ptime() - m_time;
+    else
+        td = m_time - rhs.get_ptime();
+
+    return td;
+}
+
 } // namespace bnav

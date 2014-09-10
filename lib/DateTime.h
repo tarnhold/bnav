@@ -60,6 +60,7 @@ public:
 
     bool operator==(const DateTime &rhs) const;
     bool operator<(const DateTime &rhs) const;
+    boost::posix_time::time_duration operator-(const DateTime &rhs) const;
 };
 
 } // namespace bnav
