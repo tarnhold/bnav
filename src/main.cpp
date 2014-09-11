@@ -178,10 +178,10 @@ int main(int argc, char **argv)
                     uint32_t secondOfTwoHours = eph.getSOW() % 7200;
                     uint32_t sowFullTwoHour = eph.getSOW() - secondOfTwoHours;
                     bnav::DateTime ephdate { bnav::TimeSystem::BDT, weeknum, sowFullTwoHour };
-                    bnav::Ionosphere ionoklob(klob, ephdate);
+                    bnav::Ionosphere ionoklob(klob, ephdate, false);
 
                     //std::cout << klob << std::endl;
-                    ionoklob.dump();
+                    //ionoklob.dump();
                     std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << std::endl;
                     ionostoreKlobuchar.addIonosphere(sv, ionoklob);
 
@@ -197,30 +197,32 @@ int main(int argc, char **argv)
             const bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
-#if 0
+//#if 0
             if (weeknum != 0)
             {
 
             bnav::Ionosphere iono(bdata, weeknum);
 
             // diff only for one single prn
-            if (sv.getPRN() == 2)
+            if (sv.getPRN() == 2 && iono.getDateOfIssue().getSOW() % 7200 == 0)
             {
 //                if (iono_old.hasData())
 //                    iono.diffToModel(iono_old).dump();
 
                 iono.dump();
+                ionostore.addIonosphere(sv, iono);
+
                 iono_old = iono;
             }
 
             //bnav::Ionosphere ionoclone(bdata);
             //std::cout << (ionoclone == iono) << std::endl;
 
-            ionostore.addIonosphere(sv, iono);
+
 
             //bnav::Almanac alm(data);
             }
-#endif
+//#endif
         }
     }
     reader.close();
@@ -231,12 +233,13 @@ int main(int argc, char **argv)
     std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
     std::cout << ionexfilename << std::endl;
     bnav::IonexWriter writer(ionexfilename);
-    writer.setKlobuchar();
+//    writer.setKlobuchar();
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 
     // write all models from prn2
-    const auto prn2data = ionostoreKlobuchar.getItemsBySv(bnav::SvID(2));
+    const auto prn2data = ionostore.getItemsBySv(bnav::SvID(2));
+//    const auto prn2data = ionostoreKlobuchar.getItemsBySv(bnav::SvID(2));
     writer.writeAll(prn2data);
     writer.close();
 //#endif

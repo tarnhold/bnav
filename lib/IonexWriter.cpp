@@ -257,6 +257,7 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
  */
 void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
 {
+    assert(data.size() >= 3);
     Ionosphere firstion = data.begin()->second;
     Ionosphere secondion = (++data.begin())->second;
     Ionosphere lastion = data.rbegin()->second;
@@ -299,10 +300,6 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
     assert(colcount < 360);
     assert(rowcount < 360);
 
-    // at the moment only 16 entries are supported, if we need more,
-    // we have to insert a break after every 16 enries
-    assert(colcount <= 16);
-
     // START OF TEC MAP: with index number
     m_outfile << lcl_justifyRight(std::to_string(m_tecmapcount), 6)
               << lcl_justifyRight("", 54)
@@ -323,6 +320,7 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
     std::size_t index = 0;
     for (std::size_t row = 0; row < rowcount; ++row)
     {
+        bool lastwasnewline = false;
         // header of one latitude record
         m_outfile << "  "
                   << lcl_justifyRight(igd.latitude_north + row * igd.latitude_spacing, 6, 1)
@@ -338,10 +336,23 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
         for (std::size_t col = 0; col < colcount; ++col)
         {
             m_outfile << std::setw(5) << grid[index].getVerticalDelay_TECU();
+
+            // we have to insert a break after every 16 enries
+            if (col > 0 && (col + 1) % 16 == 0)
+            {
+                lastwasnewline = true;
+                m_outfile << std::endl;
+            }
+            else
+                lastwasnewline = false;
+
             ++index;
         }
 
-        m_outfile << std::endl;
+        // don't insert two newlines, if we did insert a break after the 16th
+        // entrie (in case we have exactly 16, 32,... entries for a record.
+        if (!lastwasnewline)
+            m_outfile << std::endl;
     }
 
     // END OF TEC MAP: with index number

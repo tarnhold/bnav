@@ -63,10 +63,10 @@ class Ionosphere
 public:
     Ionosphere();
     Ionosphere(const SubframeBufferParam &sfbuf, const uint32_t weeknum);
-    Ionosphere(const KlobucharParam &klob, const DateTime &datetime);
+    Ionosphere(const KlobucharParam &klob, const DateTime &datetime, const bool global = false);
 
     void load(const SubframeBufferParam &sfbuf, const uint32_t weeknum);
-    void load(const KlobucharParam &klob, const DateTime &datetime);
+    void load(const KlobucharParam &klob, const DateTime &datetime, const bool global = false);
 
     bool hasData() const;
     void setDateOfIssue(const DateTime &datetime);

@@ -17,7 +17,8 @@ constexpr double GIVEI_LOOKUP_TABLE[] { 0.3, 0.6, 0.9, 1.2,
 
 uint32_t lcl_convertMeterToTECU(const double value, const double freq)
 {
-    assert(value >= 0 && value < 100);
+    // 500 is too much, because TECU are then more than 9999
+    assert(value >= 0 && value < 500);
     // 1 TECU is 1.0e16 el/m2
     // IONEX refers to 0.1 TECU, so we need to multiply * 10
     return static_cast<uint32_t>(std::lround((value * (freq * freq) / 40.3) / 1.0e16 * 10));
@@ -86,11 +87,14 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     double amplitude { klob.alpha0 + phim * (klob.alpha1 + phim * (klob.alpha2 + phim * klob.alpha3)) };
     double period { klob.beta0 + phim * (klob.beta1 + phim * (klob.beta2 + phim * klob.beta3)) };
 
+    // amplitude is negative on the southern sphere
+    // changing the sign isn't much better.
     if (amplitude < 0.0)
         amplitude = 0.0;
     if (period < 72000.0)
         period = 72000.0;
-    if (period >= 172800.0)
+    // this causes the vertical line:
+    if (period > 172800.0)
         period = 172800.0;
 
     double tiono;
@@ -354,47 +358,50 @@ Ionosphere::Ionosphere(const SubframeBufferParam &sfbuf, const uint32_t weeknum)
     load(sfbuf, weeknum);
 }
 
-Ionosphere::Ionosphere(const KlobucharParam &klob, const DateTime &datetime)
+Ionosphere::Ionosphere(const KlobucharParam &klob, const DateTime &datetime, const bool global)
     : Ionosphere()
 {
-    load(klob, datetime);
+    load(klob, datetime, global);
 }
 
-void Ionosphere::load(const KlobucharParam &klob, const DateTime &datetime)
+void Ionosphere::load(const KlobucharParam &klob, const DateTime &datetime, const bool global)
 {
     // we need only time of day, not full SOW
     uint32_t secofday = datetime.getSOW() % 86400;
 
     // set model time in BDT
     m_datetime = datetime;
-    m_grid.resize(320);
-    m_griddim = IonoGridDimension(55.0, 7.5, -2.5, 70.0, 145.0, 5.0);
 
-#if 0
-    // this would be global
-    m_griddim = IonoGridDimension(87.5, -87.5, -2.5, -180.0, 180.0, 5.0);
-#endif
+    if (global)
+        m_griddim = IonoGridDimension(87.5, -87.5, -2.5, -180.0, 180.0, 5.0);
+    else
+        m_griddim = IonoGridDimension(55.0, 7.5, -2.5, 70.0, 145.0, 5.0);
 
-    for (std::size_t row = 0; row < 20; ++row)
+    std::size_t rowcount = m_griddim.getItemCountLatitude();
+    std::size_t colcount = m_griddim.getItemCountLongitude();
+    std::cout << "rows: " << rowcount << " cols: " << colcount << std::endl;
+
+    for (std::size_t row = 0; row < rowcount; ++row)
     {
         // we use a single row vector for m_grid
-        for (std::size_t col = 0; col <= 15; ++col)
+        for (std::size_t col = 0; col < colcount; ++col)
         {
-            // calc IGP num formula: col * 10 + row
-            // + table * 160, to access both IGP tables
-            // array index is then -1
-            std::size_t index = row * 16 + col;
-
             /// 1.0, because we are east of Greenwich
-            double lambda { 1.0 * (70 + col * 5.0) };
-            double phi { 1.0 * (55.0 - row * 2.5) };
+            double lambda { 1.0 * (m_griddim.longitude_west + col * 5.0) };
+            double phi { 1.0 * (m_griddim.latitude_north - row * 2.5) };
+            //std::cout << "phi: " << phi << std::endl;
             double corr { lcl_calcKlobucharCorrectionBDS(klob, secofday, phi, lambda) };
             IonoGridInfo info { lcl_convertMeterToTECU(corr, bnav::BDS_B1I_FREQ) };
-            m_grid[index] = info;
+            m_grid.push_back(info);
         }
     }
-}
 
+    if (global)
+        assert(m_grid.size() == 5183);
+        //std::cout << "size: " << m_grid.size() << std::endl;
+    else
+        assert(m_grid.size() == 320);
+}
 
 void Ionosphere::load(const SubframeBufferParam &sfbuf, const uint32_t weeknum)
 {
@@ -588,17 +595,19 @@ void Ionosphere::dump(bool rms)
 {
     std::cout << "DoI: " << m_datetime.getSOW() << std::endl;
 
-    for (std::size_t row = 0; row < 20; ++row)
+    std::size_t rowcount = m_griddim.getItemCountLatitude();
+    std::size_t colcount = m_griddim.getItemCountLongitude();
+    std::cout << "rows: " << rowcount << " cols: " << colcount << std::endl;
+
+    std::size_t index {0};
+    for (std::size_t row = 0; row < rowcount; ++row)
     {
         // we use a single row vector for m_grid
-        for (std::size_t col = 0; col <= 15; ++col)
+        for (std::size_t col = 0; col < colcount; ++col)
         {
-            // calc IGP num formula: col * 10 + row
-            // + table * 160, to access both IGP tables
-            // array index is then -1
-            std::size_t index = row * 16 + col;
             std::cout << std::setw(5)
                       << (rms ? m_grid[index].getGive_TECU() : m_grid[index].getVerticalDelay_TECU());
+            ++index;
         }
         std::cout << std::endl;
     }
