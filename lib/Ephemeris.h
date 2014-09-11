@@ -94,6 +94,7 @@ private:
     void loadD1(const SubframeBufferParam &sfbuf);
     void loadD2(const SubframeBufferParam &sfbuf);
 
+    void processD1Subframe1(const Subframe &sf);
     void processD2Page1(const Subframe &sf);
     void processD2Page2(const Subframe &sf);
 };

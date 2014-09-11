@@ -58,8 +58,70 @@ bool Ephemeris::operator==(const Ephemeris &rhs) const
 
 void Ephemeris::loadD1(const SubframeBufferParam &sfbuf)
 {
-    (void)sfbuf;
-    assert(false); // not implemented
+    // ensure there is one subframe
+    assert(sfbuf.data.size() == 3);
+
+    processD1Subframe1(sfbuf.data[0][0]);
+}
+
+void Ephemeris::processD1Subframe1(const Subframe &sf)
+{
+    assert(sf.getPageNum() == 0);
+    NavBits<300> bits { sf.getBits() };
+
+    m_sow = sf.getSOW();
+    m_weeknum = bits.getLeft<60, 13>().to_ulong();
+    m_dateofissue = DateTime(TimeSystem::BDT, m_weeknum, m_sow);
+
+    NavBits<64> allbits;
+
+    // alpha0
+    NavBits<8> kval = bits.getLeft<126, 8>();
+    allbits = kval;
+    m_klob.alpha0 = kval.to_double(-30);
+    // alpha1
+    kval = bits.getLeft<134, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
+    m_klob.alpha1 = kval.to_double(-27);
+    // alpha2
+    kval = bits.getLeft<150, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
+    m_klob.alpha2 = kval.to_double(-24);
+    // alpha3
+    kval = bits.getLeft<158, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
+    m_klob.alpha3 = kval.to_double(-24);
+
+    // beta0
+    kval = bits.getLeft<166, 6>();
+    kval <<= 2;
+    kval ^= bits.getLeft<180, 2>();
+    allbits <<= 8;
+    allbits ^= kval;
+    m_klob.beta0 = kval.to_double(11);
+    // beta1
+    kval = bits.getLeft<182, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
+    m_klob.beta1 = kval.to_double(14);
+    // beta2
+    kval = bits.getLeft<190, 8>();
+    allbits <<= 8;
+    allbits ^= kval;
+    m_klob.beta2 = kval.to_double(16);
+    // beta3
+    kval = bits.getLeft<198, 4>();
+    kval <<= 4;
+    kval ^= bits.getLeft<210, 4>();
+    allbits <<= 8;
+    allbits ^= kval;
+    m_klob.beta3 = kval.to_double(16);
+
+    // save raw bits to avoid floating point comparisons
+    m_klob.rawbits = allbits;
 }
 
 void Ephemeris::loadD2(const SubframeBufferParam &sfbuf)
