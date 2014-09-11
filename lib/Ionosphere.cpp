@@ -17,8 +17,8 @@ constexpr double GIVEI_LOOKUP_TABLE[] { 0.3, 0.6, 0.9, 1.2,
 
 uint32_t lcl_convertMeterToTECU(const double value, const double freq)
 {
-    // 500 is too much, because TECU are then more than 9999
-    assert(value >= 0 && value < 500);
+    // 100 meters are 6047 TECU for B1
+    assert(value >= 0 && value < 100);
     // 1 TECU is 1.0e16 el/m2
     // IONEX refers to 0.1 TECU, so we need to multiply * 10
     return static_cast<uint32_t>(std::lround((value * (freq * freq) / 40.3) / 1.0e16 * 10));
