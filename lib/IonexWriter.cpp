@@ -161,9 +161,11 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
               << "IONEX VERSION / TYPE" << std::endl;
 
 
+    DateTime dtnow;
+    dtnow.setToCurrentDateTimeUTC();
     m_outfile << lcl_justifyLeft(application, 20)
               << lcl_justifyLeft(author, 20)
-              << lcl_justifyLeft("PSEUDODATE", 20)
+              << lcl_justifyLeft(dtnow.getIonexDate(), 20)
               << "PGM / RUN BY / DATE" << std::endl;
 
     const std::vector<std::string> description { m_isKlobuchar ? description_klobuchar : description_regional };
