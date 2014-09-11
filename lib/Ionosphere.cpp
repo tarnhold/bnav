@@ -65,7 +65,7 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     assert(time < 86400);
 
     // convert to semicircle
-    double semiphi { phi / 180.0 };
+    double semiphi { std::abs(phi) / 180.0 };
     double semilambda { lambda / 180.0 };
 
 //    std::cout << "phi: " << semiphi << std::endl;
@@ -327,6 +327,7 @@ IonoGridDimension::IonoGridDimension(const double latnorth, const double latsout
 std::size_t IonoGridDimension::getItemCountLatitude() const
 {
     assert(latitude_spacing != 0.0);
+    std::cout << std::setprecision(1);
     std::cout << "lat max: " << latitude_north << " min: " << latitude_south << " space: " << latitude_spacing << std::endl;
     // add 0.5 because the compiler will always truncate
     // +1 because latmin and latmax are counting, too
@@ -336,6 +337,7 @@ std::size_t IonoGridDimension::getItemCountLatitude() const
 std::size_t IonoGridDimension::getItemCountLongitude() const
 {
     assert(longitude_spacing != 0.0);
+    std::cout << std::setprecision(1);
     std::cout << "long max: " << longitude_west << " min: " << longitude_east << " space: " << longitude_spacing << std::endl;
     return static_cast<std::size_t>(std::fabs((longitude_west - longitude_east) / longitude_spacing) + 0.5) + 1;
 }
