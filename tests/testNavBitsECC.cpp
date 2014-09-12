@@ -157,3 +157,58 @@ TEST(testNavBitsECCWordFiles)
     CHECK(paritycount == 1);
     reader.close();
 }
+
+TEST(testNavBitsECCSamples)
+{
+    // check B1I and B2I parity counts, from a file, which has many parity fixes
+    {
+        bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/parity/CUT12014071324-parities.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+
+        std::size_t msgcount = 0, paritycountB1 = 0, paritycountB2 = 0;
+        bnav::AsciiReaderEntry entry;
+        while (reader.readLine(entry))
+        {
+            bnav::SvID sv(entry.getPRN());
+            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+
+            // check both, B1I and B2I
+            if (entry.getSignalType() == bnav::SignalType::BDS_B1)
+                paritycountB1 += sf.getParityModifiedCount();
+            else
+                paritycountB2 += sf.getParityModifiedCount();
+
+            ++msgcount;
+        }
+        CHECK(msgcount == 434);
+        CHECK(paritycountB1 == 11);
+        CHECK(paritycountB2 == 10);
+        reader.close();
+    }
+
+    {
+        bnav::AsciiReader reader(PATH_TESTDATA+ "sbf/parity/CUT12014071724-parities.txt",
+                                 bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
+
+        std::size_t msgcount = 0, paritycountB1 = 0, paritycountB2 = 0;
+        bnav::AsciiReaderEntry entry;
+        while (reader.readLine(entry))
+        {
+            bnav::SvID sv(entry.getPRN());
+            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+
+            // check both, B1I and B2I
+            if (entry.getSignalType() == bnav::SignalType::BDS_B1)
+                paritycountB1 += sf.getParityModifiedCount();
+            else
+                paritycountB2 += sf.getParityModifiedCount();
+
+            ++msgcount;
+        }
+        //std::cout << "msgcount: " << msgcount << " parity: " << paritycountB1 << std::endl;
+        CHECK(msgcount == 210);
+        CHECK(paritycountB1 == 12);
+        CHECK(paritycountB2 == 8);
+        reader.close();
+    }
+}
