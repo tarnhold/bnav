@@ -5,7 +5,7 @@
 #include "SubframeBuffer.h"
 #include "DateTime.h"
 
-#include "Ephemeris.h" // FIXME: maybe move KlobucharParam here
+#include "Ephemeris.h"
 
 #include <vector>
 
