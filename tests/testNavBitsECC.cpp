@@ -9,32 +9,6 @@
 
 #include <iostream>
 
-#if 0
-/*!
- * Normally a bitset is accessed by indices starting at the least significant
- * bit. To emulate access starting at the most significant bit, we have to
- * mirror all values.
- *
- * Thus we can access the bit at position zero, which is now accessed
- * "from the left".
- *
- */
-template <std::size_t len>
-std::bitset<len> mirror(const std::bitset<len> &rhs)
-{
-    std::bitset<len> lhs;
-
-    for (std::size_t i = 0; i < len; ++i)
-        lhs[i] = rhs[len - 1 - i];
-
-    return lhs;
-}
-
-    std::bitset<30> bTestM = mirror(bTest);
-    std::cout << "normal:" << bTest << std::endl;
-    std::cout << "mirror:" << bTestM << " :" << bTestM[29 - 4] << std::endl;
-#endif
-
 // check various bit blocks, if they got split correctly to "subwords" (11+4 bits)
 SUITE(testNavBitsECC_Block)
 {
