@@ -54,16 +54,17 @@ static inline std::size_t decodeBCH(const subword &message)
     return static_cast<std::size_t>(d0 + (d1 << 1) + (d2 << 2) + (d3 << 3));
 }
 
+#if 0
 /*!
  * BCH(15,11,1) encoding
  *
  * [1] Chapter 5.1.3 Data Error Correction Code Mode
  *
  */
-// @TODO: change this to take 15 bits, and ignore last 4 bits,
-// just write parity bits into them
-#if 0
-uint8_t encodeBCH(const NavBits<11> &information)
+// Maybe change this to take 15 bits, and ignore last 4 bits,
+// just write parity bits into them. But not this important, because we
+// don't use that at the momment.
+std::size_t encodeBCH(const NavBits<11> &information)
 {
     // default state of shift registers is zero
     bool d0 = false, d1 = false, d2 = false, d3 = false;
@@ -79,8 +80,7 @@ uint8_t encodeBCH(const NavBits<11> &information)
         d0 = buf;
     }
 
-    //subword ret = information;
-    return d0 + (d1 << 1) + (d2 << 2) + (d3 << 3);
+    return static_cast<std::size_t>(d0 + (d1 << 1) + (d2 << 2) + (d3 << 3));
 }
 #endif
 
