@@ -13,8 +13,6 @@
 #include <iostream>
 #include <map>
 
-// FIXME: check ecc counts!
-
 // Test real data
 // Only for data sets from one single PRN
 SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
@@ -26,7 +24,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
 
         bnav::SubframeBufferStore sbstore;
 
-        std::size_t msgcount = 0, ephcount = 0, almcount = 0;
+        std::size_t msgcount = 0, ephcount = 0, almcount = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -36,6 +34,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
             bnav::SubframeBuffer* sfbuf = sbstore.getSubframeBuffer(sv);
@@ -59,6 +58,8 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
         CHECK(ephcount == 30);
         // and 1 almanac data set
         CHECK(almcount == 1);
+        // all parities should be fine
+        CHECK(paritycount == 0);
 
         // there should be incomplete data at EOF
         CHECK(sbstore.hasIncompleteData());
@@ -73,7 +74,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
 
         bnav::SubframeBufferStore sbstore;
 
-        std::size_t msgcount = 0, ephcount = 0, almcount = 0;
+        std::size_t msgcount = 0, ephcount = 0, almcount = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -83,6 +84,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
             bnav::SubframeBuffer* sfbuf = sbstore.getSubframeBuffer(sv);
@@ -108,6 +110,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
         CHECK(ephcount == 14);
         // and 1 almanac data set
         CHECK(almcount == 1);
+        CHECK(paritycount == 0);
 
         // there should be incomplete data at EOF
         CHECK(sbstore.hasIncompleteData());
@@ -125,7 +128,7 @@ SUITE(testSubframeBufferStore_SBF)
 
         bnav::SubframeBufferStore sbstore;
 
-        std::size_t msgcount = 0;
+        std::size_t msgcount = 0, paritycount = 0;
         std::map<bnav::SvID, std::size_t> ephcount;
         std::map<bnav::SvID, std::size_t> almcount;
 
@@ -137,6 +140,7 @@ SUITE(testSubframeBufferStore_SBF)
 
             bnav::SvID sv(entry.getPRN());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
             bnav::SubframeBuffer* sfbuf = sbstore.getSubframeBuffer(sv);
@@ -156,6 +160,7 @@ SUITE(testSubframeBufferStore_SBF)
             ++msgcount;
         }
         CHECK(msgcount == 7500);
+        CHECK(paritycount == 0);
 
         // we should have ephemeris data from 5 geos and 3 non-geos
         CHECK(ephcount.size() == 8);
@@ -183,7 +188,7 @@ SUITE(testSubframeBufferStore_SBF)
 
         bnav::SubframeBufferStore sbstore;
 
-        std::size_t msgcount = 0;
+        std::size_t msgcount = 0, paritycount = 0;
         std::map<bnav::SvID, std::size_t> ephcount;
         std::map<bnav::SvID, std::size_t> almcount;
 
@@ -195,6 +200,7 @@ SUITE(testSubframeBufferStore_SBF)
 
             bnav::SvID sv(entry.getPRN());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
             bnav::SubframeBuffer* sfbuf = sbstore.getSubframeBuffer(sv);
@@ -214,6 +220,7 @@ SUITE(testSubframeBufferStore_SBF)
             ++msgcount;
         }
         CHECK(msgcount == 10000);
+        CHECK(paritycount == 0);
 
         // we should have ephemeris data from 5 geos and 3 non-geos
         CHECK(ephcount.size() == 8);

@@ -11,8 +11,6 @@
 
 #include <iostream>
 
-// FIXME: check ecc counts!
-
 // Test real data
 // Only for data sets from one single PRN
 SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
@@ -24,7 +22,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 
         bnav::SubframeBufferD1 sfbuf;
 
-        std::size_t msgcount = 0, ephcount = 0, almcount = 0;
+        std::size_t msgcount = 0, ephcount = 0, almcount = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -34,6 +32,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             sfbuf.addSubframe(sf);
 
@@ -56,6 +55,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
         CHECK(ephcount == 30);
         // and 1 almanac data set
         CHECK(almcount == 1);
+        CHECK(paritycount == 0);
         reader.close();
     }
 
@@ -66,7 +66,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 
         bnav::SubframeBufferD2 sfbuf;
 
-        std::size_t msgcount = 0, ephcount = 0, almcount = 0;
+        std::size_t msgcount = 0, ephcount = 0, almcount = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -76,6 +76,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             sfbuf.addSubframe(sf);
 
@@ -100,6 +101,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
         CHECK(ephcount == 14);
         // and 1 almanac data set
         CHECK(almcount == 1);
+        CHECK(paritycount == 0);
         reader.close();
     }
 
@@ -114,7 +116,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 
         bnav::SubframeBufferD2 sfbuf;
 
-        std::size_t msgcount = 0, ephcount = 0;
+        std::size_t msgcount = 0, ephcount = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -124,6 +126,7 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             sfbuf.addSubframe(sf);
 
@@ -136,10 +139,11 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 
             ++msgcount;
         }
-        std::cout << msgcount << std::endl;
         CHECK(msgcount == 52);
         // we should have on complete data set
         CHECK(ephcount == 1);
+        // one parity should be fixed!
+        CHECK(paritycount == 1);
         reader.close();
     }
 }

@@ -10,8 +10,6 @@
 
 #include <iostream>
 
-// FIXME: check ecc counts!
-
 // Test real data
 SUITE(testSubframe_SBF_Simple)
 {
@@ -22,7 +20,7 @@ SUITE(testSubframe_SBF_Simple)
 
         constexpr uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
-        std::size_t i = 0;
+        std::size_t i = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -32,6 +30,7 @@ SUITE(testSubframe_SBF_Simple)
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == i + 1);
 
@@ -46,6 +45,7 @@ SUITE(testSubframe_SBF_Simple)
             ++i;
         }
         CHECK(i == 5);
+        CHECK(paritycount == 0);
         reader.close();
     }
 
@@ -57,7 +57,7 @@ SUITE(testSubframe_SBF_Simple)
 
         constexpr uint32_t sowlist[] = {345600, 345606, 345612, 345618, 345624};
 
-        std::size_t i = 0;
+        std::size_t i = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -73,6 +73,7 @@ SUITE(testSubframe_SBF_Simple)
             sf.setBits(entry.getBits());
             sf.setSvID(sv);
             sf.initialize();
+            paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == i + 1);
 
@@ -87,6 +88,7 @@ SUITE(testSubframe_SBF_Simple)
             ++i;
         }
         CHECK(i == 5);
+        CHECK(paritycount == 0);
         reader.close();
     }
 
@@ -95,7 +97,7 @@ SUITE(testSubframe_SBF_Simple)
         bnav::AsciiReader reader(PATH_TESTDATA + "sbf/subframe/prn2-fraID.txt",
                                  bnav::AsciiReaderType::TEXT_CONVERTED_SBF);
 
-        std::size_t i = 0;
+        std::size_t i = 0, paritycount = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {
@@ -105,6 +107,7 @@ SUITE(testSubframe_SBF_Simple)
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == i + 1);
 
@@ -120,6 +123,7 @@ SUITE(testSubframe_SBF_Simple)
             ++i;
         }
         CHECK(i == 5);
+        CHECK(paritycount == 0);
         reader.close();
     }
 }
@@ -133,7 +137,7 @@ SUITE(testSubframe_SBF_OneFrame)
 
         constexpr uint32_t sowfirst = 346320;
 
-        std::size_t i = 0;
+        std::size_t i = 0, paritycount = 0;
         std::size_t pnum_fra4 = 0;
         std::size_t pnum_fra5 = 0;
         bnav::AsciiReaderEntry entry;
@@ -145,6 +149,7 @@ SUITE(testSubframe_SBF_OneFrame)
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == (i % 5) + 1);
 
@@ -171,6 +176,7 @@ SUITE(testSubframe_SBF_OneFrame)
         CHECK(i == 24*5);
         CHECK(pnum_fra4 == 24);
         CHECK(pnum_fra5 == 24);
+        CHECK(paritycount == 0);
         reader.close();
     }
 
@@ -182,7 +188,7 @@ SUITE(testSubframe_SBF_OneFrame)
         // set first sow
         uint32_t sow = 365040;
 
-        std::size_t i = 0;
+        std::size_t i = 0, paritycount = 0;
         std::size_t pnum_fra1 = 0;
         std::size_t pnum_fra2 = 0;
         std::size_t pnum_fra5 = 0;
@@ -195,6 +201,7 @@ SUITE(testSubframe_SBF_OneFrame)
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
             bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == (i % 5) + 1);
             CHECK(sf.getSOW() == sow);
@@ -237,6 +244,7 @@ SUITE(testSubframe_SBF_OneFrame)
         CHECK(pnum_fra2 == 6);
         CHECK(pnum_fra5 == 120);
         CHECK(sow == 365397 + 3); // because we incremented one too much
+        CHECK(paritycount == 0);
         reader.close();
     }
 }
