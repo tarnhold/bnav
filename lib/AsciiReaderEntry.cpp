@@ -273,10 +273,8 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
 
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
     // For whatever reason the last bit inside the SBF data is set to one
-    // ignore this bit, by removing it with -1.
-    // Older data may have set this last bit to zero, so handle correctly, too.
-    uint32_t lastbits { std::stoul(splitbits[9]) };
-    NavBits<32> lastblock { lastbits > 0 ? lastbits - 1 : lastbits };
+    // ignore this bit, by removing it with -1 (from firmware 2.5-Beidou_patch).
+    NavBits<32> lastblock { std::stoul(splitbits[9]) - 1 };
     lastblock <<= 12; // ignore the 12 msb which contain information
     assert(lastblock.to_ulong() == 0);
 
