@@ -12,7 +12,7 @@
     ecc = NavBitsECCWord<30>(m_bits.getLeft<pos, 30>()); \
     if (ecc.isModified()) \
     { \
-        std::cout << "fixed at " << pos << ", 30" << std::endl; \
+        std::cout << "Parity fixed at " << pos << ", 30" << std::endl; \
         m_bits.setLeft(pos, ecc.getBits()); \
         m_ParityModifiedCount += ecc.getModifiedCount(); \
     }
@@ -72,7 +72,7 @@ void Subframe::initialize()
     // fix all remaining words
     // other than the ICD says, there are no blocks like D2 subframe 4, which
     // has 72 parity bits at the end of the message. Those pages are as all
-    // other, 30+30+30...
+    // other, 30+30+30... (sbf and jps data!).
     checkAndFixParities();
 
     // read basic info from NavBits
