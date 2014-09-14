@@ -8,11 +8,13 @@ TARGET = bapp
 CONFIG += console
 CONFIG -= app_bundle
 
-LIBS += -L../lib -lbnav
+LIBS += -L../lib -lbnav -lboost_program_options
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    bnavMain.cpp
 
-HEADERS +=
+HEADERS += \
+    bnavMain.h
 
 OTHER_FILES +=
 
