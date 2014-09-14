@@ -17,8 +17,6 @@
 namespace
 {
 
-constexpr std::size_t ONLY_PRN_NUM = 2;
-
 #if 0
 /**
  * @brief lcl_extractDateTimeFromFilename Extract date and time from file name.
@@ -54,6 +52,8 @@ bnavMain::bnavMain(int argc, char *argv[])
     , filetypeInput(bnav::AsciiReaderType::NONE)
     , filenameIonexKlobuchar()
     , filenameIonexRegional()
+    , generateGlobalKlobuchar(false)
+    , limit_to_prn(UINT32_MAX)
     , sbstore()
     , ionostore()
     , ionostoreKlobuchar()
@@ -65,7 +65,8 @@ bnavMain::bnavMain(int argc, char *argv[])
             ("format,f", boost::program_options::value<std::string>()->default_value("sbf"), "input file format (sbf or jps)")
             ("klobuchar,k", boost::program_options::value<std::string>(&filenameIonexKlobuchar), "save Klobuchar models to file")
             ("regional,r", boost::program_options::value<std::string>(&filenameIonexRegional), "save regional grid models to file")
-            ("sv,s", boost::program_options::value< std::vector<int> >(), "proceed only specified PRNs")
+            ("global", "generate global Klobuchar model")
+            ("sv,s", boost::program_options::value< std::vector<std::size_t> >(), "proceed only specified PRN")
             ("file", boost::program_options::value<std::string>(&filenameInput)->required(), "input file name");
 
     boost::program_options::positional_options_description positionalopts;
@@ -96,7 +97,14 @@ bnavMain::bnavMain(int argc, char *argv[])
         }
         if (vm.count("sv"))
         {
-            assert(false); // not implemented at the moment
+            std::vector<std::size_t> svlist = vm["sv"].as< std::vector<std::size_t> >();
+            assert(svlist.size() == 1); // atm we can only choose one element
+            limit_to_prn = svlist[0];
+        }
+        if (vm.count("global"))
+        {
+            // whether to calculate a global Klobuchar model or not
+            generateGlobalKlobuchar = true;
         }
     }
     catch (boost::program_options::too_many_positional_options_error &)
@@ -192,7 +200,7 @@ void bnavMain::readInputFile()
             // FIXME: we take only PRN 2 data here, if we would like to
             // replace missing data of prn 2 with other geos we have to
             // think about IonosphereStore, which stores in depending on SvID!
-            if (sv.getPRN() == ONLY_PRN_NUM && twoHourCount != twoHourCountOld)
+            if (limit_to_prn != UINT32_MAX && sv.getPRN() == limit_to_prn && twoHourCount != twoHourCountOld)
             {
                 twoHourCountOld = twoHourCount;
                 bnav::KlobucharParam klob = eph.getKlobucharParam();
@@ -211,7 +219,7 @@ void bnavMain::readInputFile()
                     uint32_t secondOfTwoHours = eph.getSOW() % 7200;
                     uint32_t sowFullTwoHour = eph.getSOW() - secondOfTwoHours;
                     bnav::DateTime ephdate { bnav::TimeSystem::BDT, weeknum, sowFullTwoHour };
-                    bnav::Ionosphere ionoklob(klob, ephdate, true);
+                    bnav::Ionosphere ionoklob(klob, ephdate, generateGlobalKlobuchar);
 
                     std::cout << klob << std::endl;
                     ionoklob.dump();
@@ -234,7 +242,7 @@ void bnavMain::readInputFile()
             bnav::Ionosphere iono(bdata, weeknum);
 
             // diff only for one single prn
-            if (sv.getPRN() == ONLY_PRN_NUM && iono.getDateOfIssue().getSOW() % 7200 == 0)
+            if (limit_to_prn != UINT32_MAX && sv.getPRN() == limit_to_prn && iono.getDateOfIssue().getSOW() % 7200 == 0)
             {
 //                if (iono_old.hasData())
 //                    iono.diffToModel(iono_old).dump();
@@ -259,26 +267,27 @@ void bnavMain::readInputFile()
 
     if (sbstore.hasIncompleteData())
         std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;
+
+    if (!filenameIonexKlobuchar.empty())
+        writeIonexFile(filenameIonexKlobuchar, true);
+    if (!filenameIonexRegional.empty())
+        writeIonexFile(filenameIonexRegional, false);
 }
 
-void bnavMain::writeIonexFile(const std::string &filename)
+void bnavMain::writeIonexFile(const std::string &filename, const bool klobuchar)
 {
-    (void) filename;
-#if 0
+    assert(limit_to_prn < UINT32_MAX); // atm we can only store data from one prn
     // overwrites without warnings
-    std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
-    std::cout << ionexfilename << std::endl;
-    bnav::IonexWriter writer(ionexfilename);
-    writer.setKlobuchar();
+    //std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
+    //std::cout << ionexfilename << std::endl;
+    bnav::IonexWriter writer(filename, klobuchar);
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 
-    // write all models from prn2
-//    const auto prn2data = ionostore.getItemsBySv(bnav::SvID(2));
-    const auto prn2data = ionostoreKlobuchar.getItemsBySv(bnav::SvID(ONLY_PRN_NUM));
+    // write all models from prn
+    const auto prn2data = klobuchar ? ionostoreKlobuchar.getItemsBySv(bnav::SvID(limit_to_prn)) : ionostore.getItemsBySv(bnav::SvID(limit_to_prn));
     writer.writeAll(prn2data);
     writer.close();
-#endif
 }
 
 } // namespace bnav

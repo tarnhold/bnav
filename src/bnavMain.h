@@ -17,6 +17,9 @@ class bnavMain
     std::string filenameIonexKlobuchar;
     std::string filenameIonexRegional;
 
+    bool generateGlobalKlobuchar;
+    std::size_t limit_to_prn;
+
     bnav::SubframeBufferStore sbstore;
     bnav::IonosphereStore ionostore;
     bnav::IonosphereStore ionostoreKlobuchar;
@@ -27,7 +30,7 @@ public:
     void readInputFile();
 
 private:
-    void writeIonexFile(const std::string &filename);
+    void writeIonexFile(const std::string &filename, const bool klobuchar);
 };
 
 } // namespace bnav
