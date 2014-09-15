@@ -24,6 +24,8 @@ public:
 
     std::map< DateTime, Ionosphere> getItemsBySv(const SvID &sv);
     Ionosphere getIonosphere(const SvID &sv, const DateTime &datetime);
+
+    void dumpGridAvailability(const SvID &sv);
 };
 
 } // namespace bnav

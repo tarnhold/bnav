@@ -76,4 +76,59 @@ Ionosphere IonosphereStore::getIonosphere(const SvID &sv, const DateTime &dateti
  //   return NULL;
 }
 
+/**
+ * @brief IonosphereStore::dumpGridAvailability Generate a simple grid
+ * availability map. Counts all elements which are not 9999.
+ *
+ * @param sv Satellite for which we produce a map.
+ */
+void IonosphereStore::dumpGridAvailability(const SvID &sv)
+{
+    std::cout << "Grid availability" << std::endl;
+
+    if (m_store[sv].empty())
+    {
+        std::cout << "No data for SV: " << sv.getPRN() << std::endl;
+        return;
+    }
+    else
+    {
+        std::cout << "Total map count: " << m_store[sv].size() << std::endl;
+    }
+
+    // set same grid dimension
+    IonoGridDimension dim = m_store[sv].begin()->second.getGridDimension();
+    DateTime dtref(TimeSystem::BDT, 0, 0); // just an arbitrary date
+    Ionosphere ionoref;
+    ionoref.setGridDimension(dim);
+    ionoref.setDateOfIssue(dtref);
+    // get grid and reuse tecu as counter ;)
+    std::vector<IonoGridInfo> igpref = ionoref.getGrid();
+
+    // zero initialize every single IGP
+    for (auto it = igpref.begin(); it != igpref.end(); ++it)
+        it->setVerticalDelay_TECU(0);
+
+    // loop through each ionospheric model for SV in store
+    for (auto elem : m_store[sv])
+    {
+        std::vector<IonoGridInfo> igp = elem.second.getGrid();
+        std::size_t i = 0;
+
+        for (auto igpelem : igp)
+        {
+            // increment if real IGP point has data
+            if (igpelem.getVerticalDelay_TECU() != 9999)
+            {
+                igpref[i].setVerticalDelay_TECU(igpref[i].getVerticalDelay_TECU() + 1);
+            }
+
+            ++i;
+        }
+    }
+
+    ionoref.setGrid(igpref);
+    ionoref.dump();
+}
+
 } // namespace bnav

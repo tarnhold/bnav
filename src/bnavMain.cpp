@@ -246,7 +246,7 @@ void bnavMain::readInputFile()
             const bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
-#if 0
+//#if 0
             if (weeknum != 0)
             {
 
@@ -271,7 +271,7 @@ void bnavMain::readInputFile()
 
             //bnav::Almanac alm(data);
             }
-#endif
+//#endif
         }
     }
     reader.close();
@@ -281,6 +281,8 @@ void bnavMain::readInputFile()
 
     // dump message statistic
     msgstat.dump();
+
+    ionostore.dumpGridAvailability(bnav::SvID(2));
 
     if (!filenameIonexKlobuchar.empty())
         writeIonexFile(filenameIonexKlobuchar, true);

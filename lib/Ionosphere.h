@@ -43,6 +43,8 @@ public:
      void load(const uint32_t vertdelay, const uint32_t rms = 0);
      void load(const NavBits<13> &bits);
 
+     void setVerticalDelay_TECU(const uint32_t tec);
+
      uint32_t getVerticalDelay_TECU() const;
      uint32_t getGive_TECU() const;
 

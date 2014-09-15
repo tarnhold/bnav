@@ -264,6 +264,13 @@ void IonoGridInfo::loadGivei(const NavBits<4> &bits)
         m_giveTECU = lcl_convertMeterToTECU(GIVEI_LOOKUP_TABLE[givei], BDS_B1I_FREQ);
 }
 
+void IonoGridInfo::setVerticalDelay_TECU(const uint32_t tec)
+{
+    assert(tec < 10000);
+    m_dtTECU = tec;
+    m_isValid = true;
+}
+
 /**
  * @brief IonoGridInfo::getVerticalDelay_TECU Return ionospheric delay as 0.1 TECU.
  * @return TECU value, 9999 if not available.
@@ -544,6 +551,7 @@ std::vector<IonoGridInfo> Ionosphere::getGrid() const
 void Ionosphere::setGrid(const std::vector<IonoGridInfo> &rhs)
 {
     assert(rhs.size() == 320);
+    // FIXME: should set m_griddim, too - or at least fit to it
     m_grid.clear();
     for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
         m_grid.push_back(*it);
@@ -551,6 +559,11 @@ void Ionosphere::setGrid(const std::vector<IonoGridInfo> &rhs)
 
 void Ionosphere::setGridDimension(const IonoGridDimension &igd)
 {
+    std::size_t newsize = igd.getItemCountLatitude() * igd.getItemCountLongitude();
+    // we need to fit the grid to the new dimensions
+    // ensure, we only expand, so we don't lose data
+    assert(m_grid.size() <= newsize);
+    m_grid.resize(newsize);
     m_griddim = igd;
 }
 
