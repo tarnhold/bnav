@@ -7,6 +7,7 @@
 #include "Subframe.h"
 #include "SubframeBuffer.h"
 #include "SvID.h"
+#include "MessageStatistic.h"
 
 #include "DateTime.h"
 
@@ -160,6 +161,7 @@ void bnavMain::readInputFile()
     uint32_t intervalCountOld = UINT32_MAX;
     bnav::Ionosphere iono_old;
     bnav::KlobucharParam klob_old;
+    bnav::MessageStatistic msgstat;
 
     bnav::AsciiReaderEntry data;
     while (reader.readLine(data))
@@ -175,6 +177,9 @@ void bnavMain::readInputFile()
         //    continue;
 
         bnav::Subframe sf(sv, data.getDateTime(), data.getBits());
+
+        msgstat.add(sv, data.getDateTime());
+
 
 #if 0
         // debug
@@ -228,7 +233,7 @@ void bnavMain::readInputFile()
                     bnav::Ionosphere ionoklob(klob, ephdate, generateGlobalKlobuchar);
 
                     std::cout << klob << std::endl;
-                    ionoklob.dump();
+                    //ionoklob.dump();
                     std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << std::endl;
                     ionostoreKlobuchar.addIonosphere(sv, ionoklob);
 
@@ -274,6 +279,9 @@ void bnavMain::readInputFile()
     if (sbstore.hasIncompleteData())
         std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;
 
+    // dump message statistic
+    msgstat.dump();
+
     if (!filenameIonexKlobuchar.empty())
         writeIonexFile(filenameIonexKlobuchar, true);
     if (!filenameIonexRegional.empty())
@@ -282,6 +290,7 @@ void bnavMain::readInputFile()
 
 void bnavMain::writeIonexFile(const std::string &filename, const bool klobuchar)
 {
+    std::cout << "Writing Ionex file: " << filename << std::endl;
     assert(limit_to_prn < UINT32_MAX); // atm we can only store data from one prn
     // overwrites without warnings
     //std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
