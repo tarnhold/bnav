@@ -77,10 +77,10 @@ AsciiReaderType AsciiReader::getType() const
 }
 
 /**
-
-@returns \true if line read was sucessful
-         \false if line read was not successful
-*/
+ * @brief AsciiReader::readLine Read one line
+ * @param data ReaderEntry data type
+ * @return  true if line read was succesful.
+ */
 bool AsciiReader::readLine(AsciiReaderEntry &data)
 {
     if (isEof())
