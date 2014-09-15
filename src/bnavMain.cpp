@@ -111,6 +111,8 @@ bnavMain::bnavMain(int argc, char *argv[])
         }
         if (vm.count("interval"))
         {
+            if (limit_to_interval == 0)
+                throw std::invalid_argument("Cannot set interval to zero!");
             std::cout << "Setting interval to " << limit_to_interval << "s" << std::endl;
         }
     }
@@ -129,7 +131,7 @@ bnavMain::bnavMain(int argc, char *argv[])
     catch (std::invalid_argument &e)
     {
         std::stringstream msg;
-        msg << "Error: " << e.what() << std::endl;
+        msg << "Error: " << e.what();
         throw std::runtime_error(msg.str());
     }
     catch (...)
