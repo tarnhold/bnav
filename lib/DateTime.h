@@ -1,11 +1,11 @@
 #ifndef DATETIME_H
 #define DATETIME_H
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-
 #include <stdint.h>
 #include <string>
+
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace bnav
 {
@@ -56,10 +56,12 @@ public:
     std::string getMonthNameShort() const;
 
     std::string getISODate() const;
+    std::string getDateTimeString() const;
     std::string getIonexDate() const;
 
     bool operator==(const DateTime &rhs) const;
     bool operator<(const DateTime &rhs) const;
+    bool operator>(const DateTime &rhs) const;
     boost::posix_time::time_duration operator-(const DateTime &rhs) const;
 };
 

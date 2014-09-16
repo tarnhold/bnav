@@ -11,7 +11,8 @@ namespace bnav
 
 class MessageStatistic
 {
-    std::map< SvID, uint32_t> m_count;
+    std::map< SvID, uint32_t > m_count;
+    std::map< SvID, std::pair<DateTime, DateTime> > m_firstlast;
 
 public:
     MessageStatistic();

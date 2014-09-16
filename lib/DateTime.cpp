@@ -280,6 +280,12 @@ std::string DateTime::getMonthNameShort() const
     return d.month().as_short_string();
 }
 
+std::string DateTime::getDateTimeString() const
+{
+    return std::string(getYearString() + "-" + getMonthString() + "-" + getDayString() + " "
+                       + getHourString() + ":" + getMinuteString() + ":" + getSecondString());
+}
+
 /**
  * @brief DateTime::getIonexDate Convert date to Ionex format DD-MMM-YY HH:SS
  * @return Date string.
@@ -309,6 +315,12 @@ bool DateTime::operator<(const DateTime &rhs) const
 {
     assert(m_tsys == rhs.getTimeSystem());
     return m_time < rhs.get_ptime();
+}
+
+bool DateTime::operator>(const DateTime &rhs) const
+{
+    assert(m_tsys == rhs.getTimeSystem());
+    return m_time > rhs.get_ptime();
 }
 
 boost::posix_time::time_duration DateTime::operator-(const DateTime &rhs) const
