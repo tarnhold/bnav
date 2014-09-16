@@ -28,7 +28,6 @@ namespace bnav
 
 Subframe::Subframe()
     : m_bits()
-    , m_datetime()
     , m_sow(0)
     , m_frameID(0)
     , m_pageNum(0)
@@ -39,9 +38,8 @@ Subframe::Subframe()
 {
 }
 
-Subframe::Subframe(const SvID &sv, const DateTime &date, const NavBits<300> &bits)
+Subframe::Subframe(const SvID &sv, const NavBits<300> &bits)
     : m_bits(bits)
-    , m_datetime(date)
     , m_sow(0)
     , m_frameID(0)
     , m_pageNum(0)
@@ -98,19 +96,9 @@ NavBits<300> Subframe::getBits() const
     return m_bits;
 }
 
-void Subframe::setDateTime(const DateTime &date)
-{
-    m_datetime = date;
-}
-
 void Subframe::setSvID(const SvID &sv)
 {
     m_isGeo = sv.isGeo();
-}
-
-DateTime Subframe::getDateTime() const
-{
-    return m_datetime;
 }
 
 uint32_t Subframe::getSOW() const
@@ -145,7 +133,7 @@ bool Subframe::checkAndFixParities()
     {
         // SOW is not this helpful here, because we have an offset between SOW
         // and TOW from sbf file, but better than nothing
-        std::cout << "Parity fixed for SOW: " << m_datetime.getSOW() << std::endl;
+        std::cout << "Parity fixed for SOW: " << m_sow << std::endl;
         m_bits.setLeft(15, ecc1.getBits());
         m_ParityModifiedCount += ecc1.getModifiedCount();
     }
@@ -174,7 +162,7 @@ bool Subframe::operator==(const Subframe &rhs)
 {
     // check only Timestamp and NavBits, if they are equal
     // assume it's the same Subframe.
-    return (m_datetime == rhs.getDateTime()) && (m_bits == rhs.getBits());
+    return (m_sow == rhs.getSOW()) && (m_bits == rhs.getBits());
 }
 
 /**

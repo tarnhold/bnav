@@ -18,7 +18,6 @@ namespace bnav
 class Subframe
 {
     NavBits<300> m_bits;
-    DateTime m_datetime;
     uint32_t m_sow;
     uint32_t m_frameID;
     uint32_t m_pageNum;
@@ -30,12 +29,10 @@ class Subframe
 
 public:
     Subframe();
-    Subframe(const SvID &sv, const DateTime &date, const NavBits<300> &bits);
+    Subframe(const SvID &sv, const NavBits<300> &bits);
 
     void setBits(const NavBits<300> &bits);
     NavBits<300> getBits() const;
-    void setDateTime(const DateTime &date);
-    DateTime getDateTime() const;
     std::size_t getParityModifiedCount() const;
 
     void setSvID(const SvID &sv);

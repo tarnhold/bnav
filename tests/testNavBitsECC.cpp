@@ -148,7 +148,7 @@ TEST(testNavBitsECCWordFiles)
 
         bnav::SvID sv(entry.getPRN());
         CHECK(sv.isGeo());
-        bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+        bnav::Subframe sf(sv, entry.getBits());
         paritycount += sf.getParityModifiedCount();
 
         ++msgcount;
@@ -170,7 +170,7 @@ TEST(testNavBitsECCSamples)
         while (reader.readLine(entry))
         {
             bnav::SvID sv(entry.getPRN());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
 
             // check both, B1I and B2I
             if (entry.getSignalType() == bnav::SignalType::BDS_B1)
@@ -195,7 +195,7 @@ TEST(testNavBitsECCSamples)
         while (reader.readLine(entry))
         {
             bnav::SvID sv(entry.getPRN());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
 
             // check both, B1I and B2I
             if (entry.getSignalType() == bnav::SignalType::BDS_B1)

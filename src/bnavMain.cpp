@@ -177,15 +177,23 @@ void bnavMain::readInputFile()
         // skip non-GEO SVs
         //if (!sv.isGeo())
         //    continue;
+        if (limit_to_prn != UINT32_MAX && sv.getPRN() != limit_to_prn)
+            continue;
 
-        bnav::Subframe sf(sv, data.getDateTime(), data.getBits());
+        bnav::Subframe sf(sv, data.getBits());
 
-        msgstat.add(sv, data.getDateTime());
+        // store only messages into stat, if we have a correct BeiDou date
+        if (weeknum != 0)
+        {
+            const bnav::DateTime bdt = bnav::DateTime(bnav::TimeSystem::BDT, weeknum, sf.getSOW());
+            msgstat.add(sv, bdt);
+        }
 
 
 #if 0
         // debug
-        std::cout << "prn: " << data.getPRN() << " wn: " << data.getDateTime().getWeekNum()
+        std::cout << "prn: " << std::setw(2) << data.getPRN()
+                  << " wn: " << std::setw(4) << data.getDateTime().getWeekNum()
                   << " tow: " << data.getDateTime().getSOW() << " sow: " << sf.getSOW()
                   << " fra: " << sf.getFrameID() << " pnum: "
                   << sf.getPageNum() << std::endl;

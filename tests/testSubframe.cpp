@@ -29,7 +29,7 @@ SUITE(testSubframe_SBF_Simple)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == i + 1);
@@ -69,7 +69,6 @@ SUITE(testSubframe_SBF_Simple)
 
             // only difference
             bnav::Subframe sf;
-            sf.setDateTime(entry.getDateTime());
             sf.setBits(entry.getBits());
             sf.setSvID(sv);
             sf.initialize();
@@ -106,7 +105,7 @@ SUITE(testSubframe_SBF_Simple)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == i + 1);
@@ -148,7 +147,7 @@ SUITE(testSubframe_SBF_OneFrame)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == (i % 5) + 1);
@@ -200,7 +199,7 @@ SUITE(testSubframe_SBF_OneFrame)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             CHECK(sf.getFrameID() == (i % 5) + 1);

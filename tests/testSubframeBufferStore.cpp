@@ -33,7 +33,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(!sv.isGeo());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
@@ -83,7 +83,7 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
 
             bnav::SvID sv(entry.getPRN());
             CHECK(sv.isGeo());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
@@ -139,7 +139,7 @@ SUITE(testSubframeBufferStore_SBF)
                 continue;
 
             bnav::SvID sv(entry.getPRN());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
@@ -199,7 +199,7 @@ SUITE(testSubframeBufferStore_SBF)
                 continue;
 
             bnav::SvID sv(entry.getPRN());
-            bnav::Subframe sf(sv, entry.getDateTime(), entry.getBits());
+            bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
             sbstore.addSubframe(sv, sf);
