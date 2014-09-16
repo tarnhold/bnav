@@ -50,6 +50,20 @@ void IonosphereStore::addIonosphere(const SvID &sv, const Ionosphere &iono)
     //std::cout << "exists" << std::endl;
 }
 
+/**
+ * @brief IonosphereStore::getSvList Get a list of all SV in store.
+ * @return SvIDs inside a vector.
+ */
+std::vector< SvID > IonosphereStore::getSvList() const
+{
+    std::vector< SvID > svlist {};
+
+    for (const auto elem : m_store)
+        svlist.push_back(elem.first);
+
+    return svlist;
+}
+
 std::map<DateTime, Ionosphere> IonosphereStore::getItemsBySv(const SvID &sv)
 {
     return m_store[sv];
@@ -74,6 +88,23 @@ Ionosphere IonosphereStore::getIonosphere(const SvID &sv, const DateTime &dateti
     //assert(false); // who called this before adding the data?!
 
  //   return NULL;
+}
+
+void IonosphereStore::dumpStoreStatistics(const std::string name)
+{
+    std::cout << "IonosphereStore statistics: " << name << std::endl;
+
+    if (m_store.empty())
+    {
+        std::cout << "No items in store!" << std::endl;
+        return;
+    }
+
+    for (const auto item : m_store)
+    {
+        std::cout << item.first.getPRN() << ": "
+                  << item.second.size() << std::endl;
+    }
 }
 
 /**

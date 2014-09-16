@@ -22,9 +22,11 @@ public:
 
     void addIonosphere(const SvID &sv, const Ionosphere &iono);
 
+    std::vector< SvID > getSvList() const;
     std::map< DateTime, Ionosphere> getItemsBySv(const SvID &sv);
     Ionosphere getIonosphere(const SvID &sv, const DateTime &datetime);
 
+    void dumpStoreStatistics(const std::string name);
     void dumpGridAvailability(const SvID &sv);
 };
 

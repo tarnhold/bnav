@@ -235,7 +235,7 @@ void bnavMain::readInputFile()
                     bnav::Ionosphere ionoklob(klob, ephdate, generateGlobalKlobuchar);
 
                     std::cout << klob << std::endl;
-                    //ionoklob.dump();
+                    ionoklob.dump();
                     std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << std::endl;
                     ionostoreKlobuchar.addIonosphere(sv, ionoklob);
 
@@ -249,7 +249,8 @@ void bnavMain::readInputFile()
             //std::cout << "almanac complete" << std::endl;
 
 //#if 0
-            if (weeknum != 0)
+            // only Geos have Ionosphere
+            if (sv.isGeo() && weeknum != 0)
             {
 
             bnav::Ionosphere iono(bdata, weeknum);
@@ -281,15 +282,22 @@ void bnavMain::readInputFile()
     if (sbstore.hasIncompleteData())
         std::cout << "SubframeBufferStore has incomplete data sets at EOF. Ignoring." << std::endl;
 
+    ionostore.dumpStoreStatistics("Regional grid");
+    ionostoreKlobuchar.dumpStoreStatistics("Klobuchar");
+
     // dump message statistic
     msgstat.dump();
 
-    ionostore.dumpGridAvailability(bnav::SvID(2));
+    // works only with one sv selected at the moment
+if (limit_to_prn != UINT32_MAX)
+{
+    ionostore.dumpGridAvailability(bnav::SvID(limit_to_prn));
 
     if (!filenameIonexKlobuchar.empty())
         writeIonexFile(filenameIonexKlobuchar, true);
     if (!filenameIonexRegional.empty())
         writeIonexFile(filenameIonexRegional, false);
+}
 }
 
 void bnavMain::writeIonexFile(const std::string &filename, const bool klobuchar)

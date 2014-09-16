@@ -290,18 +290,13 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
 
     ++m_tecmapcount;
 
-   // for (auto it = data.begin(); it != data.end(); ++it)
-   // {
-        std::cout << "blubber: " << data.second.getDateOfIssue().getISODate() << std::endl;
-   // }
-
     IonoGridDimension igd = data.second.getGridDimension();
     std::vector<IonoGridInfo> grid = data.second.getGrid();
     DateTime dt = data.second.getDateOfIssue();
 
     const std::size_t colcount = igd.getItemCountLongitude();
     const std::size_t rowcount = igd.getItemCountLatitude();
-    std::cout << "rowcount: " << rowcount << std::endl;
+
     // set an arbitrary limit
     assert(colcount < 360);
     assert(rowcount < 360);

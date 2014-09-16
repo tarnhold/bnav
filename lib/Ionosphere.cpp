@@ -334,8 +334,12 @@ IonoGridDimension::IonoGridDimension(const double latnorth, const double latsout
 std::size_t IonoGridDimension::getItemCountLatitude() const
 {
     assert(latitude_spacing != 0.0);
-    std::cout << std::setprecision(1) << std::fixed;
-    std::cout << "lat max: " << latitude_north << " min: " << latitude_south << " space: " << latitude_spacing << std::endl;
+#if 0
+    std::cout << std::setprecision(1) << std::fixed
+              << "lat max: " << latitude_north
+              << " min: " << latitude_south
+              << " space: " << latitude_spacing << std::endl;
+#endif
     // add 0.5 because the compiler will always truncate
     // +1 because latmin and latmax are counting, too
     return static_cast<std::size_t>(std::fabs((latitude_north - latitude_south) / latitude_spacing) + 0.5) + 1;
@@ -344,8 +348,12 @@ std::size_t IonoGridDimension::getItemCountLatitude() const
 std::size_t IonoGridDimension::getItemCountLongitude() const
 {
     assert(longitude_spacing != 0.0);
-    std::cout << std::setprecision(1) << std::fixed;
-    std::cout << "long max: " << longitude_west << " min: " << longitude_east << " space: " << longitude_spacing << std::endl;
+#if 0
+    std::cout << std::setprecision(1) << std::fixed
+              << "long max: " << longitude_west
+              << " min: " << longitude_east
+              << " space: " << longitude_spacing << std::endl;
+#endif
     return static_cast<std::size_t>(std::fabs((longitude_west - longitude_east) / longitude_spacing) + 0.5) + 1;
 }
 
