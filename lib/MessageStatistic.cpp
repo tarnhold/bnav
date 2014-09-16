@@ -45,10 +45,11 @@ void MessageStatistic::dump()
 
     for (auto elem : m_count)
     {
-        std::cout << std::setw(2) << elem.first.getPRN() << ": " << elem.second
-                  << "\tfirst: "
+        std::cout << std::setw(2) << elem.first.getPRN() << ": "
+                  << std::setw(6) << elem.second
+                  << " first: "
                   << m_firstlast[elem.first].first.getDateTimeString()
-                  << "\tlast: "
+                  << " last: "
                   << m_firstlast[elem.first].second.getDateTimeString();
 
 
