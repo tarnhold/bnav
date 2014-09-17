@@ -32,7 +32,7 @@ public:
     void readInputFile();
 
 private:
-    void writeIonexFile(const std::string &filename, const bool klobuchar);
+    void writeIonexFile(const std::string &filename, const std::size_t interval, const bool klobuchar);
 };
 
 } // namespace bnav

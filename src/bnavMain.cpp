@@ -320,20 +320,20 @@ if (limit_to_prn != UINT32_MAX)
     ionostore.dumpGridAvailability(bnav::SvID(limit_to_prn));
 
     if (!filenameIonexKlobuchar.empty())
-        writeIonexFile(filenameIonexKlobuchar, true);
+        writeIonexFile(filenameIonexKlobuchar, limit_to_interval_klobuchar, true);
     if (!filenameIonexRegional.empty())
-        writeIonexFile(filenameIonexRegional, false);
+        writeIonexFile(filenameIonexRegional, limit_to_interval_regional, false);
 }
 }
 
-void bnavMain::writeIonexFile(const std::string &filename, const bool klobuchar)
+void bnavMain::writeIonexFile(const std::string &filename, const std::size_t interval, const bool klobuchar)
 {
     std::cout << "Writing Ionex file: " << filename << std::endl;
     assert(limit_to_prn < UINT32_MAX); // atm we can only store data from one prn
     // overwrites without warnings
     //std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
     //std::cout << ionexfilename << std::endl;
-    bnav::IonexWriter writer(filename, klobuchar);
+    bnav::IonexWriter writer(filename, interval, klobuchar);
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 

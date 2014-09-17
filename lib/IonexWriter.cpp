@@ -88,15 +88,17 @@ namespace bnav
 IonexWriter::IonexWriter()
     : m_outfile()
     , m_filename()
+    , m_interval(UINT32_MAX)
     , m_isKlobuchar(false)
     , m_isHeaderWritten(false)
     , m_tecmapcount(0)
 {
 }
 
-IonexWriter::IonexWriter(const char *filename, const bool klobuchar)
+IonexWriter::IonexWriter(const char *filename, const std::size_t interval, const bool klobuchar)
     : m_outfile()
     , m_filename(filename)
+    , m_interval(interval)
     , m_isKlobuchar(klobuchar)
     , m_isHeaderWritten(false)
     , m_tecmapcount(0)
@@ -105,8 +107,8 @@ IonexWriter::IonexWriter(const char *filename, const bool klobuchar)
 }
 
 
-IonexWriter::IonexWriter(const std::string &filename, const bool klobuchar)
-    : IonexWriter(filename.c_str(), klobuchar)
+IonexWriter::IonexWriter(const std::string &filename, const std::size_t interval, const bool klobuchar)
+    : IonexWriter(filename.c_str(), interval, klobuchar)
 {
 }
 
@@ -155,7 +157,7 @@ void IonexWriter::setKlobuchar(const bool klobuchar)
 
 /// called from writeData, because we need at least one data record to get
 /// all information of the map.
-void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &lastion, const std::size_t mapcount, const int32_t interval)
+void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &lastion, const std::size_t mapcount)
 {
     assert(isOpen());
 
@@ -199,7 +201,7 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
               << lcl_justifyLeft("EPOCH OF LAST MAP", 20)
               << std::endl;
 
-    m_outfile << lcl_justifyRight(std::to_string(interval), 6) << lcl_justifyLeft("", 54)
+    m_outfile << lcl_justifyRight(std::to_string(m_interval), 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("INTERVAL", 20) << std::endl;
 
     m_outfile << lcl_justifyRight(std::to_string(mapcount), 6) << lcl_justifyLeft("", 54)
@@ -272,8 +274,11 @@ void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
     boost::posix_time::time_duration interval {
         secondion.getDateOfIssue() - firstion.getDateOfIssue() };
 
+    // given interval should fit to the data
+    assert(m_interval == static_cast<std::size_t>(interval.total_seconds()));
+
     // write header
-    writeHeader(firstion, lastion, data.size(), interval.total_seconds());
+    writeHeader(firstion, lastion, data.size());
 
     // run through all models
     for (auto it = data.begin(); it != data.end(); ++it)
