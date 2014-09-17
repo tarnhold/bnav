@@ -41,7 +41,7 @@ public:
     void close();
 
 private:
-    void writeHeader(const Ionosphere &firstion, const Ionosphere &lastion, const std::size_t mapcount);
+    void writeHeader(const Ionosphere &firstion, const Ionosphere &lastion);
     void writeRecord(const std::pair<const DateTime, Ionosphere> &data);
     void finalize();
 };

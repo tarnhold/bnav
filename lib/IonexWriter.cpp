@@ -80,6 +80,24 @@ std::string lcl_justifyLeft(const double num, const std::string::size_type lengt
 }
 #endif
 
+static const bnav::Ionosphere lcl_dummyModel(const bnav::Ionosphere &data, const bnav::DateTime &dt)
+{
+    bnav::IonoGridDimension dim = data.getGridDimension();
+    bnav::Ionosphere ionoref;
+    ionoref.setGridDimension(dim);
+    ionoref.setDateOfIssue(dt);
+    // get grid and reuse tecu as counter ;)
+    std::vector<bnav::IonoGridInfo> igpref = ionoref.getGrid();
+
+    // zero initialize every single IGP
+    for (auto it = igpref.begin(); it != igpref.end(); ++it)
+        it->setVerticalDelay_TECU(9999);
+
+    ionoref.setGrid(igpref);
+
+    return ionoref;
+}
+
 }
 
 namespace bnav
@@ -157,7 +175,7 @@ void IonexWriter::setKlobuchar(const bool klobuchar)
 
 /// called from writeData, because we need at least one data record to get
 /// all information of the map.
-void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &lastion, const std::size_t mapcount)
+void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &lastion)
 {
     assert(isOpen());
 
@@ -204,6 +222,10 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
     m_outfile << lcl_justifyRight(std::to_string(m_interval), 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("INTERVAL", 20) << std::endl;
 
+    // calculate total map count from interval, because we fill non existing
+    // data records with dummies (9999).
+    uint32_t totalsec = static_cast<uint32_t>(std::abs((lastion.getDateOfIssue() - firstion.getDateOfIssue()).total_seconds()));
+    uint32_t mapcount = totalsec / m_interval + 1; // fence posts
     m_outfile << lcl_justifyRight(std::to_string(mapcount), 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("# OF MAPS IN FILE", 20) << std::endl;
 
@@ -265,24 +287,46 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
  */
 void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
 {
-    assert(data.size() >= 3);
+    assert(data.size() >= 2);
     Ionosphere firstion = data.begin()->second;
-    Ionosphere secondion = (++data.begin())->second;
     Ionosphere lastion = data.rbegin()->second;
 
-    // estimate interval between two data records
-    boost::posix_time::time_duration interval {
-        secondion.getDateOfIssue() - firstion.getDateOfIssue() };
-
-    // given interval should fit to the data
-    assert(m_interval == static_cast<std::size_t>(interval.total_seconds()));
-
     // write header
-    writeHeader(firstion, lastion, data.size());
+    writeHeader(firstion, lastion);
 
     // run through all models
+    std::uint32_t lastsec { 0 };
+    std::uint32_t lastweek { 0 };
+    // use a separate boolean, because SOW could be zero
+    bool firstrun { true };
     for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        if (firstrun)
+        {
+           lastsec = it->second.getDateOfIssue().getSOW();
+           firstrun = false;
+        }
+        else
+        {
+            // look if we have to fill with fake entries, because there is a data gap
+            std::size_t secdiff = it->second.getDateOfIssue().getSOW() - lastsec;
+            std::size_t fillcount = secdiff / m_interval;
+            assert(secdiff % m_interval == 0);
+            // fill one less, because we want to fill "fences" not "fence posts"
+            for (std::size_t i = 1; i < fillcount; ++i)
+            {
+                std::cout << "IonexWriter: Inserting dummy entry" << std::endl;
+
+                DateTime dt(TimeSystem::BDT, lastweek, lastsec + m_interval * i);
+                writeRecord(std::make_pair(dt, lcl_dummyModel(it->second, dt)));
+            }
+        }
+
+        // write true entry
         writeRecord(*it);
+        lastsec = it->second.getDateOfIssue().getSOW();
+        lastweek = it->second.getDateOfIssue().getWeekNum();
+    }
 
     // finalize file
     finalize();

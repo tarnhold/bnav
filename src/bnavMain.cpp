@@ -115,6 +115,11 @@ bnavMain::bnavMain(int argc, char *argv[])
         {
             if (limit_to_interval_regional == 0)
                 throw std::invalid_argument("Cannot set interval to zero!");
+
+            // they come all 6 min
+            if (limit_to_interval_regional < 360)
+                throw std::invalid_argument("Grid data is only available >=360s.");
+
             std::cout << "Setting interval to " << limit_to_interval_regional << "s" << std::endl;
         }
         if (vm.count("ik"))
@@ -126,10 +131,7 @@ bnavMain::bnavMain(int argc, char *argv[])
             // want new model data. If there is a need for <7200s data, the
             // klob != klob_old condition has to be removed.
             if (limit_to_interval_klobuchar < 7200)
-            {
-                std::cout << "Interval <7200s is not possible for Klobuchar." << std::endl;
-                limit_to_interval_klobuchar = 7200;
-            }
+                throw std::invalid_argument("Interval <7200s is not possible for Klobuchar.");
 
             std::cout << "Setting interval to " << limit_to_interval_klobuchar << "s" << std::endl;
         }
