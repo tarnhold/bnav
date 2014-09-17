@@ -18,7 +18,8 @@ class bnavMain
     std::string filenameIonexRegional;
 
     bool generateGlobalKlobuchar;
-    std::size_t limit_to_interval;
+    std::size_t limit_to_interval_regional;
+    std::size_t limit_to_interval_klobuchar;
     std::size_t limit_to_prn;
 
     bnav::SubframeBufferStore sbstore;

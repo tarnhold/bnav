@@ -54,7 +54,8 @@ bnavMain::bnavMain(int argc, char *argv[])
     , filenameIonexKlobuchar()
     , filenameIonexRegional()
     , generateGlobalKlobuchar(false)
-    , limit_to_interval(0)
+    , limit_to_interval_regional(0)
+    , limit_to_interval_klobuchar(0)
     , limit_to_prn(UINT32_MAX)
     , sbstore()
     , ionostore()
@@ -69,7 +70,8 @@ bnavMain::bnavMain(int argc, char *argv[])
             ("regional,r", boost::program_options::value<std::string>(&filenameIonexRegional), "save regional grid models to file")
             ("global", "generate global Klobuchar model")
             ("sv,s", boost::program_options::value< std::vector<std::size_t> >(), "proceed only specified PRN")
-            ("interval,i", boost::program_options::value<std::size_t>(&limit_to_interval)->default_value(7200), "decimate Ionex output to interval [s]")
+            ("ir", boost::program_options::value<std::size_t>(&limit_to_interval_regional)->default_value(7200), "decimate Regional Ionex output to interval [s]")
+            ("ik", boost::program_options::value<std::size_t>(&limit_to_interval_klobuchar)->default_value(7200), "decimate Klobuchar Ionex output to interval [s]")
             ("file", boost::program_options::value<std::string>(&filenameInput)->required(), "input file name");
 
     boost::program_options::positional_options_description positionalopts;
@@ -109,11 +111,27 @@ bnavMain::bnavMain(int argc, char *argv[])
             // whether to calculate a global Klobuchar model or not
             generateGlobalKlobuchar = true;
         }
-        if (vm.count("interval"))
+        if (vm.count("ir"))
         {
-            if (limit_to_interval == 0)
+            if (limit_to_interval_regional == 0)
                 throw std::invalid_argument("Cannot set interval to zero!");
-            std::cout << "Setting interval to " << limit_to_interval << "s" << std::endl;
+            std::cout << "Setting interval to " << limit_to_interval_regional << "s" << std::endl;
+        }
+        if (vm.count("ik"))
+        {
+            if (limit_to_interval_klobuchar == 0)
+                throw std::invalid_argument("Cannot set interval to zero!");
+
+            // With an interval <7200s we would interpolate data. We only
+            // want new model data. If there is a need for <7200s data, the
+            // klob != klob_old condition has to be removed.
+            if (limit_to_interval_klobuchar < 7200)
+            {
+                std::cout << "Interval <7200s is not possible for Klobuchar." << std::endl;
+                limit_to_interval_klobuchar = 7200;
+            }
+
+            std::cout << "Setting interval to " << limit_to_interval_klobuchar << "s" << std::endl;
         }
     }
     catch (boost::program_options::too_many_positional_options_error &)
@@ -217,7 +235,7 @@ void bnavMain::readInputFile()
             // Try to get at least one model within this time frame. It may
             // be the case, that there is no data until 01:50, but with this
             // we can grep the model within the last 10 minutes of transmission.
-            uint32_t intervalCount = eph.getSOW() / limit_to_interval;
+            uint32_t intervalCount = eph.getSOW() / limit_to_interval_klobuchar;
             // FIXME: we take only PRN 2 data here, if we would like to
             // replace missing data of prn 2 with other geos we have to
             // think about IonosphereStore, which stores in depending on SvID!
@@ -237,7 +255,7 @@ void bnavMain::readInputFile()
                     // model parameters (every two hours). Otherwise the model
                     // slightly changes with each new SOW, because it's dependent
                     // on the local time.
-                    uint32_t secondOfInterval = eph.getSOW() % limit_to_interval;
+                    uint32_t secondOfInterval = eph.getSOW() % limit_to_interval_klobuchar;
                     uint32_t sowFullInterval = eph.getSOW() - secondOfInterval;
                     bnav::DateTime ephdate { bnav::TimeSystem::BDT, weeknum, sowFullInterval };
                     bnav::Ionosphere ionoklob(klob, ephdate, generateGlobalKlobuchar);
@@ -264,7 +282,7 @@ void bnavMain::readInputFile()
             bnav::Ionosphere iono(bdata, weeknum);
 
             // diff only for one single prn
-            if (limit_to_prn != UINT32_MAX && sv.getPRN() == limit_to_prn && iono.getDateOfIssue().getSOW() % limit_to_interval == 0)
+            if (limit_to_prn != UINT32_MAX && sv.getPRN() == limit_to_prn && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
             {
 //                if (iono_old.hasData())
 //                    iono.diffToModel(iono_old).dump();
