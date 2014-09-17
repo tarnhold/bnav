@@ -21,6 +21,7 @@ class bnavMain
     std::size_t limit_to_interval_regional;
     std::size_t limit_to_interval_klobuchar;
     std::size_t limit_to_prn;
+    DateTime limit_to_date;
 
     bnav::SubframeBufferStore sbstore;
     bnav::IonosphereStore ionostore;

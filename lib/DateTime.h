@@ -49,6 +49,10 @@ public:
     std::string getMonthString() const;
     std::string getYearString() const;
 
+    uint32_t getHour() const;
+    uint32_t getMinute() const;
+    uint32_t getSecond() const;
+
     std::string getHourString() const;
     std::string getMinuteString() const;
     std::string getSecondString() const;
@@ -58,6 +62,8 @@ public:
     std::string getISODate() const;
     std::string getDateTimeString() const;
     std::string getIonexDate() const;
+
+    bool isSameIonexDay(const DateTime &rhs) const;
 
     bool operator==(const DateTime &rhs) const;
     bool operator<(const DateTime &rhs) const;

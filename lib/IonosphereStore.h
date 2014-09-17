@@ -22,6 +22,8 @@ public:
 
     void addIonosphere(const SvID &sv, const Ionosphere &iono);
 
+    bool hasDataForSv(const SvID &sv);
+
     std::vector< SvID > getSvList() const;
     std::map< DateTime, Ionosphere> getItemsBySv(const SvID &sv);
     Ionosphere getIonosphere(const SvID &sv, const DateTime &datetime);

@@ -69,6 +69,11 @@ std::map<DateTime, Ionosphere> IonosphereStore::getItemsBySv(const SvID &sv)
     return m_store[sv];
 }
 
+bool IonosphereStore::hasDataForSv(const SvID &sv)
+{
+    return m_store[sv].size() > 0;
+}
+
 /**
  * @brief IonosphereStore::getIonosphere Get the Ionosphere object.
  * @param sv The SvID.

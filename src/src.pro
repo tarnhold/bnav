@@ -8,7 +8,7 @@ TARGET = bapp
 CONFIG += console
 CONFIG -= app_bundle
 
-LIBS += -L../lib -lbnav -lboost_program_options
+LIBS += -L../lib -lbnav -lboost_program_options -lboost_regex
 
 SOURCES += main.cpp \
     bnavMain.cpp

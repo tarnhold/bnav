@@ -234,16 +234,29 @@ std::string DateTime::getISODate() const
     return std::string(getYearString() + getMonthString() + getDayString());
 }
 
+uint32_t DateTime::getHour() const
+{
+    boost::posix_time::time_duration t { m_time.time_of_day() };
+    assert(t.hours() >= 0 && t.hours() <= 24);
+    return static_cast<uint32_t>(t.hours());
+}
+
 /**
  * @brief DateTime::getHourString Return hours padded with zero.
  * @return Hours as string.
  */
 std::string DateTime::getHourString() const
 {
-    boost::posix_time::time_duration t { m_time.time_of_day() };
     std::stringstream ss;
-    ss << std::setw(2) << std::setfill('0') << t.hours();
+    ss << std::setw(2) << std::setfill('0') << getHour();
     return ss.str();
+}
+
+uint32_t DateTime::getMinute() const
+{
+    boost::posix_time::time_duration t { m_time.time_of_day() };
+    assert(t.minutes() >= 0 && t.minutes() <= 60);
+    return static_cast<uint32_t>(t.minutes());
 }
 
 /**
@@ -252,10 +265,16 @@ std::string DateTime::getHourString() const
  */
 std::string DateTime::getMinuteString() const
 {
-    boost::posix_time::time_duration t { m_time.time_of_day() };
     std::stringstream ss;
-    ss << std::setw(2) << std::setfill('0') << t.minutes();
+    ss << std::setw(2) << std::setfill('0') << getMinute();
     return ss.str();
+}
+
+uint32_t DateTime::getSecond() const
+{
+    boost::posix_time::time_duration t { m_time.time_of_day() };
+    assert(t.seconds() >= 0 && t.seconds() <= 60);
+    return static_cast<uint32_t>(t.seconds());
 }
 
 /**
@@ -264,9 +283,8 @@ std::string DateTime::getMinuteString() const
  */
 std::string DateTime::getSecondString() const
 {
-    boost::posix_time::time_duration t { m_time.time_of_day() };
     std::stringstream ss;
-    ss << std::setw(2) << std::setfill('0') << t.seconds();
+    ss << std::setw(2) << std::setfill('0') << getSecond();
     return ss.str();
 }
 
@@ -299,6 +317,34 @@ std::string DateTime::getIonexDate() const
        << getHourString() << ":"
        << getMinuteString();
     return ss.str();
+}
+
+/**
+ * @brief DateTime::isSameIonexDay Check if a given date is the same.
+ *
+ * Ionex: 20131201 00:00:00 till 20131202 00:00:00 is one day.
+ *
+ * @param rhs Date to compare to.
+ * @return true if date is the same.
+ */
+bool DateTime::isSameIonexDay(const DateTime &rhs) const
+{
+    // form number YYYYMMDD, same day
+    if (getYear() == rhs.getYear() && getMonth() == rhs.getMonth() && getDay() == rhs.getDay())
+        return true;
+
+    // rhs is next day 00:00, we count this to the same day, because Ionex needs
+    boost::gregorian::date nextday = m_time.date() + boost::gregorian::days(1);
+
+    if (rhs.getYear() == nextday.year() && rhs.getMonth() == nextday.month() && rhs.getDay() == nextday.day())
+    {
+        if (rhs.getHour() == 0 && rhs.getMinute() == 0 && rhs.getSecond() == 0)
+            return true;
+        else
+            return false;
+    }
+
+    return false;
 }
 
 /**

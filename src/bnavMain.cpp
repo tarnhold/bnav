@@ -14,34 +14,38 @@
 #include <cstdlib>
 
 #include <boost/program_options.hpp>
+#include <boost/regex.hpp>
 
 namespace
 {
 
-#if 0
 /**
- * @brief lcl_extractDateTimeFromFilename Extract date and time from file name.
- * @param filename Filename string in IGS format.
- * @return DateTime object.
+ * @brief lcl_extractDateStringFromIGSFilename Try to extract date string from
+ * IGS filename. If filename isn't in IGS format it just returns an empty string.
+ * @param fullfilename Full filename.
+ * @return Date as string.
  */
-bnav::DateTime lcl_extractDateFromFilename(const std::string &filename)
+std::string lcl_extractDateStringFromIGSFilename(const std::string &fullfilename)
 {
-    std::string filename_date;
-    const std::size_t lastslash = filename.find_last_of('/');
+    std::string filename;
+    const std::size_t lastslash = fullfilename.find_last_of('/');
 
+    // remove dir parts: dir/filename.ext
     if (lastslash != std::string::npos)
-        // dir/filename.ext
-        filename_date = filename.substr(lastslash + 5, 8);
-    else
-        // filename.ext
-        filename_date = filename.substr(4, 8);
+        filename = fullfilename.substr(lastslash + 1);
 
-    // add time to get a ISO date YYYYMMDDTHHMMSS
-    filename_date += "T000000";
+    // CUT12014071324.sbf_SBF_CMPRaw.txt
+    boost::regex expr("^[A-Z]{3}[A-Z0-9]([0-9]{8})24\\.");
+    // we want only group one
+    boost::sregex_token_iterator it(filename.begin(), filename.end(), expr, {1});
+    boost::sregex_token_iterator end;
 
-    return bnav::DateTime(bnav::TimeSystem::BDT, filename_date);
+    if (it != end)
+        return it->str();
+
+    // nothing matched
+    return "";
 }
-#endif
 
 }
 
@@ -57,10 +61,12 @@ bnavMain::bnavMain(int argc, char *argv[])
     , limit_to_interval_regional(0)
     , limit_to_interval_klobuchar(0)
     , limit_to_prn(UINT32_MAX)
+    , limit_to_date()
     , sbstore()
     , ionostore()
     , ionostoreKlobuchar()
 {
+    std::string limit_to_date_str;
     boost::program_options::options_description desc("Generic options");
     desc.add_options()
             ("help,h", "show help message")
@@ -72,6 +78,7 @@ bnavMain::bnavMain(int argc, char *argv[])
             ("sv,s", boost::program_options::value< std::vector<std::size_t> >(), "proceed only specified PRN")
             ("ir", boost::program_options::value<std::size_t>(&limit_to_interval_regional)->default_value(7200), "decimate Regional Ionex output to interval [s]")
             ("ik", boost::program_options::value<std::size_t>(&limit_to_interval_klobuchar)->default_value(7200), "decimate Klobuchar Ionex output to interval [s]")
+            ("date,d", boost::program_options::value<std::string>(&limit_to_date_str), "limit Ionex output to date")
             ("file", boost::program_options::value<std::string>(&filenameInput)->required(), "input file name");
 
     boost::program_options::positional_options_description positionalopts;
@@ -135,6 +142,17 @@ bnavMain::bnavMain(int argc, char *argv[])
 
             std::cout << "Setting interval to " << limit_to_interval_klobuchar << "s" << std::endl;
         }
+        if (vm.count("date"))
+        {
+            // limit data processing to a specific date, this is higher
+            // in priority than extracting the date from filename.
+
+            // check for date validity
+            if (limit_to_date_str.length() != 8)
+                throw std::invalid_argument("Invalid date!");
+
+            //FIXME: maybe try to parse the date and catch exceptions
+        }
     }
     catch (boost::program_options::too_many_positional_options_error &)
     {
@@ -160,6 +178,24 @@ bnavMain::bnavMain(int argc, char *argv[])
         msg << "Error: Unknown exception!" << std::endl << std::endl << desc;
         throw std::runtime_error(msg.str());
     }
+
+    // argument --date is higher in priority, if set don't overwrite
+    if (limit_to_date_str.empty())
+    {
+        // extract date from filename, so we have a clue which data we want
+        // to extract from the file (it's possible that there is more than
+        // one day data inside the file.
+        std::string igsdate = lcl_extractDateStringFromIGSFilename(filenameInput);
+        if (!igsdate.empty())
+        {
+            limit_to_date_str = igsdate;
+            std::cout << "Date limit from IGS filename: " << igsdate << std::endl;
+        }
+    }
+
+    limit_to_date.setTimeSystem(bnav::TimeSystem::BDT);
+    limit_to_date.setISODateTime(limit_to_date_str + "T000000");
+    std::cout << "Limiting date to: " << limit_to_date.getISODate() << std::endl;
 }
 
 void bnavMain::readInputFile()
@@ -168,16 +204,6 @@ void bnavMain::readInputFile()
     bnav::AsciiReader reader(filenameInput, filetypeInput);
     if (!reader.isOpen())
         std::perror(("Error: Could not open file: " + filenameInput).c_str());
-
-    // extract date from filename, so we have a clue which data we want
-    // to extract from the file (it's possible that there is more than
-    // one day data in the file.
-
-//FIXME: we need to check if we have IGS filename!
-//    if (isIGSFilename(filename))
-
-//std::cout << "bla: " << lcl_extractDateFromFilename(filename).getISODate() << std::endl;
-//    const bnav::DateTime dtfilename { lcl_extractDateFromFilename(filename) };
 
     uint32_t weeknum {0};
     uint32_t intervalCountOld = UINT32_MAX;
@@ -264,8 +290,12 @@ void bnavMain::readInputFile()
 
                     std::cout << klob << std::endl;
                     ionoklob.dump();
-                    std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << std::endl;
-                    ionostoreKlobuchar.addIonosphere(sv, ionoklob);
+
+                    if (limit_to_date.isSameIonexDay(ionoklob.getDateOfIssue()))
+                    {
+                        std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << std::endl;
+                        ionostoreKlobuchar.addIonosphere(sv, ionoklob);
+                    }
 
                     klob_old = klob;
                 }
@@ -290,7 +320,12 @@ void bnavMain::readInputFile()
 //                    iono.diffToModel(iono_old).dump();
 
                 iono.dump();
-                ionostore.addIonosphere(sv, iono);
+
+                if (limit_to_date.isSameIonexDay(iono.getDateOfIssue()))
+                {
+                    std::cout << "add Regional Grid to store for SV: " << sv.getPRN() << std::endl;
+                    ionostore.addIonosphere(sv, iono);
+                }
 
                 iono_old = iono;
             }
@@ -319,12 +354,28 @@ void bnavMain::readInputFile()
     // works only with one sv selected at the moment
 if (limit_to_prn != UINT32_MAX)
 {
-    ionostore.dumpGridAvailability(bnav::SvID(limit_to_prn));
+    const bnav::SvID svlim(limit_to_prn);
+    if (ionostore.hasDataForSv(svlim))
+    {
+        ionostore.dumpGridAvailability(svlim);
 
-    if (!filenameIonexKlobuchar.empty())
-        writeIonexFile(filenameIonexKlobuchar, limit_to_interval_klobuchar, true);
-    if (!filenameIonexRegional.empty())
-        writeIonexFile(filenameIonexRegional, limit_to_interval_regional, false);
+        if (!filenameIonexRegional.empty())
+            writeIonexFile(filenameIonexRegional, limit_to_interval_regional, false);
+    }
+    else
+    {
+        std::cout << "No data in Regional Grid store. No Ionex output." << std::endl;
+    }
+
+    if (ionostoreKlobuchar.hasDataForSv(svlim))
+    {
+        if (!filenameIonexKlobuchar.empty())
+            writeIonexFile(filenameIonexKlobuchar, limit_to_interval_klobuchar, true);
+    }
+    else
+    {
+        std::cout << "No data in Klobuchar store. No Ionex output." << std::endl;
+    }
 }
 }
 

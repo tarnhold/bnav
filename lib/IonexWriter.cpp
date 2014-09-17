@@ -287,7 +287,7 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
  */
 void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
 {
-    assert(data.size() >= 2);
+    assert(data.size() >= 1);
     Ionosphere firstion = data.begin()->second;
     Ionosphere lastion = data.rbegin()->second;
 

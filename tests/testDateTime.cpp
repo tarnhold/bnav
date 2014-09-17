@@ -389,3 +389,47 @@ SUITE(testDateTime_Increment)
         }
     }
 }
+
+TEST(testDateTime_isSameIonexDay)
+{
+    // simple, all on the same day, only time is different
+    {
+        bnav::DateTime dt1(bnav::TimeSystem::BDT, "20100101T000000");
+        bnav::DateTime dt2(bnav::TimeSystem::BDT, "20100101T010000");
+        bnav::DateTime dt3(bnav::TimeSystem::BDT, "20100101T235959");
+        CHECK(dt1.isSameIonexDay(dt2));
+        CHECK(dt1.isSameIonexDay(dt3));
+        CHECK(dt2.isSameIonexDay(dt1));
+        CHECK(dt2.isSameIonexDay(dt3));
+        CHECK(dt3.isSameIonexDay(dt1));
+        CHECK(dt3.isSameIonexDay(dt2));
+    }
+    // case 00:00, should be same day, if day = day + 1
+    {
+        bnav::DateTime dt0(bnav::TimeSystem::BDT, "20091231T000000");
+        bnav::DateTime dt1(bnav::TimeSystem::BDT, "20100101T000000");
+        bnav::DateTime dt2(bnav::TimeSystem::BDT, "20100102T000000");
+        bnav::DateTime dt3(bnav::TimeSystem::BDT, "20100102T010000");
+        // year change
+        CHECK(dt0.isSameIonexDay(dt1));
+        CHECK(!dt1.isSameIonexDay(dt0));
+
+        // day change
+        CHECK(dt1.isSameIonexDay(dt2));
+        CHECK(!dt1.isSameIonexDay(dt3));
+
+        CHECK(dt2.isSameIonexDay(dt3));
+    }
+    // different dates
+    {
+        bnav::DateTime dt1(bnav::TimeSystem::BDT, "20110101T000000");
+        bnav::DateTime dt2(bnav::TimeSystem::BDT, "20100101T000000");
+        bnav::DateTime dt3(bnav::TimeSystem::BDT, "20090101T000000");
+        CHECK(!dt1.isSameIonexDay(dt2));
+        CHECK(!dt2.isSameIonexDay(dt1));
+        CHECK(!dt1.isSameIonexDay(dt3));
+        CHECK(!dt3.isSameIonexDay(dt1));
+        CHECK(!dt2.isSameIonexDay(dt3));
+        CHECK(!dt3.isSameIonexDay(dt2));
+    }
+}
