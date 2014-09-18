@@ -75,6 +75,17 @@ void SubframeBufferD2::addSubframe(const Subframe &sf)
                   << m_buffer[fraid - 1].back().getPageNum()
                   << ") for Subframe " << fraid << " at SOW "
                   << sow << "!" << std::endl;
+
+        if (fraid == 1)
+        {
+            std::cout << "SubframeBuffer: Auto clear of incomplete ephemeris data set" << std::endl;
+            clearEphemerisData();
+        }
+        if (fraid == 5)
+        {
+            std::cout << "SubframeBuffer: Auto clear of incomplete alamanac data set" << std::endl;
+            clearAlmanacData();
+        }
     }
 
     m_buffer[fraid - 1].push_back(sf);

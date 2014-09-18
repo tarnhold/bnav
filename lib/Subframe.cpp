@@ -289,7 +289,7 @@ void Subframe::parsePageNumD2()
     }
     catch (const std::invalid_argument &e)
     {
-        std::cout << "Subframe: Pnum (" << e.what() << ") not in range!" << std::endl;
+        std::cout << "Subframe: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
         m_pageNum = UINT32_MAX;
     }
 
