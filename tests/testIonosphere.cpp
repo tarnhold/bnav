@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-SUITE(testIonosphere)
+SUITE(testIonoGridInfo)
 {
     // Test empty contructor and max/min allowed values
     TEST(testIonoGridInfoCtorEmpty)
@@ -55,6 +55,64 @@ SUITE(testIonosphere)
         igp.load(bits);
         CHECK(igp.getVerticalDelay_TECU() == 3840);
         CHECK(igp.getGive_TECU() == 907);
+    }
+
+    TEST(testIonoGridInfo_Constructor)
+    {
+        // vertdelay, rms
+        {
+            {
+                bnav::IonoGridInfo igi(0);
+                CHECK(igi.getVerticalDelay_TECU() == 0);
+                CHECK(igi.getGive_TECU() == 0);
+            }
+            {
+                bnav::IonoGridInfo igi(9999);
+                CHECK(igi.getVerticalDelay_TECU() == 9999);
+                CHECK(igi.getGive_TECU() == 0);
+            }
+            {
+                bnav::IonoGridInfo igi(20, 99);
+                CHECK(igi.getVerticalDelay_TECU() == 20);
+                CHECK(igi.getGive_TECU() == 99);
+            }
+            {
+                bnav::IonoGridInfo igi(9999, 9999);
+                CHECK(igi.getVerticalDelay_TECU() == 9999);
+                CHECK(igi.getGive_TECU() == 9999);
+            }
+        }
+    }
+
+    TEST(testIonoGridInfo_load)
+    {
+        // vertdelay, rms
+        {
+            bnav::IonoGridInfo igi;
+            igi.load(9999);
+            CHECK(igi.getVerticalDelay_TECU() == 9999);
+            CHECK(igi.getGive_TECU() == 0);
+            igi.load(0, 9999);
+            CHECK(igi.getVerticalDelay_TECU() == 0);
+            CHECK(igi.getGive_TECU() == 9999);
+            igi.load(345, 678);
+            CHECK(igi.getVerticalDelay_TECU() == 345);
+            CHECK(igi.getGive_TECU() == 678);
+        }
+        // TODO: NavBits
+    }
+
+    TEST(testIonoGridInfo_setVerticalDelay)
+    {
+        bnav::IonoGridInfo igi(100, 101);
+        CHECK(igi.getVerticalDelay_TECU() == 100);
+        CHECK(igi.getGive_TECU() == 101);
+        igi.setVerticalDelay_TECU(9999);
+        CHECK(igi.getVerticalDelay_TECU() == 9999);
+        CHECK(igi.getGive_TECU() == 101);
+        igi.setVerticalDelay_TECU(0);
+        CHECK(igi.getVerticalDelay_TECU() == 0);
+        CHECK(igi.getGive_TECU() == 101);
     }
 
     // Check if all GIVEI values convert correctly TECU
@@ -102,67 +160,6 @@ SUITE(testIonosphere)
             bnav::IonoGridInfo igp3(bnav::NavBits<13>(0));
             CHECK(!(igp3 == igp1));
         }
-    }
-}
-
-SUITE(testIonoGridInfo)
-{
-    TEST(testIonoGridInfo_Constructor)
-    {
-        // vertdelay, rms
-        {
-            {
-                bnav::IonoGridInfo igi(0);
-                CHECK(igi.getVerticalDelay_TECU() == 0);
-                CHECK(igi.getGive_TECU() == 0);
-            }
-            {
-                bnav::IonoGridInfo igi(20, 99);
-                CHECK(igi.getVerticalDelay_TECU() == 20);
-                CHECK(igi.getGive_TECU() == 99);
-            }
-            {
-                bnav::IonoGridInfo igi(9999, 9999);
-                CHECK(igi.getVerticalDelay_TECU() == 9999);
-                CHECK(igi.getGive_TECU() == 9999);
-            }
-        }
-        // TODO: NavBits
-    }
-
-    TEST(testIonoGridInfo_load)
-    {
-        // vertdelay, rms
-        {
-            bnav::IonoGridInfo igi;
-            igi.load(9999);
-            CHECK(igi.getVerticalDelay_TECU() == 9999);
-            CHECK(igi.getGive_TECU() == 0);
-            igi.load(0, 9999);
-            CHECK(igi.getVerticalDelay_TECU() == 0);
-            CHECK(igi.getGive_TECU() == 9999);
-            igi.load(345, 678);
-            CHECK(igi.getVerticalDelay_TECU() == 345);
-            CHECK(igi.getGive_TECU() == 678);
-        }
-        // TODO: NavBits
-    }
-
-    TEST(testIonoGridInfo_setVerticalDelay)
-    {
-        bnav::IonoGridInfo igi(100, 101);
-        CHECK(igi.getVerticalDelay_TECU() == 100);
-        CHECK(igi.getGive_TECU() == 101);
-        igi.setVerticalDelay_TECU(9999);
-        CHECK(igi.getVerticalDelay_TECU() == 9999);
-        CHECK(igi.getGive_TECU() == 101);
-        igi.setVerticalDelay_TECU(0);
-        CHECK(igi.getVerticalDelay_TECU() == 0);
-        CHECK(igi.getGive_TECU() == 101);
-    }
-
-    TEST(testIonoGridInfo_operatorEqual)
-    {
         // different vertdelay
         {
             bnav::IonoGridInfo igi1(100, 100);
