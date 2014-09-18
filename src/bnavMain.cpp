@@ -221,9 +221,6 @@ void bnavMain::readInputFile()
 
         const bnav::SvID sv(data.getPRN());
 
-        // skip non-GEO SVs
-        //if (!sv.isGeo())
-        //    continue;
         if (limit_to_prn && sv != limit_to_prn.get())
             continue;
 
@@ -306,38 +303,28 @@ void bnavMain::readInputFile()
             const bnav::SubframeBufferParam bdata = sfbuf->flushAlmanacData();
             //std::cout << "almanac complete" << std::endl;
 
-//#if 0
             // only Geos have Ionosphere
             if (sv.isGeo() && weeknum != 0)
             {
+                bnav::Ionosphere iono(bdata, weeknum);
 
-            bnav::Ionosphere iono(bdata, weeknum);
-
-            // diff only for one single prn
-            if (limit_to_prn && sv == limit_to_prn.get() && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
-            {
-//                if (iono_old.hasData())
-//                    iono.diffToModel(iono_old).dump();
-
-                //iono.dump();
-
-                if (limit_to_date && limit_to_date->isSameIonexDay(iono.getDateOfIssue()))
+                // diff only for one single prn
+                if (limit_to_prn && sv == limit_to_prn.get() && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
                 {
-                    std::cout << "add Regional Grid to store for SV: " << sv.getPRN() << " at " << iono.getDateOfIssue().getDateTimeString() << std::endl;
-                    ionostore.addIonosphere(sv, iono);
+//                  if (iono_old.hasData())
+//                      iono.diffToModel(iono_old).dump();
+
+                    //iono.dump();
+
+                    if (limit_to_date && limit_to_date->isSameIonexDay(iono.getDateOfIssue()))
+                    {
+                        std::cout << "add Regional Grid to store for SV: " << sv.getPRN() << " at " << iono.getDateOfIssue().getDateTimeString() << std::endl;
+                        ionostore.addIonosphere(sv, iono);
+                    }
+
+                    iono_old = iono;
                 }
-
-                iono_old = iono;
             }
-
-            //bnav::Ionosphere ionoclone(bdata);
-            //std::cout << (ionoclone == iono) << std::endl;
-
-
-
-            //bnav::Almanac alm(data);
-            }
-//#endif
         }
     }
     reader.close();
