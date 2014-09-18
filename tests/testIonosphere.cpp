@@ -104,3 +104,190 @@ SUITE(testIonosphere)
         }
     }
 }
+
+SUITE(testIonoGridInfo)
+{
+    TEST(testIonoGridInfo_Constructor)
+    {
+        // vertdelay, rms
+        {
+            {
+                bnav::IonoGridInfo igi(0);
+                CHECK(igi.getVerticalDelay_TECU() == 0);
+                CHECK(igi.getGive_TECU() == 0);
+            }
+            {
+                bnav::IonoGridInfo igi(20, 99);
+                CHECK(igi.getVerticalDelay_TECU() == 20);
+                CHECK(igi.getGive_TECU() == 99);
+            }
+            {
+                bnav::IonoGridInfo igi(9999, 9999);
+                CHECK(igi.getVerticalDelay_TECU() == 9999);
+                CHECK(igi.getGive_TECU() == 9999);
+            }
+        }
+        // TODO: NavBits
+    }
+
+    TEST(testIonoGridInfo_load)
+    {
+        // vertdelay, rms
+        {
+            bnav::IonoGridInfo igi;
+            igi.load(9999);
+            CHECK(igi.getVerticalDelay_TECU() == 9999);
+            CHECK(igi.getGive_TECU() == 0);
+            igi.load(0, 9999);
+            CHECK(igi.getVerticalDelay_TECU() == 0);
+            CHECK(igi.getGive_TECU() == 9999);
+            igi.load(345, 678);
+            CHECK(igi.getVerticalDelay_TECU() == 345);
+            CHECK(igi.getGive_TECU() == 678);
+        }
+        // TODO: NavBits
+    }
+
+    TEST(testIonoGridInfo_setVerticalDelay)
+    {
+        bnav::IonoGridInfo igi(100, 101);
+        CHECK(igi.getVerticalDelay_TECU() == 100);
+        CHECK(igi.getGive_TECU() == 101);
+        igi.setVerticalDelay_TECU(9999);
+        CHECK(igi.getVerticalDelay_TECU() == 9999);
+        CHECK(igi.getGive_TECU() == 101);
+        igi.setVerticalDelay_TECU(0);
+        CHECK(igi.getVerticalDelay_TECU() == 0);
+        CHECK(igi.getGive_TECU() == 101);
+    }
+
+    TEST(testIonoGridInfo_operatorEqual)
+    {
+        // different vertdelay
+        {
+            bnav::IonoGridInfo igi1(100, 100);
+            bnav::IonoGridInfo igi2(100, 100);
+            CHECK(igi1 == igi2);
+            igi2.setVerticalDelay_TECU(9999);
+            CHECK(!(igi1 == igi2));
+        }
+        // different rms
+        {
+            bnav::IonoGridInfo igi1(100, 9999);
+            bnav::IonoGridInfo igi2(100, 100);
+            CHECK(!(igi1 == igi2));
+            igi2.load(100, 9999);
+            CHECK(igi1 == igi2);
+        }
+        // all 9999
+        {
+            bnav::IonoGridInfo igi1(9999, 9999);
+            bnav::IonoGridInfo igi2(9999, 9999);
+            CHECK(igi1 == igi2);
+        }
+    }
+
+    TEST(testIonoGridInfo_operatorMinus)
+    {
+        // simple one
+        {
+            bnav::IonoGridInfo igi1(100, 100);
+            bnav::IonoGridInfo igi2(50, 50);
+            bnav::IonoGridInfo igim = igi1 - igi2;
+            CHECK(igim.getVerticalDelay_TECU() == 50);
+            CHECK(igim.getGive_TECU() == 50);
+
+            igim = igi2 - igi1;
+            CHECK(igim.getVerticalDelay_TECU() == 50);
+            CHECK(igim.getGive_TECU() == 50);
+        }
+        // same values
+        {
+            bnav::IonoGridInfo igi1(333, 333);
+            bnav::IonoGridInfo igi2(333, 333);
+            bnav::IonoGridInfo igim = igi1 - igi2;
+            CHECK(igim.getVerticalDelay_TECU() == 0);
+            CHECK(igim.getGive_TECU() == 0);
+
+            igim = igi2 - igi1;
+            CHECK(igim.getVerticalDelay_TECU() == 0);
+            CHECK(igim.getGive_TECU() == 0);
+        }
+        {
+            // first vertdelay 9999
+            {
+                bnav::IonoGridInfo igi1(9999);
+                bnav::IonoGridInfo igi2(100);
+                bnav::IonoGridInfo igim = igi1 - igi2;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 0);
+
+                igim = igi2 - igi1;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 0);
+            }
+            // second vertdelay 9999
+            {
+                bnav::IonoGridInfo igi1(100);
+                bnav::IonoGridInfo igi2(9999);
+                bnav::IonoGridInfo igim = igi1 - igi2;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 0);
+
+                igim = igi2 - igi1;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 0);
+            }
+            // both vertdelay 9999
+            {
+                bnav::IonoGridInfo igi1(9999);
+                bnav::IonoGridInfo igi2(9999);
+                bnav::IonoGridInfo igim = igi1 - igi2;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 0);
+
+                igim = igi2 - igi1;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 0);
+            }
+        }
+        {
+            // first rms 9999
+            {
+                bnav::IonoGridInfo igi1(0, 9999);
+                bnav::IonoGridInfo igi2(0, 20);
+                bnav::IonoGridInfo igim = igi1 - igi2;
+                CHECK(igim.getVerticalDelay_TECU() == 0);
+                CHECK(igim.getGive_TECU() == 9999);
+
+                igim = igi2 - igi1;
+                CHECK(igim.getVerticalDelay_TECU() == 0);
+                CHECK(igim.getGive_TECU() == 9999);
+            }
+            // second rms 9999
+            {
+                bnav::IonoGridInfo igi1(100, 9999);
+                bnav::IonoGridInfo igi2(100, 9999);
+                bnav::IonoGridInfo igim = igi1 - igi2;
+                CHECK(igim.getVerticalDelay_TECU() == 0);
+                CHECK(igim.getGive_TECU() == 9999);
+
+                igim = igi2 - igi1;
+                CHECK(igim.getVerticalDelay_TECU() == 0);
+                CHECK(igim.getGive_TECU() == 9999);
+            }
+            // both rms 9999
+            {
+                bnav::IonoGridInfo igi1(9999, 9999);
+                bnav::IonoGridInfo igi2(9999, 9999);
+                bnav::IonoGridInfo igim = igi1 - igi2;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 9999);
+
+                igim = igi2 - igi1;
+                CHECK(igim.getVerticalDelay_TECU() == 9999);
+                CHECK(igim.getGive_TECU() == 9999);
+            }
+        }
+    }
+}
