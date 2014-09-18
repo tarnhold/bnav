@@ -230,13 +230,26 @@ void Subframe::parsePageNumD1()
     if (m_frameID == 0)
         parseFrameID();
 
-    // for D1, only frame 4 and 5 have Pnum
-    if (m_frameID > 3)
+    // first three frames have no Pnum
+    if (m_frameID > 0 && m_frameID <= 3)
+        m_pageNum = 0;
+
+    try
     {
-        // Pnum
-        NavBits<7> pnum { m_bits.getLeft<43, 7>() };
-        m_pageNum = pnum.to_ulong();
-        assert(m_pageNum > 0 && m_pageNum <= 24);
+        // for D1, only frame 4 and 5 have Pnum
+        if (m_frameID > 3)
+        {
+            // Pnum
+            NavBits<7> pnum { m_bits.getLeft<43, 7>() };
+            m_pageNum = pnum.to_ulong();
+            if (m_pageNum == 0 || m_pageNum > 24)
+                throw std::invalid_argument(std::to_string(m_pageNum));
+        }
+    }
+    catch (const std::invalid_argument &e)
+    {
+        std::cout << "SubframeD1: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
+        m_pageNum = UINT32_MAX;
     }
 
 //    std::cout << "D1: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
@@ -289,7 +302,7 @@ void Subframe::parsePageNumD2()
     }
     catch (const std::invalid_argument &e)
     {
-        std::cout << "Subframe: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
+        std::cout << "SubframeD2: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
         m_pageNum = UINT32_MAX;
     }
 
