@@ -6,7 +6,6 @@
 #include "Ionosphere.h"
 #include "Subframe.h"
 #include "SubframeBuffer.h"
-#include "SvID.h"
 #include "MessageStatistic.h"
 
 #include "DateTime.h"
@@ -60,8 +59,8 @@ bnavMain::bnavMain(int argc, char *argv[])
     , generateGlobalKlobuchar(false)
     , limit_to_interval_regional(0)
     , limit_to_interval_klobuchar(0)
-    , limit_to_prn(UINT32_MAX)
-    , limit_to_date(boost::optional<bnav::DateTime>())
+    , limit_to_prn(boost::optional<SvID>())
+    , limit_to_date(boost::optional<DateTime>())
     , sbstore()
     , ionostore()
     , ionostoreKlobuchar()
@@ -111,7 +110,7 @@ bnavMain::bnavMain(int argc, char *argv[])
         {
             std::vector<std::size_t> svlist = vm["sv"].as< std::vector<std::size_t> >();
             assert(svlist.size() == 1); // atm we can only choose one element
-            limit_to_prn = svlist[0];
+            limit_to_prn = SvID(svlist[0]);
         }
         if (vm.count("global"))
         {
@@ -193,9 +192,9 @@ bnavMain::bnavMain(int argc, char *argv[])
         }
     }
 
-    // would be better with boost::optional...
     if (limit_to_date_str.empty())
         throw std::runtime_error("Please limit to a specific day!");
+
     limit_to_date = bnav::DateTime(bnav::TimeSystem::BDT, limit_to_date_str + "T000000");
     std::cout << "Limiting date to: " << limit_to_date->getISODate() << std::endl;
 }
@@ -225,7 +224,7 @@ void bnavMain::readInputFile()
         // skip non-GEO SVs
         //if (!sv.isGeo())
         //    continue;
-        if (limit_to_prn != UINT32_MAX && sv.getPRN() != limit_to_prn)
+        if (limit_to_prn && sv != limit_to_prn.get())
             continue;
 
         bnav::Subframe sf(sv, data.getBits());
@@ -236,7 +235,6 @@ void bnavMain::readInputFile()
             const bnav::DateTime bdt = bnav::DateTime(bnav::TimeSystem::BDT, weeknum, sf.getSOW());
             msgstat.add(sv, bdt);
         }
-
 
 #if 0
         // debug
@@ -269,7 +267,7 @@ void bnavMain::readInputFile()
             // FIXME: we take only PRN 2 data here, if we would like to
             // replace missing data of prn 2 with other geos we have to
             // think about IonosphereStore, which stores in depending on SvID!
-            if (limit_to_prn != UINT32_MAX && sv.getPRN() == limit_to_prn && intervalCount != intervalCountOld)
+            if (limit_to_prn && sv == limit_to_prn.get() && intervalCount != intervalCountOld)
             {
                 intervalCountOld = intervalCount;
                 bnav::KlobucharParam klob = eph.getKlobucharParam();
@@ -316,7 +314,7 @@ void bnavMain::readInputFile()
             bnav::Ionosphere iono(bdata, weeknum);
 
             // diff only for one single prn
-            if (limit_to_prn != UINT32_MAX && sv.getPRN() == limit_to_prn && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
+            if (limit_to_prn && sv == limit_to_prn.get() && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
             {
 //                if (iono_old.hasData())
 //                    iono.diffToModel(iono_old).dump();
@@ -354,44 +352,43 @@ void bnavMain::readInputFile()
     msgstat.dump();
 
     // works only with one sv selected at the moment
-if (limit_to_prn != UINT32_MAX)
-{
-    const bnav::SvID svlim(limit_to_prn);
-    if (ionostore.hasDataForSv(svlim))
+    if (limit_to_prn)
     {
-        ionostore.dumpGridAvailability(svlim);
+        if (ionostore.hasDataForSv(limit_to_prn.get()))
+        {
+            ionostore.dumpGridAvailability(limit_to_prn.get());
 
-        if (!filenameIonexRegional.empty())
-            writeIonexFile(filenameIonexRegional, limit_to_interval_regional, false);
-    }
-    else
-    {
-        std::cout << "No data in Regional Grid store. No Ionex output." << std::endl;
-    }
+            if (!filenameIonexRegional.empty())
+                writeIonexFile(filenameIonexRegional, limit_to_interval_regional, false);
+        }
+        else
+        {
+            std::cout << "No data in Regional Grid store. No Ionex output." << std::endl;
+        }
 
-    if (ionostoreKlobuchar.hasDataForSv(svlim))
-    {
-        if (!filenameIonexKlobuchar.empty())
-            writeIonexFile(filenameIonexKlobuchar, limit_to_interval_klobuchar, true);
+        if (ionostoreKlobuchar.hasDataForSv(limit_to_prn.get()))
+        {
+            if (!filenameIonexKlobuchar.empty())
+                writeIonexFile(filenameIonexKlobuchar, limit_to_interval_klobuchar, true);
+        }
+        else
+        {
+            std::cout << "No data in Klobuchar store. No Ionex output." << std::endl;
+        }
     }
-    else
-    {
-        std::cout << "No data in Klobuchar store. No Ionex output." << std::endl;
-    }
-}
 }
 
 void bnavMain::writeIonexFile(const std::string &filename, const std::size_t interval, const bool klobuchar)
 {
     std::cout << "Writing Ionex file: " << filename << std::endl;
-    assert(limit_to_prn < UINT32_MAX); // atm we can only store data from one prn
+    assert(limit_to_prn); // atm we can only store data from one prn
     // overwrites without warnings
     bnav::IonexWriter writer(filename, interval, klobuchar);
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());
 
     // write all models from prn
-    const auto prn2data = klobuchar ? ionostoreKlobuchar.getItemsBySv(bnav::SvID(limit_to_prn)) : ionostore.getItemsBySv(bnav::SvID(limit_to_prn));
+    const auto prn2data = klobuchar ? ionostoreKlobuchar.getItemsBySv(limit_to_prn.get()) : ionostore.getItemsBySv(limit_to_prn.get());
     writer.writeAll(prn2data);
     writer.close();
 }

@@ -4,6 +4,7 @@
 #include "AsciiReader.h"
 #include "IonosphereStore.h"
 #include "SubframeBufferStore.h"
+#include "SvID.h"
 
 #include <string>
 
@@ -22,7 +23,7 @@ class bnavMain
     bool generateGlobalKlobuchar;
     std::size_t limit_to_interval_regional;
     std::size_t limit_to_interval_klobuchar;
-    std::size_t limit_to_prn;
+    boost::optional<SvID> limit_to_prn;
     boost::optional<DateTime> limit_to_date;
 
     bnav::SubframeBufferStore sbstore;

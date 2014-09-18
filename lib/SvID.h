@@ -25,6 +25,8 @@ public:
     uint32_t getPRN() const;
 
     bool operator<(const SvID &rhs) const;
+    bool operator==(const SvID &rhs) const;
+    bool operator!=(const SvID &rhs) const;
 
     bool isGeo() const;
     // maybe implement:
