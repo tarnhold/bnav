@@ -289,11 +289,11 @@ void bnavMain::readInputFile()
                     bnav::Ionosphere ionoklob(klob, ephdate, generateGlobalKlobuchar);
 
                     std::cout << klob << std::endl;
-                    ionoklob.dump();
+                    //ionoklob.dump();
 
                     if (limit_to_date.isSameIonexDay(ionoklob.getDateOfIssue()))
                     {
-                        std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << std::endl;
+                        std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << " at " << ionoklob.getDateOfIssue().getDateTimeString() << std::endl;
                         ionostoreKlobuchar.addIonosphere(sv, ionoklob);
                     }
 
@@ -319,11 +319,11 @@ void bnavMain::readInputFile()
 //                if (iono_old.hasData())
 //                    iono.diffToModel(iono_old).dump();
 
-                iono.dump();
+                //iono.dump();
 
                 if (limit_to_date.isSameIonexDay(iono.getDateOfIssue()))
                 {
-                    std::cout << "add Regional Grid to store for SV: " << sv.getPRN() << std::endl;
+                    std::cout << "add Regional Grid to store for SV: " << sv.getPRN() << " at " << iono.getDateOfIssue().getDateTimeString() << std::endl;
                     ionostore.addIonosphere(sv, iono);
                 }
 
@@ -384,8 +384,6 @@ void bnavMain::writeIonexFile(const std::string &filename, const std::size_t int
     std::cout << "Writing Ionex file: " << filename << std::endl;
     assert(limit_to_prn < UINT32_MAX); // atm we can only store data from one prn
     // overwrites without warnings
-    //std::string ionexfilename = station + dtfilename.getISODate() + ".inx";
-    //std::cout << ionexfilename << std::endl;
     bnav::IonexWriter writer(filename, interval, klobuchar);
     if (!writer.isOpen())
         std::perror(("Error: Could not open file: " + filename).c_str());

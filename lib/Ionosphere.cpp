@@ -616,7 +616,7 @@ bool Ionosphere::operator==(const Ionosphere &iono) const
  */
 void Ionosphere::dump(bool rms)
 {
-    std::cout << "DoI: " << m_datetime.getSOW() << std::endl;
+    std::cout << "DoI: " << m_datetime.getDateTimeString() << " (" << m_datetime.getSOW() << ")" << std::endl;
 
     std::size_t rowcount = m_griddim.getItemCountLatitude();
     std::size_t colcount = m_griddim.getItemCountLongitude();

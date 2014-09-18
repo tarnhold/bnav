@@ -301,6 +301,7 @@ void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
     bool firstrun { true };
     for (auto it = data.begin(); it != data.end(); ++it)
     {
+        std::cout << "=> Writing: " << it->second.getDateOfIssue().getDateTimeString() << std::endl;
         if (firstrun)
         {
            lastsec = it->second.getDateOfIssue().getSOW();
