@@ -16,7 +16,7 @@ int main(int argc, char **argv)
         bnav::bnavMain om(argc, argv);
         om.readInputFile();
     }
-    catch (std::runtime_error &e)
+    catch (const std::runtime_error &e)
     {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
