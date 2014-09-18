@@ -154,19 +154,19 @@ bnavMain::bnavMain(int argc, char *argv[])
             //FIXME: maybe try to parse the date and catch exceptions
         }
     }
-    catch (boost::program_options::too_many_positional_options_error &)
+    catch (const boost::program_options::too_many_positional_options_error &)
     {
         std::stringstream msg;
         msg << "Error: Only one input file allowed." << std::endl << std::endl << desc;
         throw std::runtime_error(msg.str());
     }
-    catch (boost::program_options::error &e)
+    catch (const boost::program_options::error &e)
     {
         std::stringstream msg;
         msg << "Error: " << e.what() << std::endl << std::endl << desc;
         throw std::runtime_error(msg.str());
     }
-    catch (std::invalid_argument &e)
+    catch (const std::invalid_argument &e)
     {
         std::stringstream msg;
         msg << "Error: " << e.what();
@@ -193,6 +193,9 @@ bnavMain::bnavMain(int argc, char *argv[])
         }
     }
 
+    // would be better with boost::optional...
+    if (limit_to_date_str.empty())
+        throw std::runtime_error("Please limit to a specific day!");
     limit_to_date.setTimeSystem(bnav::TimeSystem::BDT);
     limit_to_date.setISODateTime(limit_to_date_str + "T000000");
     std::cout << "Limiting date to: " << limit_to_date.getISODate() << std::endl;
