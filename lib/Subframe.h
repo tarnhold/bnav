@@ -36,6 +36,7 @@ public:
     std::size_t getParityModifiedCount() const;
 
     void setSvID(const SvID &sv);
+    void setPageNum(const std::size_t pnum);
 
     void initialize();
 

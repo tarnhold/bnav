@@ -28,9 +28,9 @@ namespace bnav
 
 Subframe::Subframe()
     : m_bits()
-    , m_sow(0)
-    , m_frameID(0)
-    , m_pageNum(0)
+    , m_sow(UINT32_MAX)
+    , m_frameID(UINT32_MAX)
+    , m_pageNum(UINT32_MAX)
     , m_isGeo(false)
     , m_isParityFixed(false)
     , m_ParityModifiedCount(0)
@@ -40,9 +40,9 @@ Subframe::Subframe()
 
 Subframe::Subframe(const SvID &sv, const NavBits<300> &bits)
     : m_bits(bits)
-    , m_sow(0)
-    , m_frameID(0)
-    , m_pageNum(0)
+    , m_sow(UINT32_MAX)
+    , m_frameID(UINT32_MAX)
+    , m_pageNum(UINT32_MAX)
     , m_isGeo(sv.isGeo())
     , m_isParityFixed(false)
     , m_ParityModifiedCount(0)
@@ -99,6 +99,11 @@ NavBits<300> Subframe::getBits() const
 void Subframe::setSvID(const SvID &sv)
 {
     m_isGeo = sv.isGeo();
+}
+
+void Subframe::setPageNum(const std::size_t pnum)
+{
+    m_pageNum = pnum;
 }
 
 uint32_t Subframe::getSOW() const
@@ -248,29 +253,44 @@ void Subframe::parsePageNumD2()
     if (m_frameID == 0)
         parseFrameID();
 
+    try
+    {
     if (m_frameID == 1)
     {
         // Pnum1
         NavBits<4> pnum { m_bits.getLeft<42, 4>() };
         m_pageNum = pnum.to_ulong();
-        assert(m_pageNum > 0 && m_pageNum <= 10);
+        if (m_pageNum == 0 || m_pageNum > 10)
+            throw std::invalid_argument(std::to_string(m_pageNum));
     }
     // frameID 3 and 4 have no Pnum, they use that from FrameID 2
     // as those frames only contain integrity information, which is
     // not handled by this program, we ignore this detail.
+    else if (m_frameID == 3 || m_frameID == 4)
+    {
+        m_pageNum = 0;
+    }
     else if (m_frameID == 2)
     {
         // Pnum2
         NavBits<4> pnum { m_bits.getLeft<43, 4>() };
         m_pageNum = pnum.to_ulong();
-        assert(m_pageNum > 0 && m_pageNum <= 6);
+        if (m_pageNum == 0 || m_pageNum > 6)
+            throw std::invalid_argument(std::to_string(m_pageNum));
     }
     else if (m_frameID == 5)
     {
         // Pnum
         NavBits<7> pnum { m_bits.getLeft<43, 7>() };
         m_pageNum = pnum.to_ulong();
-        assert(m_pageNum > 0 && m_pageNum <= 120);
+        if (m_pageNum == 0 || m_pageNum > 120)
+            throw std::invalid_argument(std::to_string(m_pageNum));
+    }
+    }
+    catch (const std::invalid_argument &e)
+    {
+        std::cout << "Subframe: Pnum (" << e.what() << ") not in range!" << std::endl;
+        m_pageNum = UINT32_MAX;
     }
 
 //    std::cout << "D2: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
