@@ -3,39 +3,66 @@
 
 #include "SvID.h"
 
-// empty constructor
-TEST(testSvID)
+SUITE(testSvID)
 {
-    bnav::SvID sv;
-
-    // default should be not valid
-    CHECK(sv.getPRN() == 0);
-    CHECK(!sv.isGeo());
-
-    // check all possible PRNs
-    for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
+    // constructor tests cover: isGeo, getPRN, setPRN
+    // empty constructor
+    TEST(testSvID_Constructor1)
     {
-        sv.setPRN(i);
-        CHECK(sv.getPRN() == i);
+        bnav::SvID sv;
 
-        if (i <= 5)
-            CHECK(sv.isGeo());
-        else
-            CHECK(!sv.isGeo());
+        // default should be not valid
+        CHECK(sv.getPRN() == 0);
+        CHECK(!sv.isGeo());
+
+        // check all possible PRNs
+        for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
+        {
+            sv.setPRN(i);
+            CHECK(sv.getPRN() == i);
+
+            if (i <= 5)
+                CHECK(sv.isGeo());
+            else
+                CHECK(!sv.isGeo());
+        }
     }
-}
 
-TEST(testSvID2)
-{
-    // check all possible PRNs
-    for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
+    TEST(testSvID_Constructor2)
     {
-        bnav::SvID sv(i);
-        CHECK(sv.getPRN() == i);
+        // check all possible PRNs
+        for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
+        {
+            bnav::SvID sv(i);
+            CHECK(sv.getPRN() == i);
 
-        if (i <= 5)
-            CHECK(sv.isGeo());
-        else
-            CHECK(!sv.isGeo());
+            if (i <= 5)
+                CHECK(sv.isGeo());
+            else
+                CHECK(!sv.isGeo());
+        }
+    }
+
+    // both operator== and operator!=
+    TEST(testSvID_operatorEqual)
+    {
+        bnav::SvID sv1(1);
+        bnav::SvID sv2(1);
+        CHECK(sv1 == sv2);
+        CHECK(!(sv1 != sv2));
+        sv1.setPRN(2);
+        CHECK(!(sv1 == sv2));
+        CHECK(sv1 != sv2);
+    }
+
+    TEST(testSvID_operatorLess)
+    {
+        bnav::SvID sv1(1);
+        bnav::SvID sv2(1);
+        CHECK(!(sv1 < sv2));
+        sv2.setPRN(2);
+        CHECK(sv1 < sv2);
+        sv1.setPRN(3);
+        CHECK(!(sv1 < sv2));
     }
 }
