@@ -310,7 +310,14 @@ void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
         else
         {
             // look if we have to fill with fake entries, because there is a data gap
-            std::size_t secdiff = it->second.getDateOfIssue().getSOW() - lastsec;
+            std::size_t sow = it->second.getDateOfIssue().getSOW();
+            // in case there is a week change
+            if (sow == 0)
+            {
+                assert(lastsec + m_interval == SECONDS_OF_A_WEEK);
+                sow = lastsec + m_interval;
+            }
+            std::size_t secdiff = sow - lastsec;
             std::size_t fillcount = secdiff / m_interval;
             assert(secdiff % m_interval == 0);
             // fill one less, because we want to fill "fences" not "fence posts"
