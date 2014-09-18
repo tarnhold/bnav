@@ -64,7 +64,7 @@ static inline std::size_t decodeBCH(const subword &message)
 // Maybe change this to take 15 bits, and ignore last 4 bits,
 // just write parity bits into them. But not this important, because we
 // don't use that at the momment.
-std::size_t encodeBCH(const NavBits<11> &information)
+std::size_t encodeBCH(const bnav::NavBits<11> &information)
 {
     // default state of shift registers is zero
     bool d0 = false, d1 = false, d2 = false, d3 = false;
