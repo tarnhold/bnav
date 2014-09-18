@@ -325,7 +325,11 @@ IonoGridDimension::IonoGridDimension(const double latnorth, const double latsout
     , longitude_east(longeast)
     , longitude_spacing(longspace)
 {
+    assert(latitude_north <= 90.0);
+    assert(latitude_south >= -90.0);
     assert(latitude_north > latitude_south);
+    assert(longitude_west >= -180.0);
+    assert(longitude_east <= 180.0);
     assert(longitude_east > longitude_west);
     assert(latitude_spacing < 0);
     assert(longitude_spacing > 0);
