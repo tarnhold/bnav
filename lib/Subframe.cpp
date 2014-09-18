@@ -138,7 +138,7 @@ bool Subframe::checkAndFixParities()
     {
         // SOW is not this helpful here, because we have an offset between SOW
         // and TOW from sbf file, but better than nothing
-        std::cout << "Parity fixed for SOW: " << m_sow << std::endl;
+        std::cout << "Subframe: Parity fixed for SOW: " << m_sow << std::endl;
         m_bits.setLeft(15, ecc1.getBits());
         m_ParityModifiedCount += ecc1.getModifiedCount();
     }
@@ -255,37 +255,37 @@ void Subframe::parsePageNumD2()
 
     try
     {
-    if (m_frameID == 1)
-    {
-        // Pnum1
-        NavBits<4> pnum { m_bits.getLeft<42, 4>() };
-        m_pageNum = pnum.to_ulong();
-        if (m_pageNum == 0 || m_pageNum > 10)
-            throw std::invalid_argument(std::to_string(m_pageNum));
-    }
-    // frameID 3 and 4 have no Pnum, they use that from FrameID 2
-    // as those frames only contain integrity information, which is
-    // not handled by this program, we ignore this detail.
-    else if (m_frameID == 3 || m_frameID == 4)
-    {
-        m_pageNum = 0;
-    }
-    else if (m_frameID == 2)
-    {
-        // Pnum2
-        NavBits<4> pnum { m_bits.getLeft<43, 4>() };
-        m_pageNum = pnum.to_ulong();
-        if (m_pageNum == 0 || m_pageNum > 6)
-            throw std::invalid_argument(std::to_string(m_pageNum));
-    }
-    else if (m_frameID == 5)
-    {
-        // Pnum
-        NavBits<7> pnum { m_bits.getLeft<43, 7>() };
-        m_pageNum = pnum.to_ulong();
-        if (m_pageNum == 0 || m_pageNum > 120)
-            throw std::invalid_argument(std::to_string(m_pageNum));
-    }
+        if (m_frameID == 1)
+        {
+            // Pnum1
+            NavBits<4> pnum { m_bits.getLeft<42, 4>() };
+            m_pageNum = pnum.to_ulong();
+            if (m_pageNum == 0 || m_pageNum > 10)
+                throw std::invalid_argument(std::to_string(m_pageNum));
+        }
+        // frameID 3 and 4 have no Pnum, they use that from FrameID 2
+        // as those frames only contain integrity information, which is
+        // not handled by this program, we ignore this detail.
+        else if (m_frameID == 3 || m_frameID == 4)
+        {
+            m_pageNum = 0;
+        }
+        else if (m_frameID == 2)
+        {
+            // Pnum2
+            NavBits<4> pnum { m_bits.getLeft<43, 4>() };
+            m_pageNum = pnum.to_ulong();
+            if (m_pageNum == 0 || m_pageNum > 6)
+                throw std::invalid_argument(std::to_string(m_pageNum));
+        }
+        else if (m_frameID == 5)
+        {
+            // Pnum
+            NavBits<7> pnum { m_bits.getLeft<43, 7>() };
+            m_pageNum = pnum.to_ulong();
+            if (m_pageNum == 0 || m_pageNum > 120)
+                throw std::invalid_argument(std::to_string(m_pageNum));
+        }
     }
     catch (const std::invalid_argument &e)
     {
