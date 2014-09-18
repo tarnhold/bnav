@@ -25,9 +25,9 @@ namespace
  * @param fullfilename Full filename.
  * @return Date as string.
  */
-std::string lcl_extractDateStringFromIGSFilename(const std::string &fullfilename)
+boost::optional<std::string> lcl_extractDateStringFromIGSFilename(const std::string &fullfilename)
 {
-    std::string filename;
+    boost::optional<std::string> filename;
     const std::size_t lastslash = fullfilename.find_last_of('/');
 
     // remove dir parts: dir/filename.ext
@@ -37,14 +37,14 @@ std::string lcl_extractDateStringFromIGSFilename(const std::string &fullfilename
     // CUT12014071324.sbf_SBF_CMPRaw.txt
     boost::regex expr("^[A-Z]{3}[A-Z0-9]([0-9]{8})24\\.");
     // we want only group one
-    boost::sregex_token_iterator it(filename.begin(), filename.end(), expr, {1});
+    boost::sregex_token_iterator it(filename->begin(), filename->end(), expr, {1});
     boost::sregex_token_iterator end;
 
     if (it != end)
-        return it->str();
+        filename = it->str();
 
-    // nothing matched
-    return "";
+    // if nothing matched, optional is null
+    return filename;
 }
 
 }
@@ -61,7 +61,7 @@ bnavMain::bnavMain(int argc, char *argv[])
     , limit_to_interval_regional(0)
     , limit_to_interval_klobuchar(0)
     , limit_to_prn(UINT32_MAX)
-    , limit_to_date()
+    , limit_to_date(boost::optional<bnav::DateTime>())
     , sbstore()
     , ionostore()
     , ionostoreKlobuchar()
@@ -185,20 +185,19 @@ bnavMain::bnavMain(int argc, char *argv[])
         // extract date from filename, so we have a clue which data we want
         // to extract from the file (it's possible that there is more than
         // one day data inside the file.
-        std::string igsdate = lcl_extractDateStringFromIGSFilename(filenameInput);
-        if (!igsdate.empty())
+        boost::optional<std::string> igsdate = lcl_extractDateStringFromIGSFilename(filenameInput);
+        if (igsdate)
         {
-            limit_to_date_str = igsdate;
-            std::cout << "Date limit from IGS filename: " << igsdate << std::endl;
+            limit_to_date_str = igsdate.get();
+            std::cout << "Date limit from IGS filename: " << limit_to_date_str << std::endl;
         }
     }
 
     // would be better with boost::optional...
     if (limit_to_date_str.empty())
         throw std::runtime_error("Please limit to a specific day!");
-    limit_to_date.setTimeSystem(bnav::TimeSystem::BDT);
-    limit_to_date.setISODateTime(limit_to_date_str + "T000000");
-    std::cout << "Limiting date to: " << limit_to_date.getISODate() << std::endl;
+    limit_to_date = bnav::DateTime(bnav::TimeSystem::BDT, limit_to_date_str + "T000000");
+    std::cout << "Limiting date to: " << limit_to_date->getISODate() << std::endl;
 }
 
 void bnavMain::readInputFile()
@@ -294,7 +293,7 @@ void bnavMain::readInputFile()
                     std::cout << klob << std::endl;
                     //ionoklob.dump();
 
-                    if (limit_to_date.isSameIonexDay(ionoklob.getDateOfIssue()))
+                    if (limit_to_date && limit_to_date->isSameIonexDay(ionoklob.getDateOfIssue()))
                     {
                         std::cout << "add Klobuchar to store for SV: " << sv.getPRN() << " at " << ionoklob.getDateOfIssue().getDateTimeString() << std::endl;
                         ionostoreKlobuchar.addIonosphere(sv, ionoklob);
@@ -324,7 +323,7 @@ void bnavMain::readInputFile()
 
                 //iono.dump();
 
-                if (limit_to_date.isSameIonexDay(iono.getDateOfIssue()))
+                if (limit_to_date && limit_to_date->isSameIonexDay(iono.getDateOfIssue()))
                 {
                     std::cout << "add Regional Grid to store for SV: " << sv.getPRN() << " at " << iono.getDateOfIssue().getDateTimeString() << std::endl;
                     ionostore.addIonosphere(sv, iono);
