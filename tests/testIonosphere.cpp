@@ -13,7 +13,7 @@
 SUITE(testIonoGridInfo)
 {
     // Test empty contructor and max/min allowed values
-    TEST(testIonoGridInfoCtorEmpty)
+    TEST(testIonoGridInfo_ConstructorEmpty)
     {
         bnav::NavBits<13> bits("0000000000000");
         bnav::IonoGridInfo igp;
@@ -38,7 +38,7 @@ SUITE(testIonoGridInfo)
     }
 
     // Test constructor
-    TEST(testIonoGridInfoCtor)
+    TEST(testIonoGridInfo_ConstructorNavBits)
     {
         bnav::NavBits<13> bits("0000000010001");
         bnav::IonoGridInfo igp(bits);
@@ -57,30 +57,28 @@ SUITE(testIonoGridInfo)
         CHECK(igp.getGive_TECU() == 907);
     }
 
-    TEST(testIonoGridInfo_Constructor)
+    TEST(testIonoGridInfo_ConstructorVDRMS)
     {
         // vertdelay, rms
         {
-            {
-                bnav::IonoGridInfo igi(0);
-                CHECK(igi.getVerticalDelay_TECU() == 0);
-                CHECK(igi.getGive_TECU() == 0);
-            }
-            {
-                bnav::IonoGridInfo igi(9999);
-                CHECK(igi.getVerticalDelay_TECU() == 9999);
-                CHECK(igi.getGive_TECU() == 0);
-            }
-            {
-                bnav::IonoGridInfo igi(20, 99);
-                CHECK(igi.getVerticalDelay_TECU() == 20);
-                CHECK(igi.getGive_TECU() == 99);
-            }
-            {
-                bnav::IonoGridInfo igi(9999, 9999);
-                CHECK(igi.getVerticalDelay_TECU() == 9999);
-                CHECK(igi.getGive_TECU() == 9999);
-            }
+            bnav::IonoGridInfo igi(0);
+            CHECK(igi.getVerticalDelay_TECU() == 0);
+            CHECK(igi.getGive_TECU() == 0);
+        }
+        {
+            bnav::IonoGridInfo igi(9999);
+            CHECK(igi.getVerticalDelay_TECU() == 9999);
+            CHECK(igi.getGive_TECU() == 0);
+        }
+        {
+            bnav::IonoGridInfo igi(20, 99);
+            CHECK(igi.getVerticalDelay_TECU() == 20);
+            CHECK(igi.getGive_TECU() == 99);
+        }
+        {
+            bnav::IonoGridInfo igi(9999, 9999);
+            CHECK(igi.getVerticalDelay_TECU() == 9999);
+            CHECK(igi.getGive_TECU() == 9999);
         }
     }
 
@@ -99,7 +97,6 @@ SUITE(testIonoGridInfo)
             CHECK(igi.getVerticalDelay_TECU() == 345);
             CHECK(igi.getGive_TECU() == 678);
         }
-        // TODO: NavBits
     }
 
     TEST(testIonoGridInfo_setVerticalDelay)
@@ -115,6 +112,31 @@ SUITE(testIonoGridInfo)
         CHECK(igi.getGive_TECU() == 101);
     }
 
+    // Check if all Vertical Delay values convert correctly TECU
+    TEST(testIonoGridInfoVerticalDelayTable)
+    {
+        bnav::NavBits<13> bits(0);
+        bnav::IonoGridInfo igp;
+
+        // Vert delay has 9 bits, this means 512 possible values
+        for (std::size_t i = 0; i <= 511; ++i)
+        {
+            // Vertical delay: steps are 7.55902e-01 TECU
+            double vertdelay = i * 7.55902;
+            if (i >= 510)
+                vertdelay = 9999.0;
+
+            bits = bnav::NavBits<13>(i);
+            // move 4 left, because we set only 9 bits maximum
+            // vertical delay is left of givei bits
+            bits <<= 4;
+            igp.load(bits);
+            CHECK(igp.getVerticalDelay_TECU() == static_cast<uint32_t>(std::lround(vertdelay)));
+            // GIVEI 0 is 0.3 [m] which are 18e-1 TECU
+            CHECK(igp.getGive_TECU() == 18);
+        }
+    }
+
     // Check if all GIVEI values convert correctly TECU
     TEST(testIonoGridInfoGIVEITable)
     {
@@ -125,6 +147,7 @@ SUITE(testIonoGridInfo)
         constexpr uint32_t givei_values[] = {18, 36, 54, 73, 91, 109, 127, 145, 163,
                                          181, 218, 272, 363, 544, 907, 9999};
 
+        // GIVEI has 4 bits, this means 16 possible values
         for (std::size_t i = 0; i <= 15; ++i)
         {
             bits = bnav::NavBits<13>(i);
