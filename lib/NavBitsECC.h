@@ -103,7 +103,7 @@ private:
 public:
     NavBitsECCWord(const NavBits<len> &bits);
 
-    NavBits<len> getBits();
+    NavBits<len> getBits() const;
 
     bool isModified() const;
     std::size_t getModifiedCount() const;
@@ -111,7 +111,7 @@ public:
 private:
     void checkAndFixAllSubwords();
     void splitWordToSubword();
-    std::string mergeSubwordsToWord();
+    std::string mergeSubwordsToWord() const;
 
     bool checkAndFixSubword(subword &message);
 
@@ -171,8 +171,8 @@ void NavBitsECCWord<len>::splitWordToSubword()
 
     for (std::size_t i = 0; i < num; ++i)
     {
-        std::size_t startinfo { 11*i };
-        std::size_t startpar { 11*num + 4*i };
+        const std::size_t startinfo { 11*i };
+        const std::size_t startpar { 11*num + 4*i };
 
         NavBits<15> submessage;
 
@@ -195,16 +195,16 @@ void NavBitsECCWord<len>::splitWordToSubword()
  * TODO: don't use to_string()!
  */
 template <std::size_t len>
-std::string NavBitsECCWord<len>::mergeSubwordsToWord()
+std::string NavBitsECCWord<len>::mergeSubwordsToWord() const
 {
     // merge msg list back to original message
     // only if some parity bits were fixed!
     std::string info;
     std::string parity;
 
-    for (std::vector< subword >::iterator it = m_msglist.begin(); it != m_msglist.end(); ++it)
+    for (const auto item : m_msglist)
     {
-        std::string msgstr = it->to_string();
+        const std::string msgstr = item.to_string();
         //std::cerr << "blob: " <<msgstr << " : "<< msgstr.substr(0, 11) << " - " << msgstr.substr(11) << std::endl;
         info += msgstr.substr(0, 11);
         parity += msgstr.substr(11);
@@ -219,12 +219,12 @@ std::string NavBitsECCWord<len>::mergeSubwordsToWord()
 template <std::size_t len>
 bool NavBitsECCWord<len>::checkAndFixSubword(subword &message)
 {
-    std::size_t idx { decodeBCH(message) };
+    const std::size_t idx { decodeBCH(message) };
 
     // fix parity
     if (idx > 0)
     {
-        subword fixed { message ^ NavBits<15>(cROMTable[idx]) };
+        const subword fixed { message ^ NavBits<15>(cROMTable[idx]) };
         ++m_counter;
 
 #if 0
@@ -252,9 +252,9 @@ void NavBitsECCWord<len>::checkAndFixAllSubwords()
 }
 
 template <std::size_t len>
-NavBits<len> NavBitsECCWord<len>::getBits()
+NavBits<len> NavBitsECCWord<len>::getBits() const
 {
-    std::string merge { mergeSubwordsToWord() };
+    const std::string merge { mergeSubwordsToWord() };
 
     return NavBits<len>(merge);
 }
