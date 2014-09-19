@@ -1,8 +1,8 @@
 #ifndef BEIDOU_H
 #define BEIDOU_H
 
+#include <cstdint>
 #include <iostream>
-#include <stdint.h>
 
 namespace bnav
 {

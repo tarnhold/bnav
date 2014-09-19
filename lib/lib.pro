@@ -22,7 +22,8 @@ SOURCES += \
     Ephemeris.cpp \
     DateTime.cpp \
     IonexWriter.cpp \
-    MessageStatistic.cpp
+    MessageStatistic.cpp \
+    IonosphereGridInfo.cpp
 
 HEADERS += \
     AsciiReader.h \
@@ -41,5 +42,6 @@ HEADERS += \
     Ephemeris.h \
     DateTime.h \
     IonexWriter.h \
-    MessageStatistic.h
+    MessageStatistic.h \
+    IonosphereGridInfo.h
 
