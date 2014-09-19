@@ -29,7 +29,7 @@ public:
     boost::optional< std::map<DateTime, Ionosphere> > getItemsBySv(const SvID &sv) const;
     boost::optional< Ionosphere > getIonosphere(const SvID &sv, const DateTime &datetime) const;
 
-    void dumpStoreStatistics(const std::string name) const;
+    void dumpStoreStatistics(const std::string &name) const;
     void dumpGridAvailability(const SvID &sv) const;
 };
 

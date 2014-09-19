@@ -85,7 +85,7 @@ boost::optional<Ionosphere> IonosphereStore::getIonosphere(const SvID &sv, const
     return ion;
 }
 
-void IonosphereStore::dumpStoreStatistics(const std::string name) const
+void IonosphereStore::dumpStoreStatistics(const std::string &name) const
 {
     std::cout << "IonosphereStore statistics: " << name << std::endl;
 
