@@ -50,7 +50,7 @@ struct KlobucharParam
         return ret;
     }
 
-    bool operator==(const KlobucharParam &rhs)
+    bool operator==(const KlobucharParam &rhs) const
     {
         // avoid floating point comparisons by using the raw bits
         // if rawbits are zero, assume this is a differenced set (operator-)
@@ -60,7 +60,7 @@ struct KlobucharParam
                 && (rawbits == rhs.rawbits);
     }
 
-    bool operator!=(const KlobucharParam &rhs)
+    bool operator!=(const KlobucharParam &rhs) const
     {
         return !(*this == rhs);
     }
@@ -86,9 +86,6 @@ public:
     KlobucharParam getKlobucharParam() const;
 
     bool operator==(const Ephemeris &iono) const;
-
-//    void dump();
-//    void dump2();
 
 private:
     void loadD1(const SubframeBufferParam &sfbuf);
