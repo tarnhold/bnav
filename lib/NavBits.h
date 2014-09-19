@@ -4,10 +4,10 @@
 #include <bitset>
 #include <cassert>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <iomanip>
 #include <iostream>
-#include <stdint.h>
 #include <string>
 
 namespace bnav

@@ -1,7 +1,7 @@
 #ifndef DATETIME_H
 #define DATETIME_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #include <boost/date_time/posix_time/posix_time.hpp>

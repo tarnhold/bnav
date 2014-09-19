@@ -5,7 +5,7 @@
 #include "NavBits.h"
 #include "SvID.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace bnav
 {

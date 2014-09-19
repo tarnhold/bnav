@@ -6,7 +6,7 @@
 #include "SvID.h"
 
 #include <map>
-#include <stdint.h>
+#include <cstdint>
 
 #include <boost/optional.hpp>
 

@@ -4,7 +4,7 @@
 #include "SubframeBuffer.h"
 #include "DateTime.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace bnav
 {
