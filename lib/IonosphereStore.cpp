@@ -85,7 +85,7 @@ boost::optional<Ionosphere> IonosphereStore::getIonosphere(const SvID &sv, const
     return ion;
 }
 
-void IonosphereStore::dumpStoreStatistics(const std::string name)
+void IonosphereStore::dumpStoreStatistics(const std::string name) const
 {
     std::cout << "IonosphereStore statistics: " << name << std::endl;
 
@@ -108,22 +108,30 @@ void IonosphereStore::dumpStoreStatistics(const std::string name)
  *
  * @param sv Satellite for which we produce a map.
  */
-void IonosphereStore::dumpGridAvailability(const SvID &sv)
+void IonosphereStore::dumpGridAvailability(const SvID &sv) const
 {
     std::cout << "Grid availability" << std::endl;
 
-    if (m_store[sv].empty())
+    // find sv
+    auto svit = m_store.find(sv);
+    // sv is not in store
+    if (svit == m_store.end())
+        return;
+
+    auto svitems = svit->second;
+
+    if (svitems.empty())
     {
         std::cout << "No data for SV: " << sv.getPRN() << std::endl;
         return;
     }
     else
     {
-        std::cout << "Total map count: " << m_store[sv].size() << std::endl;
+        std::cout << "Total map count: " << svitems.size() << std::endl;
     }
 
     // set same grid dimension
-    IonoGridDimension dim = m_store[sv].begin()->second.getGridDimension();
+    IonoGridDimension dim = svitems.begin()->second.getGridDimension();
     DateTime dtref(TimeSystem::BDT, 0, 0); // just an arbitrary date
     Ionosphere ionoref;
     ionoref.setGridDimension(dim);
@@ -136,7 +144,7 @@ void IonosphereStore::dumpGridAvailability(const SvID &sv)
         it->setVerticalDelay_TECU(0);
 
     // loop through each ionospheric model for SV in store
-    for (auto elem : m_store[sv])
+    for (auto elem : svitems)
     {
         std::vector<IonoGridInfo> igp = elem.second.getGrid();
         std::size_t i = 0;
