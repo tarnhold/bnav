@@ -331,13 +331,13 @@ IonoGridDimension::IonoGridDimension(const double latnorth, const double latsout
     assert(longitude_west >= -180.0);
     assert(longitude_east <= 180.0);
     assert(longitude_east > longitude_west);
-    assert(latitude_spacing < 0);
-    assert(longitude_spacing > 0);
+    assert(latitude_spacing < 0.0);
+    assert(longitude_spacing > 0.0);
 }
 
 std::size_t IonoGridDimension::getItemCountLatitude() const
 {
-    assert(latitude_spacing != 0.0);
+    assert(latitude_spacing > 0.0 || latitude_spacing < 0.0);
 #if 0
     std::cout << std::setprecision(1) << std::fixed
               << "lat max: " << latitude_north
@@ -351,7 +351,7 @@ std::size_t IonoGridDimension::getItemCountLatitude() const
 
 std::size_t IonoGridDimension::getItemCountLongitude() const
 {
-    assert(longitude_spacing != 0.0);
+    assert(longitude_spacing > 0.0 || longitude_spacing < 0.0);
 #if 0
     std::cout << std::setprecision(1) << std::fixed
               << "long max: " << longitude_west
