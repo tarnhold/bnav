@@ -44,7 +44,7 @@ public:
     NavBits<dim> operator^(const NavBits<dim> &rhs) const;
     NavBits<dim>& operator^=(const NavBits<dim> &rhs);
     NavBits<dim>& operator<<=(std::size_t shift);
-    bool operator==(const NavBits<dim> &rhs);
+    bool operator==(const NavBits<dim> &rhs) const;
 
     void setLeft(std::size_t index, bool value = true);
 
@@ -62,7 +62,7 @@ public:
     template<std::size_t start, std::size_t len>
     NavBits<len> getLeft() const;
 
-    void dumpDifferingBits(const NavBits<dim> &rhs);
+    void dumpDifferingBits(const NavBits<dim> &rhs) const;
 
     unsigned long to_ulong() const;
     double to_double(const int32_t scale_pow2 = 0) const;
@@ -206,7 +206,7 @@ NavBits<dim>& NavBits<dim>::operator<<=(std::size_t shift)
  * @return true if equal, false if unequal.
  */
 template<std::size_t dim>
-bool NavBits<dim>::operator==(const NavBits<dim> &rhs)
+bool NavBits<dim>::operator==(const NavBits<dim> &rhs) const
 {
     return m_bitset == rhs.getBits();
 }
@@ -291,7 +291,7 @@ NavBits<len> NavBits<dim>::getLeft() const
  * @param rhs NavBits<dim> to compare to.
  */
 template<std::size_t dim>
-void NavBits<dim>::dumpDifferingBits(const NavBits<dim> &rhs)
+void NavBits<dim>::dumpDifferingBits(const NavBits<dim> &rhs) const
 {
     for (std::size_t i = 0; i < rhs.size(); ++i)
     {
