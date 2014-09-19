@@ -8,12 +8,13 @@
 
 #include <string>
 
+#include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 
 namespace bnav
 {
 
-class bnavMain
+class bnavMain final: public boost::noncopyable
 {
     std::string filenameInput;
     bnav::AsciiReaderType filetypeInput;
