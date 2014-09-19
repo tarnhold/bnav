@@ -80,7 +80,7 @@ SubframeBuffer* SubframeBufferStore::getSubframeBuffer(const SvID &sv)
         return it->second;
 
     assert(false); // who called this before adding the data?!
-    return NULL;
+    return nullptr;
 }
 
 /**
