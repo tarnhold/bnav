@@ -58,7 +58,7 @@ bool IonosphereStore::hasDataForSv(const SvID &sv) const
     if (it == m_store.end())
         return false;
 
-    return it->second.size() > 0;
+    return !it->second.empty();
 }
 
 /**
