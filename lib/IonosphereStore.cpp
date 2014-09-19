@@ -14,19 +14,6 @@ IonosphereStore::IonosphereStore()
 }
 
 /**
- * @brief IonosphereStore::~IonosphereStore
- *
- * Clean up underlying Ionosphere objects if store gets destroyed.
- */
-IonosphereStore::~IonosphereStore()
-{
-#if 0
-    for (auto it = m_store.begin(); it != m_store.end(); ++it)
-        delete it->second;
-#endif
-}
-
-/**
  * @brief IonosphereStore::addIonosphere Add a Ionosphere to the storage.
  *
  * Automatically adds a new storage object, if a given SvID is not known.
@@ -36,18 +23,7 @@ IonosphereStore::~IonosphereStore()
  */
 void IonosphereStore::addIonosphere(const SvID &sv, const Ionosphere &iono)
 {
-#if 0
-    auto it = m_store.find(sv);
-
-    if (it == m_store.end())
-        // initialize SV, if not present in store
-        m_store[sv].emplace(iono.getDateOfIssue(), iono);
-    else
-        // FIXME: warn if there's already an entry at this time!
-        it->second[iono.getDateOfIssue()] = iono;
-#endif
     m_store[sv][iono.getDateOfIssue()] = iono;
-    //std::cout << "exists" << std::endl;
 }
 
 /**
@@ -64,35 +40,49 @@ std::vector< SvID > IonosphereStore::getSvList() const
     return svlist;
 }
 
-std::map<DateTime, Ionosphere> IonosphereStore::getItemsBySv(const SvID &sv)
+boost::optional< std::map<DateTime, Ionosphere> > IonosphereStore::getItemsBySv(const SvID &sv) const
 {
-    return m_store[sv];
+    boost::optional< std::map<DateTime, Ionosphere> > items;
+
+    auto it = m_store.find(sv);
+    if (it != m_store.end())
+        items = it->second;
+
+    return items;
 }
 
-bool IonosphereStore::hasDataForSv(const SvID &sv)
+bool IonosphereStore::hasDataForSv(const SvID &sv) const
 {
-    return m_store[sv].size() > 0;
+    auto it = m_store.find(sv);
+    // sv doesn't exist in store
+    if (it == m_store.end())
+        return false;
+
+    return it->second.size() > 0;
 }
 
 /**
- * @brief IonosphereStore::getIonosphere Get the Ionosphere object.
+ * @brief IonosphereStore::getIonosphere Get an Ionosphere object.
  * @param sv The SvID.
+ * @param datetime Date of specific Ionosphere.
  * @return Pointer to Ionosphere for SV.
  */
-Ionosphere IonosphereStore::getIonosphere(const SvID &sv, const DateTime &datetime)
+boost::optional<Ionosphere> IonosphereStore::getIonosphere(const SvID &sv, const DateTime &datetime) const
 {
-#if 0
-    auto it = m_store.find(sv);
+    boost::optional<Ionosphere> ion;
+    std::map<DateTime, Ionosphere> dateion;
 
-    if (it != m_store.end())
-        return it->second;
-#endif
+    // find sv
+    auto dateit = m_store.find(sv);
+    if (dateit != m_store.end())
+        dateion = dateit->second;
 
-    return m_store[sv][datetime];
+    // find date
+    auto it = dateion.find(datetime);
+    if (it != dateion.end())
+        ion = it->second;
 
-    //assert(false); // who called this before adding the data?!
-
- //   return NULL;
+    return ion;
 }
 
 void IonosphereStore::dumpStoreStatistics(const std::string name)

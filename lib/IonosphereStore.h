@@ -8,6 +8,8 @@
 #include <map>
 #include <stdint.h>
 
+#include <boost/optional.hpp>
+
 namespace bnav
 {
 
@@ -18,15 +20,14 @@ class IonosphereStore
 
 public:
     IonosphereStore();
-    ~IonosphereStore();
 
     void addIonosphere(const SvID &sv, const Ionosphere &iono);
 
-    bool hasDataForSv(const SvID &sv);
+    bool hasDataForSv(const SvID &sv) const;
 
     std::vector< SvID > getSvList() const;
-    std::map< DateTime, Ionosphere> getItemsBySv(const SvID &sv);
-    Ionosphere getIonosphere(const SvID &sv, const DateTime &datetime);
+    boost::optional< std::map<DateTime, Ionosphere> > getItemsBySv(const SvID &sv) const;
+    boost::optional< Ionosphere > getIonosphere(const SvID &sv, const DateTime &datetime) const;
 
     void dumpStoreStatistics(const std::string name);
     void dumpGridAvailability(const SvID &sv);

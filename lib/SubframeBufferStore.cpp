@@ -65,8 +65,6 @@ void SubframeBufferStore::addSubframe(const SvID &sv, const Subframe &sf)
     assert(it != m_store.end());
 
     it->second->addSubframe(sf);
-
-    //std::cout << "exists" << std::endl;
 }
 
 /**
