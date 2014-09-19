@@ -106,7 +106,7 @@ bool SubframeBufferD2::isAlmanacComplete() const
 SubframeBufferParam SubframeBufferD2::flushEphemerisData()
 {
     // D2: all ephemeris data is inside subframe 1
-    SubframeVectorVector ephdata { m_buffer[0] };
+    const SubframeVectorVector ephdata { m_buffer[0] };
 
     // ensure correct data sets, should not be possible!
     assert(m_buffer[0].front().getPageNum() == 1);
@@ -119,7 +119,7 @@ SubframeBufferParam SubframeBufferD2::flushEphemerisData()
 
 SubframeBufferParam SubframeBufferD2::flushAlmanacData()
 {
-    SubframeVectorVector almdata { m_buffer[4] };
+    const SubframeVectorVector almdata { m_buffer[4] };
 
     // ensure correct data sets, should not be possible!
     assert(m_buffer[4].front().getPageNum() == 1);

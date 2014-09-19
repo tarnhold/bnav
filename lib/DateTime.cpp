@@ -94,7 +94,7 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
         assert(false); // not implemented
     }
 
-    boost::posix_time::ptime t0(d0, boost::posix_time::hours(0));
+    const boost::posix_time::ptime t0(d0, boost::posix_time::hours(0));
 
     m_time = t0 + boost::gregorian::weeks(static_cast<int>(weeknum))
             + boost::posix_time::seconds(static_cast<int>(sow))
@@ -111,7 +111,7 @@ void DateTime::setISODateTime(const std::string &isostr)
     // ensure ISO date YYYYMMDDTHHMMSS
     assert(isostr.length() == 15);
     assert(isostr[8] == 'T');
-    boost::posix_time::ptime date { boost::posix_time::from_iso_string(isostr) };
+    const boost::posix_time::ptime date { boost::posix_time::from_iso_string(isostr) };
 
     m_time = date;
 }
@@ -122,7 +122,7 @@ void DateTime::setISODateTime(const std::string &isostr)
 void DateTime::setToCurrentDateTimeUTC()
 {
    // get the current time from the clock -- one second resolution
-   boost::posix_time::ptime now { boost::posix_time::second_clock::universal_time() };
+   const boost::posix_time::ptime now { boost::posix_time::second_clock::universal_time() };
 
    m_tsys = TimeSystem::UTC;
    m_time = now;
@@ -168,7 +168,7 @@ uint32_t DateTime::getSOW() const
  */
 uint32_t DateTime::getDay() const
 {
-    boost::gregorian::date d { m_time.date() };
+    const boost::gregorian::date d { m_time.date() };
     return d.day();
 }
 
@@ -178,7 +178,7 @@ uint32_t DateTime::getDay() const
  */
 uint32_t DateTime::getMonth() const
 {
-    boost::gregorian::date d { m_time.date() };
+    const boost::gregorian::date d { m_time.date() };
     return d.month();
 }
 
@@ -188,7 +188,7 @@ uint32_t DateTime::getMonth() const
  */
 uint32_t DateTime::getYear() const
 {
-    boost::gregorian::date d { m_time.date() };
+    const boost::gregorian::date d { m_time.date() };
     return d.year();
 }
 
@@ -236,7 +236,7 @@ std::string DateTime::getISODate() const
 
 uint32_t DateTime::getHour() const
 {
-    boost::posix_time::time_duration t { m_time.time_of_day() };
+    const boost::posix_time::time_duration t { m_time.time_of_day() };
     assert(t.hours() >= 0 && t.hours() <= 24);
     return static_cast<uint32_t>(t.hours());
 }
@@ -254,7 +254,7 @@ std::string DateTime::getHourString() const
 
 uint32_t DateTime::getMinute() const
 {
-    boost::posix_time::time_duration t { m_time.time_of_day() };
+    const boost::posix_time::time_duration t { m_time.time_of_day() };
     assert(t.minutes() >= 0 && t.minutes() <= 60);
     return static_cast<uint32_t>(t.minutes());
 }
@@ -272,7 +272,7 @@ std::string DateTime::getMinuteString() const
 
 uint32_t DateTime::getSecond() const
 {
-    boost::posix_time::time_duration t { m_time.time_of_day() };
+    const boost::posix_time::time_duration t { m_time.time_of_day() };
     assert(t.seconds() >= 0 && t.seconds() <= 60);
     return static_cast<uint32_t>(t.seconds());
 }
@@ -294,7 +294,7 @@ std::string DateTime::getSecondString() const
  */
 std::string DateTime::getMonthNameShort() const
 {
-    boost::gregorian::date d { m_time.date() };
+    const boost::gregorian::date d { m_time.date() };
     return d.month().as_short_string();
 }
 
@@ -334,7 +334,7 @@ bool DateTime::isSameIonexDay(const DateTime &rhs) const
         return true;
 
     // rhs is next day 00:00, we count this to the same day, because Ionex needs
-    boost::gregorian::date nextday = m_time.date() + boost::gregorian::days(1);
+    const boost::gregorian::date nextday = m_time.date() + boost::gregorian::days(1);
 
     if (rhs.getYear() == nextday.year() && rhs.getMonth() == nextday.month() && rhs.getDay() == nextday.day())
     {

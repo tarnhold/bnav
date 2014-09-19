@@ -67,7 +67,7 @@ void Ephemeris::loadD1(const SubframeBufferParam &sfbuf)
 void Ephemeris::processD1Subframe1(const Subframe &sf)
 {
     assert(sf.getPageNum() == 0);
-    NavBits<300> bits { sf.getBits() };
+    const NavBits<300> bits { sf.getBits() };
 
     m_sow = sf.getSOW();
     m_weeknum = bits.getLeft<60, 13>().to_ulong();
@@ -129,7 +129,7 @@ void Ephemeris::loadD2(const SubframeBufferParam &sfbuf)
     // ensure there is one subframe
     assert(sfbuf.data.size() == 1);
 
-    SubframeVector vfra = sfbuf.data[0];
+    const SubframeVector vfra = sfbuf.data[0];
     // ensure there are all pages
     assert(vfra.size() == 10);
 
@@ -149,7 +149,7 @@ void Ephemeris::loadD2(const SubframeBufferParam &sfbuf)
 void Ephemeris::processD2Page1(const Subframe &sf)
 {
     assert(sf.getPageNum() == 1);
-    NavBits<300> bits { sf.getBits() };
+    const NavBits<300> bits { sf.getBits() };
 
     // date of issue of ionospheric model is at page 1 of subframe 1
     // [1] 5.3.3.1 Basic NAV Information, p. 68
@@ -176,7 +176,7 @@ void Ephemeris::processD2Page1(const Subframe &sf)
 void Ephemeris::processD2Page2(const Subframe &sf)
 {
     assert(sf.getPageNum() == 2);
-    NavBits<300> bits { sf.getBits() };
+    const NavBits<300> bits { sf.getBits() };
     NavBits<64> allbits;
 
     // alpha0
@@ -232,7 +232,7 @@ void Ephemeris::processD2Page2(const Subframe &sf)
 
 std::ostream & operator<<(std::ostream & out, const KlobucharParam & rhs)
 {
-    const std::size_t width = 12;
+    constexpr std::size_t width = 12;
     out << std::setprecision(4) << std::scientific;
     out << "alpha: "
         << std::setw(width) << rhs.alpha0

@@ -84,11 +84,11 @@ public:
 
     bool operator==(const Ionosphere &iono) const;
 
-    void dump(bool rms = false);
+    void dump(const bool rms = false) const;
 
 private:
     void processPageBlock(const SubframeVector &vfra5, const std::size_t startpage, std::vector<IonoGridInfo> &grid_chinese);
-    void parseIonospherePage(const NavBits<300> &bits, bool lastpage, std::vector<IonoGridInfo> &grid_chinese);
+    void parseIonospherePage(const NavBits<300> &bits, const bool lastpage, std::vector<IonoGridInfo> &grid_chinese);
 };
 
 } // namespace bnav

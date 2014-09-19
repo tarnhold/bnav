@@ -133,7 +133,7 @@ bool Subframe::checkAndFixParities()
 {
     // second 15 bits of word one need to be checked
     // first 15 bits are preamble and 4 bit reserved
-    NavBitsECCWord<15> ecc1 { m_bits.getLeft<15, 15>() };
+    const NavBitsECCWord<15> ecc1 { m_bits.getLeft<15, 15>() };
     if (ecc1.isModified())
     {
         // SOW is not this helpful here, because we have an offset between SOW

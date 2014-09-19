@@ -489,7 +489,7 @@ void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t
  * @param bits message NavBits.
  * @param lastpage true, if this is page 13 or 73.
  */
-void Ionosphere::parseIonospherePage(const NavBits<300> &bits, bool lastpage, std::vector<IonoGridInfo> &grid_chinese)
+void Ionosphere::parseIonospherePage(const NavBits<300> &bits, const bool lastpage, std::vector<IonoGridInfo> &grid_chinese)
 {
     // Ion1
     grid_chinese.push_back(IonoGridInfo(lcl_parsePageIon<50, 2, 60, 11>(bits)));
@@ -588,7 +588,7 @@ Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
 {
     Ionosphere diff;
     std::vector<IonoGridInfo> vdiff;
-    std::vector<IonoGridInfo> gridrhs = rhs.getGrid();
+    const std::vector<IonoGridInfo> gridrhs = rhs.getGrid();
     assert(m_grid.size() == gridrhs.size());
 
     // use SOW from current Ionosphere
@@ -618,12 +618,12 @@ bool Ionosphere::operator==(const Ionosphere &iono) const
  * @brief Ionosphere::dump Dump complete IGP table.
  * @param rms Whether to print vertical delay or its RMS (GIVEI).
  */
-void Ionosphere::dump(bool rms)
+void Ionosphere::dump(const bool rms) const
 {
     std::cout << "DoI: " << m_datetime.getDateTimeString() << " (" << m_datetime.getSOW() << ")" << std::endl;
 
-    std::size_t rowcount = m_griddim.getItemCountLatitude();
-    std::size_t colcount = m_griddim.getItemCountLongitude();
+    const std::size_t rowcount = m_griddim.getItemCountLatitude();
+    const std::size_t colcount = m_griddim.getItemCountLongitude();
     std::cout << "rows: " << rowcount << " cols: " << colcount << std::endl;
 
     std::size_t index {0};

@@ -22,7 +22,7 @@ void MessageStatistic::add(const SvID &sv, const DateTime &dt)
     ++m_count[sv];
 
     // keep info about first and last message date
-    auto item = m_firstlast.find(sv);
+    const auto item = m_firstlast.find(sv);
     if (item != m_firstlast.end())
     {
         // first
@@ -43,9 +43,9 @@ void MessageStatistic::dump() const
 {
     std::cout << "Message statistic:" << std::endl;
 
-    for (auto elem : m_count)
+    for (const auto elem : m_count)
     {
-        auto it = m_firstlast.find(elem.first);
+        const auto it = m_firstlast.find(elem.first);
         assert(it != m_firstlast.end());
 
         std::cout << std::setw(2) << elem.first.getPRN() << ": "

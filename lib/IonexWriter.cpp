@@ -82,7 +82,7 @@ std::string lcl_justifyLeft(const double num, const std::string::size_type lengt
 
 static const bnav::Ionosphere lcl_dummyModel(const bnav::Ionosphere &data, const bnav::DateTime &dt)
 {
-    bnav::IonoGridDimension dim = data.getGridDimension();
+    const bnav::IonoGridDimension dim = data.getGridDimension();
     bnav::Ionosphere ionoref;
     ionoref.setGridDimension(dim);
     ionoref.setDateOfIssue(dt);
@@ -197,7 +197,7 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
         m_outfile << lcl_justifyLeft(*it, 60)
                   << lcl_justifyLeft("DESCRIPTION", 20) << std::endl;
 
-    DateTime dtfirst = firstion.getDateOfIssue();
+    const DateTime dtfirst = firstion.getDateOfIssue();
     m_outfile << lcl_justifyRight(dtfirst.getYearString(), 6)
               << lcl_justifyRight(dtfirst.getMonthString(), 6)
               << lcl_justifyRight(dtfirst.getDayString(), 6)
@@ -208,7 +208,7 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
               << lcl_justifyLeft("EPOCH OF FIRST MAP", 20)
               << std::endl;
 
-    DateTime dtlast = lastion.getDateOfIssue();
+    const DateTime dtlast = lastion.getDateOfIssue();
     m_outfile << lcl_justifyRight(dtlast.getYearString(), 6)
               << lcl_justifyRight(dtlast.getMonthString(), 6)
               << lcl_justifyRight(dtlast.getDayString(), 6)
@@ -224,8 +224,8 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
 
     // calculate total map count from interval, because we fill non existing
     // data records with dummies (9999).
-    uint32_t totalsec = static_cast<uint32_t>(std::abs((lastion.getDateOfIssue() - firstion.getDateOfIssue()).total_seconds()));
-    uint32_t mapcount = totalsec / m_interval + 1; // fence posts
+    const uint32_t totalsec = static_cast<uint32_t>(std::abs((lastion.getDateOfIssue() - firstion.getDateOfIssue()).total_seconds()));
+    const uint32_t mapcount = totalsec / m_interval + 1; // fence posts
     m_outfile << lcl_justifyRight(std::to_string(mapcount), 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("# OF MAPS IN FILE", 20) << std::endl;
 
@@ -288,8 +288,8 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
 void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
 {
     assert(!data.empty());
-    Ionosphere firstion = data.begin()->second;
-    Ionosphere lastion = data.rbegin()->second;
+    const Ionosphere firstion = data.begin()->second;
+    const Ionosphere lastion = data.rbegin()->second;
 
     // write header
     writeHeader(firstion, lastion);
@@ -317,15 +317,15 @@ void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
                 assert(lastsec + m_interval == SECONDS_OF_A_WEEK);
                 sow = lastsec + m_interval;
             }
-            std::size_t secdiff = sow - lastsec;
-            std::size_t fillcount = secdiff / m_interval;
+            const std::size_t secdiff = sow - lastsec;
+            const std::size_t fillcount = secdiff / m_interval;
             assert(secdiff % m_interval == 0);
             // fill one less, because we want to fill "fences" not "fence posts"
             for (std::size_t i = 1; i < fillcount; ++i)
             {
                 std::cout << "IonexWriter: Inserting dummy entry" << std::endl;
 
-                DateTime dt(TimeSystem::BDT, lastweek, lastsec + m_interval * i);
+                const DateTime dt(TimeSystem::BDT, lastweek, lastsec + m_interval * i);
                 writeRecord(std::make_pair(dt, lcl_dummyModel(it->second, dt)));
             }
         }
@@ -347,9 +347,9 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
 
     ++m_tecmapcount;
 
-    IonoGridDimension igd = data.second.getGridDimension();
-    std::vector<IonoGridInfo> grid = data.second.getGrid();
-    DateTime dt = data.second.getDateOfIssue();
+    const IonoGridDimension igd = data.second.getGridDimension();
+    const std::vector<IonoGridInfo> grid = data.second.getGrid();
+    const DateTime dt = data.second.getDateOfIssue();
 
     const std::size_t colcount = igd.getItemCountLongitude();
     const std::size_t rowcount = igd.getItemCountLatitude();

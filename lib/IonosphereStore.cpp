@@ -44,7 +44,7 @@ boost::optional< std::map<DateTime, Ionosphere> > IonosphereStore::getItemsBySv(
 {
     boost::optional< std::map<DateTime, Ionosphere> > items;
 
-    auto it = m_store.find(sv);
+    const auto it = m_store.find(sv);
     if (it != m_store.end())
         items = it->second;
 
@@ -53,7 +53,7 @@ boost::optional< std::map<DateTime, Ionosphere> > IonosphereStore::getItemsBySv(
 
 bool IonosphereStore::hasDataForSv(const SvID &sv) const
 {
-    auto it = m_store.find(sv);
+    const auto it = m_store.find(sv);
     // sv doesn't exist in store
     if (it == m_store.end())
         return false;
@@ -73,12 +73,12 @@ boost::optional<Ionosphere> IonosphereStore::getIonosphere(const SvID &sv, const
     std::map<DateTime, Ionosphere> dateion;
 
     // find sv
-    auto dateit = m_store.find(sv);
+    const auto dateit = m_store.find(sv);
     if (dateit != m_store.end())
         dateion = dateit->second;
 
     // find date
-    auto it = dateion.find(datetime);
+    const auto it = dateion.find(datetime);
     if (it != dateion.end())
         ion = it->second;
 
@@ -113,12 +113,12 @@ void IonosphereStore::dumpGridAvailability(const SvID &sv) const
     std::cout << "Grid availability" << std::endl;
 
     // find sv
-    auto svit = m_store.find(sv);
+    const auto svit = m_store.find(sv);
     // sv is not in store
     if (svit == m_store.end())
         return;
 
-    auto svitems = svit->second;
+    const auto svitems = svit->second;
 
     if (svitems.empty())
     {
@@ -131,8 +131,8 @@ void IonosphereStore::dumpGridAvailability(const SvID &sv) const
     }
 
     // set same grid dimension
-    IonoGridDimension dim = svitems.begin()->second.getGridDimension();
-    DateTime dtref(TimeSystem::BDT, 0, 0); // just an arbitrary date
+    const IonoGridDimension dim = svitems.begin()->second.getGridDimension();
+    const DateTime dtref(TimeSystem::BDT, 0, 0); // just an arbitrary date
     Ionosphere ionoref;
     ionoref.setGridDimension(dim);
     ionoref.setDateOfIssue(dtref);
@@ -144,9 +144,9 @@ void IonosphereStore::dumpGridAvailability(const SvID &sv) const
         it->setVerticalDelay_TECU(0);
 
     // loop through each ionospheric model for SV in store
-    for (auto elem : svitems)
+    for (const auto elem : svitems)
     {
-        std::vector<IonoGridInfo> igp = elem.second.getGrid();
+        const std::vector<IonoGridInfo> igp = elem.second.getGrid();
         std::size_t i = 0;
 
         for (auto igpelem : igp)

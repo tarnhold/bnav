@@ -91,7 +91,7 @@ SubframeBuffer* SubframeBufferStore::getSubframeBuffer(const SvID &sv)
  */
 bool SubframeBufferStore::hasIncompleteData() const
 {
-    for (auto elem : m_store)
+    for (const auto elem : m_store)
     {
         if (elem.second->hasIncompleteData())
             return true;
