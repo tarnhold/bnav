@@ -19,7 +19,7 @@ public:
 
     void add(const SvID &sv, const DateTime &dt);
 
-    void dump();
+    void dump() const;
 };
 
 } // namespace bnav

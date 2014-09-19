@@ -39,20 +39,21 @@ void MessageStatistic::add(const SvID &sv, const DateTime &dt)
     }
 }
 
-void MessageStatistic::dump()
+void MessageStatistic::dump() const
 {
     std::cout << "Message statistic:" << std::endl;
 
     for (auto elem : m_count)
     {
+        auto it = m_firstlast.find(elem.first);
+        assert(it != m_firstlast.end());
+
         std::cout << std::setw(2) << elem.first.getPRN() << ": "
                   << std::setw(6) << elem.second
                   << " first: "
-                  << m_firstlast[elem.first].first.getDateTimeString()
+                  << it->second.first.getDateTimeString()
                   << " last: "
-                  << m_firstlast[elem.first].second.getDateTimeString();
-
-
+                  << it->second.second.getDateTimeString();
 
         std::cout << std::endl;
     }
