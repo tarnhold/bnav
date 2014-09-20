@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-SUITE(testIonoGridInfo)
+SUITE(testIonoGridInfo_Constructor)
 {
     // Test empty contructor and max/min allowed values
     TEST(testIonoGridInfo_ConstructorEmpty)
@@ -81,7 +81,10 @@ SUITE(testIonoGridInfo)
             CHECK(igi.getGive_TECU() == 9999);
         }
     }
+}
 
+SUITE(testIonoGridInfo_Various)
+{
     TEST(testIonoGridInfo_load)
     {
         // vertdelay, rms
@@ -156,7 +159,10 @@ SUITE(testIonoGridInfo)
             CHECK(igp.getGive_TECU() == givei_values[i]);
         }
     }
+}
 
+SUITE(testIonoGridInfo_Operators)
+{
     // Test comparision of two objects
     TEST(testIonoGridInfoOperatorEqual)
     {
