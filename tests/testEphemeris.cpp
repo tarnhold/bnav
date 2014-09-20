@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <iostream>
 
-TEST(testEphemeris)
+TEST(testKlobucharParam)
 {
     // default constructor
     {
