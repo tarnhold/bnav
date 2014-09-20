@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     testIonosphere.cpp \
     testDateTime.cpp \
     testSamples.cpp \
-    testEphemeris.cpp
+    testEphemeris.cpp \
+    testIonosphereGridInfo.cpp
 
 HEADERS += \
     TestConfig.h
