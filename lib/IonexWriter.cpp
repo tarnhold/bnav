@@ -6,10 +6,6 @@
 #include <string>
 #include <vector>
 
-//FIXME: Leica SpiderQC can only read the IONEX file, if there are data records
-// at every! point defined by the Interval in the header!
-// Solution: Write only 9999 for missing models.
-
 namespace
 {
 
