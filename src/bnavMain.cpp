@@ -215,9 +215,11 @@ void bnavMain::readInputFile()
     bnav::AsciiReaderEntry data;
     while (reader.readLine(data))
     {
+#if 0
         // skip B2 signals, the differences are not in our interest
         if (data.getSignalType() != bnav::SignalType::BDS_B1)
             continue;
+#endif
 
         const bnav::SvID sv(data.getPRN());
 
