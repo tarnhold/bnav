@@ -111,7 +111,7 @@ public:
 private:
     void checkAndFixAllSubwords();
     void splitWordToSubword();
-    std::string mergeSubwordsToWord() const;
+    NavBits<len> mergeSubwordsToWord() const;
 
     bool checkAndFixSubword(subword &message);
 
@@ -189,28 +189,28 @@ void NavBitsECCWord<len>::splitWordToSubword()
     }
 }
 
-/*!
+/**
  * Concatenate an array (11+4,11+4,...) back to 11+11+...+4+4+...
- *
- * TODO: don't use to_string()!
  */
 template <std::size_t len>
-std::string NavBitsECCWord<len>::mergeSubwordsToWord() const
+NavBits<len> NavBitsECCWord<len>::mergeSubwordsToWord() const
 {
     // merge msg list back to original message
     // only if some parity bits were fixed!
-    std::string info;
-    std::string parity;
+    NavBits<len> merged;
+    const std::size_t count = m_msglist.size();
 
-    for (const auto item : m_msglist)
+    for (std::size_t i = 0; i < count; ++i)
     {
-        const std::string msgstr = item.to_string();
-        //std::cerr << "blob: " <<msgstr << " : "<< msgstr.substr(0, 11) << " - " << msgstr.substr(11) << std::endl;
-        info += msgstr.substr(0, 11);
-        parity += msgstr.substr(11);
+        const NavBits<15> subwbits = m_msglist[i];
+
+        // information bits
+        merged.setLeft(i * 11, subwbits.getLeft<0, 11>());
+        // parity bits
+        merged.setLeft(count * 11 + i * 4, subwbits.getLeft<11, 4>());
     }
 
-    return info + parity;
+    return merged;
 }
 
 /*!
@@ -254,9 +254,7 @@ void NavBitsECCWord<len>::checkAndFixAllSubwords()
 template <std::size_t len>
 NavBits<len> NavBitsECCWord<len>::getBits() const
 {
-    const std::string merge { mergeSubwordsToWord() };
-
-    return NavBits<len>(merge);
+    return mergeSubwordsToWord();
 }
 
 /*!
