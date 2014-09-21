@@ -199,15 +199,19 @@ NavBits<len> NavBitsECCWord<len>::mergeSubwordsToWord() const
     // only if some parity bits were fixed!
     NavBits<len> merged;
     const std::size_t count = m_msglist.size();
+    const std::size_t startparity = count * 11;
 
     for (std::size_t i = 0; i < count; ++i)
     {
         const NavBits<15> subwbits = m_msglist[i];
 
         // information bits
-        merged.setLeft(i * 11, subwbits.getLeft<0, 11>());
+        for (std::size_t k = 0; k < 11; ++k)
+            merged.setLeft(i * 11 + k, subwbits.atLeft(k));
+
         // parity bits
-        merged.setLeft(count * 11 + i * 4, subwbits.getLeft<11, 4>());
+        for (std::size_t k = 0; k < 4; ++k)
+            merged.setLeft(startparity + i * 4 + k, subwbits.atLeft(11 + k));
     }
 
     return merged;
