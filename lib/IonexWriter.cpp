@@ -14,7 +14,7 @@ const std::string application { "bapp v0.4" };
 
 // BeiDou specific
 const std::vector<std::string> height {"475.0", "475.0", "0.0"};
-const std::string radius { "6478.0" };
+const std::string radius { "6378.0" };
 
 const std::vector<std::string> description_klobuchar = {
     "BeiDou Ionospheric Map (CIM), Klobuchar model",
