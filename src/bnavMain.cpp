@@ -192,6 +192,9 @@ bnavMain::bnavMain(int argc, char *argv[])
         }
     }
 
+    if (!limit_to_prn)
+        throw std::runtime_error("Please limit to a specific SV!");
+
     if (limit_to_date_str.empty())
         throw std::runtime_error("Please limit to a specific day!");
 
