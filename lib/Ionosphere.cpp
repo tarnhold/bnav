@@ -30,13 +30,13 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     assert(time < 86400);
 
     // convert to semicircle
-    double semiphi { std::abs(phi) / 180.0 };
+    double semiphi { phi / 180.0 };
     double semilambda { lambda / 180.0 };
 
 //    std::cout << "phi: " << semiphi << std::endl;
 
     // chinese don't do geomagnetic latitude
-    double phim { semiphi };
+    double absphim { std::fabs(semiphi) };
 
 //    std::cout << "phim: " << phim << std::endl;
 
@@ -49,8 +49,8 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
 
 //    std::cout << "time: " << time2 << std::endl;
 
-    double amplitude { klob.alpha0 + phim * (klob.alpha1 + phim * (klob.alpha2 + phim * klob.alpha3)) };
-    double period { klob.beta0 + phim * (klob.beta1 + phim * (klob.beta2 + phim * klob.beta3)) };
+    double amplitude { klob.alpha0 + absphim * (klob.alpha1 + absphim * (klob.alpha2 + absphim * klob.alpha3)) };
+    double period { klob.beta0 + absphim * (klob.beta1 + absphim * (klob.beta2 + absphim * klob.beta3)) };
 
     // amplitude is negative on the southern sphere
     // changing the sign isn't much better.
