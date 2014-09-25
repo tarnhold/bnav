@@ -12,8 +12,8 @@ namespace
 const std::string author { "TUD/Arnhold" };
 const std::string application { "bapp v0.4" };
 
-// BeiDou specific
-const std::vector<std::string> height {"475.0", "475.0", "0.0"};
+// BeiDou specific (p. 26 and p. 74 ICD)
+const std::vector<std::string> height {"375.0", "375.0", "0.0"};
 const std::string radius { "6378.0" };
 
 const std::vector<std::string> description_klobuchar = {
