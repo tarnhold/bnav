@@ -26,7 +26,8 @@ namespace
  */
 boost::optional<std::string> lcl_extractDateStringFromIGSFilename(const std::string &fullfilename)
 {
-    boost::optional<std::string> filename;
+    boost::optional<std::string> datestring;
+    std::string filename = fullfilename;
     const std::size_t lastslash = fullfilename.find_last_of('/');
 
     // remove dir parts: dir/filename.ext
@@ -36,14 +37,14 @@ boost::optional<std::string> lcl_extractDateStringFromIGSFilename(const std::str
     // CUT12014071324.sbf_SBF_CMPRaw.txt
     boost::regex expr("^[A-Z]{3}[A-Z0-9]([0-9]{8})24\\.");
     // we want only group one
-    boost::sregex_token_iterator it(filename->begin(), filename->end(), expr, {1});
+    boost::sregex_token_iterator it(filename.begin(), filename.end(), expr, {1});
     boost::sregex_token_iterator end;
 
     if (it != end)
-        filename = it->str();
+        datestring = it->str();
 
     // if nothing matched, optional is null
-    return filename;
+    return datestring;
 }
 
 }
