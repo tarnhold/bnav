@@ -446,6 +446,7 @@ Ionosphere Ionosphere::diffToModel(const Ionosphere &rhs)
         vdiff.push_back(m_grid[i] - gridrhs[i]);
     }
     diff.setGrid(vdiff);
+    diff.setGridDimension(getGridDimension());
 
     return diff;
 }
