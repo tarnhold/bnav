@@ -382,7 +382,10 @@ void bnavMain::writeIonexFile(const std::string &filename, const std::size_t int
 
     // write all models from prn
     const auto prn2data = klobuchar ? ionostoreKlobuchar.getItemsBySv(limit_to_prn.get()) : ionostore.getItemsBySv(limit_to_prn.get());
-    writer.writeAll(prn2data.get());
+    if (prn2data)
+        writer.writeAll(prn2data.get());
+    else
+        std::cerr << "writeIonexFile: no data for getItemsBySv!" << std::endl;
     writer.close();
 }
 
