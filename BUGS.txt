@@ -1,0 +1,14 @@
+* 2014-03-28 and 2014-04-01 (20000 lines appended): 2014-04-01 00:00 is not
+  written into ionex file. Should at least insert a dummy entry. Maybe this
+  is caused because it's the last entry.
+  Probable fix: Write ionex from 00:00 to 00:00
+
+* segfault because of missing klobuchar data at two epochs
+
+file: CUT12014032024.sbf.CMPRawB1m
+
+bapp: ../../bnav3/lib/Ionosphere.cpp:415: void bnav::Ionosphere::setGrid(const std::vector<IonoGridInfo> &): Assertion `rhs.size() == 320' failed.
+/home/thomas/Dropbox/projects/scripts/10linux_bapp.sh: line 12:  1042 Aborted                 (core dumped) LD_LIBRARY_PATH=${project_dir}/lib/ ${project_dir}/src/bapp ${filename} --ir 7200 --global -k ${output_dir}/bdsk${doy}0.${year}i -s1
+
+
+* GIVE: should be written into RMS maps into IONEX file
