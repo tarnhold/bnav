@@ -378,7 +378,8 @@ void Ionosphere::parseIonospherePage(const NavBits<300> &bits, const bool lastpa
 
 bool Ionosphere::hasData() const
 {
-    return m_grid.size() == 320;
+    // regional grid has 320 cells, global 5183
+    return m_grid.size() == 320 || m_grid.size() == 5183;
 }
 
 /**
@@ -409,7 +410,8 @@ std::vector<IonoGridInfo> Ionosphere::getGrid() const
 
 void Ionosphere::setGrid(const std::vector<IonoGridInfo> &rhs)
 {
-    assert(rhs.size() == 320);
+    // regional grid has 320 cells, global 5183
+    assert(rhs.size() == 320 || rhs.size() == 5183);
     // FIXME: should set m_griddim, too - or at least fit to it
     m_grid.clear();
     for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
