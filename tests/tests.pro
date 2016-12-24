@@ -6,7 +6,7 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 
-LIBS += -lunittest++ -L../lib -lbnav
+LIBS += -lUnitTest++ -L../lib -lbnav
 
 SOURCES += main.cpp \
     testNavBits.cpp \
