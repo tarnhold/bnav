@@ -71,7 +71,7 @@ bnavMain::bnavMain(int argc, char *argv[])
     desc.add_options()
             ("help,h", "show help message")
             ("verbose,v", "verbose output")
-            ("format,f", boost::program_options::value<std::string>()->default_value("sbf"), "input file format (sbf or jps)")
+            ("format,f", boost::program_options::value<std::string>()->default_value("sbf"), "input file format (sbf, sbfhex or jps)")
             ("klobuchar,k", boost::program_options::value<std::string>(&filenameIonexKlobuchar), "save Klobuchar models to file")
             ("regional,r", boost::program_options::value<std::string>(&filenameIonexRegional), "save regional grid models to file")
             ("global", "generate global Klobuchar model")
@@ -104,6 +104,8 @@ bnavMain::bnavMain(int argc, char *argv[])
                 filetypeInput = bnav::AsciiReaderType::TEXT_CONVERTED_JPS;
             else if (arg == "sbf")
                 filetypeInput = bnav::AsciiReaderType::TEXT_CONVERTED_SBF;
+            else if (arg == "sbfhex")
+                filetypeInput = bnav::AsciiReaderType::TEXT_CONVERTED_SBF_HEX;
             else
                 throw std::invalid_argument("Unknown file format: " + arg);
         }
