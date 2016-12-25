@@ -50,22 +50,22 @@ SUITE(testDateTime)
             // BDT reference epoch
             dt.setWeekAndSOW(0, 0);
             CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
-            CHECK(dt.getDay() == 1);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(1, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
 
             // BDT reference epoch with milliseconds
             dt.setWeekAndSOW(0, 0, 0);
             CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
-            CHECK(dt.getDay() == 1);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(1, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
         {
             bnav::DateTime dt;
@@ -75,12 +75,12 @@ SUITE(testDateTime)
             // GPST reference epoch
             dt.setWeekAndSOW(0, 0);
             CHECK(dt.getTimeSystem() == bnav::TimeSystem::GPST);
-            CHECK(dt.getDay() == 6);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 1980);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(6, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(1980, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
         // some arbitrary date in GPST in 2014
         {
@@ -90,12 +90,12 @@ SUITE(testDateTime)
 
             dt.setWeekAndSOW(1801, 0);
             CHECK(dt.getTimeSystem() == bnav::TimeSystem::GPST);
-            CHECK(dt.getDay() == 13);
-            CHECK(dt.getMonth() == 7);
-            CHECK(dt.getYear() == 2014);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(13, dt.getDay());
+            CHECK_EQUAL(7, dt.getMonth());
+            CHECK_EQUAL(2014, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
         // some arbitrary date in BDT in 2014
         {
@@ -105,12 +105,12 @@ SUITE(testDateTime)
 
             dt.setWeekAndSOW(445, 0);
             CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
-            CHECK(dt.getDay() == 13);
-            CHECK(dt.getMonth() == 7);
-            CHECK(dt.getYear() == 2014);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(13, dt.getDay());
+            CHECK_EQUAL(7, dt.getMonth());
+            CHECK_EQUAL(2014, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
     }
 
@@ -124,24 +124,24 @@ SUITE(testDateTime)
 
             dt.setISODateTime("19950304T123021");
             CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
-            CHECK(dt.getDay() == 4);
-            CHECK(dt.getMonth() == 3);
-            CHECK(dt.getYear() == 1995);
-            CHECK(dt.getHourString() == "12");
-            CHECK(dt.getMinuteString() == "30");
-            CHECK(dt.getSecondString() == "21");
+            CHECK_EQUAL(4, dt.getDay());
+            CHECK_EQUAL(3, dt.getMonth());
+            CHECK_EQUAL(1995, dt.getYear());
+            CHECK_EQUAL("12", dt.getHourString());
+            CHECK_EQUAL("30", dt.getMinuteString());
+            CHECK_EQUAL("21", dt.getSecondString());
         }
 
         // set inside constructor
         {
             bnav::DateTime dt(bnav::TimeSystem::BDT, "19950304T123021");
             CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
-            CHECK(dt.getDay() == 4);
-            CHECK(dt.getMonth() == 3);
-            CHECK(dt.getYear() == 1995);
-            CHECK(dt.getHourString() == "12");
-            CHECK(dt.getMinuteString() == "30");
-            CHECK(dt.getSecondString() == "21");
+            CHECK_EQUAL(4, dt.getDay());
+            CHECK_EQUAL(3, dt.getMonth());
+            CHECK_EQUAL(1995, dt.getYear());
+            CHECK_EQUAL("12", dt.getHourString());
+            CHECK_EQUAL("30", dt.getMinuteString());
+            CHECK_EQUAL("21", dt.getSecondString());
         }
     }
 
@@ -152,28 +152,28 @@ SUITE(testDateTime)
         dt.setTimeSystem(bnav::TimeSystem::GPST);
         CHECK(dt.getTimeSystem() == bnav::TimeSystem::GPST);
         dt.setWeekAndSOW(0, 60);
-        CHECK(dt.getDay() == 6);
-        CHECK(dt.getMonth() == 1);
-        CHECK(dt.getYear() == 1980);
-        CHECK(dt.getHourString() == "00");
-        CHECK(dt.getMinuteString() == "01");
-        CHECK(dt.getSecondString() == "00");
+        CHECK_EQUAL(6, dt.getDay());
+        CHECK_EQUAL(1, dt.getMonth());
+        CHECK_EQUAL(1980, dt.getYear());
+        CHECK_EQUAL("00", dt.getHourString());
+        CHECK_EQUAL("01", dt.getMinuteString());
+        CHECK_EQUAL("00", dt.getSecondString());
 
         dt.setWeekAndSOW(1, 1);
-        CHECK(dt.getDay() == 13);
-        CHECK(dt.getMonth() == 1);
-        CHECK(dt.getYear() == 1980);
-        CHECK(dt.getHourString() == "00");
-        CHECK(dt.getMinuteString() == "00");
-        CHECK(dt.getSecondString() == "01");
+        CHECK_EQUAL(13, dt.getDay());
+        CHECK_EQUAL(1, dt.getMonth());
+        CHECK_EQUAL(1980, dt.getYear());
+        CHECK_EQUAL("00", dt.getHourString());
+        CHECK_EQUAL("00", dt.getMinuteString());
+        CHECK_EQUAL("01", dt.getSecondString());
 
         dt.setWeekAndSOW(2, 3600);
-        CHECK(dt.getDay() == 20);
-        CHECK(dt.getMonth() == 1);
-        CHECK(dt.getYear() == 1980);
-        CHECK(dt.getHourString() == "01");
-        CHECK(dt.getMinuteString() == "00");
-        CHECK(dt.getSecondString() == "00");
+        CHECK_EQUAL(20, dt.getDay());
+        CHECK_EQUAL(1, dt.getMonth());
+        CHECK_EQUAL(1980, dt.getYear());
+        CHECK_EQUAL("01", dt.getHourString());
+        CHECK_EQUAL("00", dt.getMinuteString());
+        CHECK_EQUAL("00", dt.getSecondString());
     }
 
     // operator<
@@ -222,13 +222,13 @@ SUITE(testDateTime_Strings)
         {
             std::stringstream seconds;
             seconds << std::setw(2) << std::setfill('0') << i;
-            dt.setWeekAndSOW(0, i);
-            CHECK(dt.getDay() == 1);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == seconds.str());
+            dt.setWeekAndSOW(0, i);     
+            CHECK_EQUAL(1, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL(seconds.str(), dt.getSecondString());
         }
     }
 
@@ -244,12 +244,12 @@ SUITE(testDateTime_Strings)
             std::stringstream minutes;
             minutes << std::setw(2) << std::setfill('0') << i;
             dt.setWeekAndSOW(0, i*60);
-            CHECK(dt.getDay() == 1);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == minutes.str());
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(1, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL(minutes.str(), dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
     }
 
@@ -265,12 +265,12 @@ SUITE(testDateTime_Strings)
             std::stringstream hours;
             hours << std::setw(2) << std::setfill('0') << i;
             dt.setWeekAndSOW(0, i*60*60);
-            CHECK(dt.getDay() == 1);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getHourString() == hours.str());
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(1, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL(hours.str(), dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
     }
 
@@ -287,15 +287,15 @@ SUITE(testDateTime_Strings)
             std::stringstream days;
             days << std::setw(2) << std::setfill('0') << i;
             dt.setWeekAndSOW(0, (i - 1) * bnav::SECONDS_OF_A_DAY);
-            CHECK(dt.getDay() == i);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getYearString() == "2006");
-            CHECK(dt.getMonthString() == "01");
-            CHECK(dt.getDayString() == days.str());
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(i, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL("2006", dt.getYearString());
+            CHECK_EQUAL("01", dt.getMonthString());
+            CHECK_EQUAL(days.str(), dt.getDayString());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
     }
 
@@ -312,15 +312,15 @@ SUITE(testDateTime_Strings)
             std::stringstream month;
             month << std::setw(2) << std::setfill('0') << i;
             dt.setISODateTime("2006" + month.str() + "01T000000");
-            CHECK(dt.getDay() == 1);
-            CHECK(dt.getMonth() == i);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getYearString() == "2006");
-            CHECK(dt.getMonthString() == month.str());
-            CHECK(dt.getDayString() == "01");
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(1, dt.getDay());
+            CHECK_EQUAL(i, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL("2006", dt.getYearString());
+            CHECK_EQUAL(month.str(), dt.getMonthString());
+            CHECK_EQUAL("01", dt.getDayString());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
     }
 
@@ -338,15 +338,15 @@ SUITE(testDateTime_Strings)
             std::stringstream year;
             year << std::setw(4) << std::setfill('0') << (i + offset);
             dt.setISODateTime(year.str() + "0101T000000");
-            CHECK(dt.getDay() == 1);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == i + offset);
-            CHECK(dt.getYearString() == year.str());
-            CHECK(dt.getMonthString() == "01");
-            CHECK(dt.getDayString() == "01");
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(1, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(i + offset, dt.getYear());
+            CHECK_EQUAL(year.str(), dt.getYearString());
+            CHECK_EQUAL("01", dt.getMonthString());
+            CHECK_EQUAL("01", dt.getDayString());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
     }
 }
@@ -363,12 +363,12 @@ SUITE(testDateTime_Increment)
         for (std::size_t i = 0; i < 30; ++i)
         {
             dt.setWeekAndSOW(0, i*60*60*24);
-            CHECK(dt.getDay() == i + 1);
-            CHECK(dt.getMonth() == 1);
-            CHECK(dt.getYear() == 2006);
-            CHECK(dt.getHourString() == "00");
-            CHECK(dt.getMinuteString() == "00");
-            CHECK(dt.getSecondString() == "00");
+            CHECK_EQUAL(i + 1, dt.getDay());
+            CHECK_EQUAL(1, dt.getMonth());
+            CHECK_EQUAL(2006, dt.getYear());
+            CHECK_EQUAL("00", dt.getHourString());
+            CHECK_EQUAL("00", dt.getMinuteString());
+            CHECK_EQUAL("00", dt.getSecondString());
         }
     }
 
@@ -384,8 +384,8 @@ SUITE(testDateTime_Increment)
             // reduced by this value and added to weeknum.
             // Test if weeknum increments.
             dt.setWeekAndSOW(0, i * bnav::SECONDS_OF_A_WEEK);
-            CHECK(dt.getWeekNum() == i);
-            CHECK(dt.getSOW() == 0);
+            CHECK_EQUAL(i, dt.getWeekNum());
+            CHECK_EQUAL(0, dt.getSOW());
         }
     }
 }

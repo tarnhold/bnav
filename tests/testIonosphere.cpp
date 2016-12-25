@@ -32,8 +32,8 @@ TEST(testIonoGridDimension)
         CHECK_CLOSE(30.0, igd.longitude_east, 0.0001);
         CHECK_CLOSE(10.0, igd.longitude_spacing, 0.0001);
 
-        CHECK(igd.getItemCountLatitude() == 9);
-        CHECK(igd.getItemCountLongitude() == 4);
+        CHECK_EQUAL(9, igd.getItemCountLatitude());
+        CHECK_EQUAL(4, igd.getItemCountLongitude());
     }
     // east+west and north+south
     {
@@ -45,8 +45,8 @@ TEST(testIonoGridDimension)
         CHECK_CLOSE(30.0, igd.longitude_east, 0.0001);
         CHECK_CLOSE(10.0, igd.longitude_spacing, 0.0001);
 
-        CHECK(igd.getItemCountLatitude() == 4);
-        CHECK(igd.getItemCountLongitude() == 5);
+        CHECK_EQUAL(4, igd.getItemCountLatitude());
+        CHECK_EQUAL(5, igd.getItemCountLongitude());
     }
     // east+west and north+south maximum
     {
@@ -58,8 +58,8 @@ TEST(testIonoGridDimension)
         CHECK_CLOSE(180.0, igd.longitude_east, 0.0001);
         CHECK_CLOSE(10.0, igd.longitude_spacing, 0.0001);
 
-        CHECK(igd.getItemCountLatitude() == 181);
-        CHECK(igd.getItemCountLongitude() == 37);
+        CHECK_EQUAL(181, igd.getItemCountLatitude());
+        CHECK_EQUAL(37, igd.getItemCountLongitude());
     }
 
     // east+west and north+south maximum, floating point spacing
@@ -72,15 +72,15 @@ TEST(testIonoGridDimension)
         CHECK_CLOSE(180.0, igd.longitude_east, 0.0001);
         CHECK_CLOSE(2.5, igd.longitude_spacing, 0.0001);
 
-        CHECK(igd.getItemCountLatitude() == 361);
-        CHECK(igd.getItemCountLongitude() == 145);
+        CHECK_EQUAL(361, igd.getItemCountLatitude());
+        CHECK_EQUAL(145, igd.getItemCountLongitude());
 
         igd.latitude_spacing = -1.25;
         igd.longitude_spacing = 1.25;
         CHECK_CLOSE(-1.25, igd.latitude_spacing, 0.0001);
         CHECK_CLOSE(1.25, igd.longitude_spacing, 0.0001);
 
-        CHECK(igd.getItemCountLatitude() == 145);
-        CHECK(igd.getItemCountLongitude() == 289);
+        CHECK_EQUAL(145, igd.getItemCountLatitude());
+        CHECK_EQUAL(289, igd.getItemCountLongitude());
     }
 }

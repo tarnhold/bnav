@@ -29,7 +29,7 @@ TEST(testKlobucharParam)
         klob.alpha1 = 1.0;
         klob.beta0 = -1.0;
         klob.beta1 = -1.0;
-        CHECK(klob.rawbits.to_ulong() == 0);
+        CHECK_EQUAL(0, klob.rawbits.to_ulong());
         CHECK_CLOSE(1.0, klob.alpha0, 0.0001);
         CHECK_CLOSE(1.0, klob.alpha1, 0.0001);
         CHECK_CLOSE(0.0, klob.alpha2, 0.0001);
@@ -48,7 +48,7 @@ TEST(testKlobucharParam)
 
         // operator- is absolute difference
         bnav::KlobucharParam klobdiff = klob - klob2;
-        CHECK(klobdiff.rawbits.to_ulong() == 0);
+        CHECK_EQUAL(0, klobdiff.rawbits.to_ulong());
         CHECK_CLOSE(1.0, klobdiff.alpha0, 0.0001);
         CHECK_CLOSE(0.0, klobdiff.alpha1, 0.0001);
         CHECK_CLOSE(1.0, klobdiff.alpha2, 0.0001);

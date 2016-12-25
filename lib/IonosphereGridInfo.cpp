@@ -21,12 +21,12 @@ uint32_t lcl_convertMeterToTECU(const double value, const double freq)
 }
 
 /**
- * @brief lcl_diffTECUValues Difference between two TECU values.
+ * @brief lcl_diffAbsTECUValues Absolute difference between two TECU values.
  * @param t1 TECU 1
  * @param t2 TECU 2
  * @return Invalid 9999, if one of both is invalid, otherwise absolute difference.
  */
-uint32_t lcl_diffTECUValues(const uint32_t t1, const uint32_t t2)
+uint32_t lcl_diffAbsTECUValues(const uint32_t t1, const uint32_t t2)
 {
     // comprises two cases:
     // 1. one of both is not available
@@ -163,8 +163,8 @@ bool IonoGridInfo::operator==(const IonoGridInfo &rhs) const
 
 IonoGridInfo IonoGridInfo::operator-(const IonoGridInfo &rhs) const
 {
-    uint32_t dvdel { lcl_diffTECUValues(getVerticalDelay_TECU(), rhs.getVerticalDelay_TECU()) };
-    uint32_t dgive { lcl_diffTECUValues(getGive_TECU(), rhs.getGive_TECU()) };
+    uint32_t dvdel { lcl_diffAbsTECUValues(getVerticalDelay_TECU(), rhs.getVerticalDelay_TECU()) };
+    uint32_t dgive { lcl_diffAbsTECUValues(getGive_TECU(), rhs.getGive_TECU()) };
 
     return IonoGridInfo(dvdel, dgive);
 }
