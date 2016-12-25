@@ -80,6 +80,51 @@ TEST(testAsciiReaderSBF) {
     }
 }
 
+// process B1 sbf entries. Newer RxTools give hex values, not decimals.
+TEST(testAsciiReaderSBFHexB1Prn2) {
+    std::stringstream ssfile;
+    ssfile << PATH_TESTDATA << "sbf.hex/CUT12016122024.sbf_SBF_CMPRaw-snip500-prn2-hex.txt";
+
+    // read a simple sbf file
+    {
+        bnav::AsciiReader reader;
+        reader.setType(bnav::AsciiReaderType::TEXT_CONVERTED_SBF_HEX);
+        CHECK(reader.getType() == bnav::AsciiReaderType::TEXT_CONVERTED_SBF_HEX);
+        reader.open(ssfile.str());
+        CHECK(reader.isOpen());
+
+        const uint32_t tow_first = 172800200;
+        const uint32_t tow_last = 172949600;
+        uint32_t cur_tow = 0;
+
+        std::size_t i = 0;
+        bnav::AsciiReaderEntry entry;
+        while (reader.readLine(entry))
+        {
+            if (entry.getSignalType() != bnav::SignalType::BDS_B1)
+                continue;
+
+            cur_tow = tow_first + i * 600;
+
+            CHECK_EQUAL(entry.getPRN(), 2);
+            CHECK_EQUAL(bnav::DateTime(bnav::TimeSystem::GPST, 1928, cur_tow / 1000, cur_tow % 1000).getISODate(), entry.getDateTime().getISODate());
+
+            // TODO: write data into file and compare to already converted file
+            // TestWriter.write(), TestFile.isEqual(filename)...
+            ++i;
+        }
+        // ensure we have all elements
+        CHECK_EQUAL(250, i);
+        CHECK_EQUAL(tow_last, cur_tow);
+
+        // FIXME: check at least bits of the last entry, until we use a proper compare file
+        CHECK_EQUAL("111000100100000001001010101000001110000111011001011100110100111000010000101111001000001101101110101011010000010001011010101100000000000101010110001101010101010101010101010101001011010101010101010101010101001011010101010101010101010101001011010101010101010101010101001011010101010101010101010101001011", entry.getBits().to_string());
+
+        reader.close();
+        CHECK(!reader.isOpen());
+    }
+}
+
 // process only B1 signal messages
 TEST(testAsciiReaderSBFB1) {
     std::stringstream ssfile;

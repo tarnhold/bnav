@@ -105,6 +105,8 @@ bool AsciiReader::readLine(AsciiReaderEntry &data)
         data = AsciiReaderEntryJPS(line);
     else if (m_filetype == AsciiReaderType::TEXT_CONVERTED_SBF)
         data = AsciiReaderEntrySBF(line);
+    else if (m_filetype == AsciiReaderType::TEXT_CONVERTED_SBF_HEX)
+        data = AsciiReaderEntrySBFHex(line);
 
     if (m_infile.eof())
         m_eof = true;

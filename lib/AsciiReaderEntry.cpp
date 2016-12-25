@@ -8,6 +8,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -275,6 +276,134 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
     // For whatever reason the last bit inside the SBF data is set to one
     // ignore this bit, by removing it with -1 (from firmware 2.5-Beidou_patch).
     NavBits<32> lastblock { std::stoul(splitbits[9]) - 1 };
+    lastblock <<= 12; // ignore the 12 msb which contain information
+    assert(lastblock.to_ulong() == 0);
+
+    m_bits = navbits320.getLeft<0, 300>();
+
+    //std::cout << m_bits << std::endl;
+}
+
+/*
+ * Reads an ASCII file with format
+ * TOW,WNc,SvID,CRCPassed,..,Data (hex)
+ *
+ * Newer RxTools (16.2.0) give hex values instead of decimals, like in version 2.10.0.
+ *
+ * TODO: Maybe older files should be re-converted by a current version of RxTools
+ * so we can drop this hex/non-hex duality.
+ *
+ * Returns a bitset of the raw navigation message
+ */
+AsciiReaderEntrySBFHex::AsciiReaderEntrySBFHex()
+{
+}
+
+AsciiReaderEntrySBFHex::AsciiReaderEntrySBFHex(const std::string &line)
+{
+    readLine(line);
+}
+
+void AsciiReaderEntrySBFHex::readLine(const std::string &line)
+{
+    static const uint32_t SBF_SVID_OFFSET_BEIDOU { 140 };
+
+    // one line looks like:
+    // 345605000,1801,145,1,28,3795932449 2099070704 0 0 0 0 0 0 0 1
+    // which is
+    // TOW [0.001 s], WNc [w], SVID, CRCPassed, signalType, NAVBits
+    //
+    // Reference: [1] 3.2 Navigation Page blocks
+
+    // signalType
+    // 28=CMP_B1
+    // 29=CMP_B2
+    //
+    // Reference: [2] 11.9 sbf2ismr
+
+    // split fields, delimited by comma
+    std::vector<std::string> splitline;
+    boost::split(splitline, line, boost::is_any_of(","));
+
+    // ensure we have all elements
+    assert(splitline.size() == 7);
+
+    // parse tow and prn fields
+
+    /*
+     * SBF TOW represents every single subframe time stamp. This makes no
+     * difference for D1, but for D2.
+     *
+     * Duration of one subframe:
+     * D1: 6s
+     * D2: 0.6s
+     *
+     * BDS SOW behavior:
+     * D1: Every subframe gets a unique timestamp.
+     * D2: Every _frame_ gets a unique timestamp. That means all subframes of
+     *     that frame have the same SOW.
+     *
+     * Additionaly there is an offset between TOW and BDS SOW:
+     * D1: 20s
+     * D2: 14.4s + frameID * 0.6s
+     */
+    uint32_t tow { std::stoul(splitline[0]) };
+    uint32_t week { std::stoul(splitline[1]) };
+    uint32_t millisec { tow % 1000 };
+    tow = (tow - millisec) / 1000;
+    m_datetime = DateTime(bnav::TimeSystem::GPST, week, tow, millisec);
+
+    // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
+    m_prn = std::stoul(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
+
+    // determine signal type - yes, Septentrio saves both B1 and B2
+    const uint32_t sigtype { std::stoul(splitline[4]) };
+
+    if (sigtype == 28)
+        m_sigtype = SignalType::BDS_B1;
+    else if (sigtype == 29)
+        m_sigtype = SignalType::BDS_B2;
+
+    //FIXME: index 5 in unused and unknown!
+
+    // parse last field, which contains 10 numeric values, separated by whitespace
+    std::vector<std::string> splitbits;
+    boost::split(splitbits, splitline[6], boost::is_any_of(" "));
+
+    // ensure we have 10 values
+    assert(splitbits.size() == 10);
+
+    NavBits<320> navbits320;
+    for (std::vector<std::string>::iterator it = splitbits.begin(); it < splitbits.end(); ++it)
+    {
+        // convert hex string to unsigned integer
+        uint32_t val { 0 };
+        std::stringstream ss;
+        ss << std::hex << *it;
+        ss >> val;
+
+        //const uint32_t val { std::stoul(*it) };
+        const std::size_t bsize { 32 };
+        const NavBits<bsize> bitblock { val };
+
+        // shift 32 bytes to the left and fill the right side
+        navbits320 <<= bsize;
+        for (std::size_t k = 0; k < bsize; ++k)
+            navbits320[k] = bitblock[k];
+
+        //std::cout << ": " << bitblock << std::endl;
+    }
+
+    // The last 20 bits have to be zero, because we have only 300 bits nav msg.
+    // For whatever reason the last bit inside the SBF data is set to one
+    // ignore this bit, by removing it with -1 (from firmware 2.5-Beidou_patch).
+    // convert hex string to unsigned integer
+    uint32_t val { 0 };
+    std::stringstream ss;
+    ss << std::hex << splitbits[9];
+    ss >> val;
+
+    NavBits<32> lastblock { val - 1 };
     lastblock <<= 12; // ignore the 12 msb which contain information
     assert(lastblock.to_ulong() == 0);
 

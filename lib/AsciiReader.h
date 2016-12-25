@@ -15,6 +15,7 @@ enum class AsciiReaderType
 {
     TEXT_CONVERTED_JPS,
     TEXT_CONVERTED_SBF,
+    TEXT_CONVERTED_SBF_HEX,
     NONE
 };
 

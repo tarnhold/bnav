@@ -50,6 +50,16 @@ public:
     void readLine(const std::string &line);
 };
 
+// Type for SBF style files
+class AsciiReaderEntrySBFHex final : public AsciiReaderEntry
+{
+public:
+    AsciiReaderEntrySBFHex();
+    AsciiReaderEntrySBFHex(const std::string &line);
+
+    void readLine(const std::string &line);
+};
+
 } // namespace bnav
 
 #endif // ASCIIREADERENTRY_H
