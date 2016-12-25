@@ -294,13 +294,14 @@ void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
     std::uint32_t lastsec { 0 };
     std::uint32_t lastweek { 0 };
     // use a separate boolean, because SOW could be zero
-    bool firstrun { true };
+    bool firstentry { true };
     for (auto it = data.begin(); it != data.end(); ++it)
     {
         std::cout << "=> Writing: " << it->second.getDateOfIssue().getDateTimeString() << std::endl;
-        if (firstrun)
+        // if we write the first entry, we don't have to close a data gap before
+        if (firstentry)
         {
-           firstrun = false;
+           firstentry = false;
         }
         else
         {
