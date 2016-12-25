@@ -20,7 +20,7 @@ SUITE(testNavBitsECC_Block)
         bnav::NavBitsECCWord<30> ecc(bTest);
         CHECK(!ecc.isModified());
         // check if bits, which got split into subwords, merge back correctly
-        CHECK(ecc.getBits() == bTest);
+        CHECK_EQUAL(bTest, ecc.getBits());
 
         // change first bit
         bTest.flipLeft(0);
@@ -38,12 +38,12 @@ SUITE(testNavBitsECC_Block)
         const bnav::NavBits<30> word1 = bTest.getLeft<0, 30>();
         bnav::NavBitsECCWord<30> ecc(word1);
         CHECK(!ecc.isModified());
-        CHECK(ecc.getBits() == word1);
+        CHECK_EQUAL(word1, ecc.getBits());
 
         const bnav::NavBits<30> word2 = bTest.getLeft<30, 30>();
         ecc = bnav::NavBitsECCWord<30>(word2);
         CHECK(!ecc.isModified());
-        CHECK(ecc.getBits() == word2);
+        CHECK_EQUAL(word2, ecc.getBits());
     }
 
     // block with 24 parity bits at the end
@@ -53,7 +53,7 @@ SUITE(testNavBitsECC_Block)
 
         bnav::NavBitsECCWord<90> ecc90(bTest);
         CHECK(!ecc90.isModified());
-        CHECK(ecc90.getBits() == bTest);
+        CHECK_EQUAL(bTest, ecc90.getBits());
 
         // change first bit of subword 1
         bTest.flipLeft(0);
@@ -73,7 +73,7 @@ SUITE(testNavBitsECC_Block)
 
         bnav::NavBitsECCWord<150> ecc150(bTest);
         CHECK(!ecc150.isModified());
-        CHECK(ecc150.getBits() == bTest);
+        CHECK_EQUAL(bTest, ecc150.getBits());
     }
 
     // block with 72 parity bits at the end
@@ -84,7 +84,7 @@ SUITE(testNavBitsECC_Block)
         bnav::NavBitsECCWord<270> ecc270(bTest);
         CHECK(!ecc270.isModified());
         // check if bits, which got split into subwords, merge back correctly
-        CHECK(ecc270.getBits() == bTest);
+        CHECK_EQUAL(bTest, ecc270.getBits());
     }
 }
 
@@ -114,7 +114,7 @@ TEST(testNavBitsECCParity15)
     bnav::NavBitsECCWord<15> ecc(bits);
     // ensure nothing was modified, because the bits are ok
     CHECK(!ecc.isModified());
-    CHECK(ecc.getBits().to_ulong() == initialbitval);
+    CHECK_EQUAL(initialbitval, ecc.getBits().to_ulong());
 
     // now manipulate every single bit of that message (only one once!)
     // so we can see, that the error correction works for every bit
@@ -126,11 +126,11 @@ TEST(testNavBitsECCParity15)
         bnav::NavBitsECCWord<15> ecc3(bits);
         CHECK(ecc3.isModified());
         // ensure we recovered the original state
-        CHECK(ecc3.getBits().to_ulong() == initialbitval);
+        CHECK_EQUAL(initialbitval, ecc3.getBits().to_ulong());
 
         // restore originial state
         bits.flip(i);
-        CHECK(bits.to_ulong() == initialbitval);
+        CHECK_EQUAL(initialbitval, bits.to_ulong());
     }
 }
 
@@ -153,8 +153,8 @@ TEST(testNavBitsECCWordFiles)
 
         ++msgcount;
     }
-    CHECK(msgcount == 5);
-    CHECK(paritycount == 1);
+    CHECK_EQUAL(5, msgcount);
+    CHECK_EQUAL(1, paritycount);
     reader.close();
 }
 
@@ -180,9 +180,9 @@ TEST(testNavBitsECCSamples)
 
             ++msgcount;
         }
-        CHECK(msgcount == 434);
-        CHECK(paritycountB1 == 11);
-        CHECK(paritycountB2 == 10);
+        CHECK_EQUAL(434, msgcount);
+        CHECK_EQUAL(11, paritycountB1);
+        CHECK_EQUAL(10, paritycountB2);
         reader.close();
     }
 
@@ -206,9 +206,9 @@ TEST(testNavBitsECCSamples)
             ++msgcount;
         }
         //std::cout << "msgcount: " << msgcount << " parity: " << paritycountB1 << std::endl;
-        CHECK(msgcount == 210);
-        CHECK(paritycountB1 == 12);
-        CHECK(paritycountB2 == 8);
+        CHECK_EQUAL(210, msgcount);
+        CHECK_EQUAL(12, paritycountB1);
+        CHECK_EQUAL(8, paritycountB2);
         reader.close();
     }
 }

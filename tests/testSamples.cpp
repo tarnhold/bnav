@@ -51,11 +51,11 @@ SUITE(testSamples)
 
             ++msgcount;
         }
-        CHECK(msgcount == 150);
+        CHECK_EQUAL(150, msgcount);
         // we should have completed 30 ephemeris data sets
-        CHECK(ephcount == 30);
+        CHECK_EQUAL(30, ephcount);
         // and 1 almanac data set
-        CHECK(almcount == 1);
+        CHECK_EQUAL(1, almcount);
 
         // there should be incomplete data at EOF
         CHECK(sbstore.hasIncompleteData());

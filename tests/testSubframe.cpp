@@ -32,20 +32,20 @@ SUITE(testSubframe_SBF_Simple)
             bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
-            CHECK(sf.getFrameID() == i + 1);
+            CHECK_EQUAL(i + 1, sf.getFrameID());
 
             // non-Geo: FraID 1-3 have no Pnum
             if (sf.getFrameID() < 4)
-                CHECK(sf.getPageNum() == 0);
+                CHECK_EQUAL(0, sf.getPageNum());
             else
-                CHECK(sf.getPageNum() == 1);
+                CHECK_EQUAL(1, sf.getPageNum());
 
-            CHECK(sf.getSOW() == sowlist[i]);
+            CHECK_EQUAL(sowlist[i], sf.getSOW());
 
             ++i;
         }
-        CHECK(i == 5);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(5, i);
+        CHECK_EQUAL(0, paritycount);
         reader.close();
     }
 
@@ -74,20 +74,20 @@ SUITE(testSubframe_SBF_Simple)
             sf.initialize();
             paritycount += sf.getParityModifiedCount();
 
-            CHECK(sf.getFrameID() == i + 1);
+            CHECK_EQUAL(i + 1, sf.getFrameID());
 
             // non-Geo: FraID 1-3 have no Pnum
             if (sf.getFrameID() < 4)
-                CHECK(sf.getPageNum() == 0);
+                CHECK_EQUAL(0, sf.getPageNum());
             else
-                CHECK(sf.getPageNum() == 1);
+                CHECK_EQUAL(1, sf.getPageNum());
 
-            CHECK(sf.getSOW() == sowlist[i]);
+            CHECK_EQUAL(sowlist[i], sf.getSOW());
 
             ++i;
         }
-        CHECK(i == 5);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(5, i);
+        CHECK_EQUAL(0, paritycount);
         reader.close();
     }
 
@@ -108,21 +108,21 @@ SUITE(testSubframe_SBF_Simple)
             bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
-            CHECK(sf.getFrameID() == i + 1);
+            CHECK_EQUAL(i + 1, sf.getFrameID());
 
             // Geo: FraID 3 and 4 have no Pnum
             if (sf.getFrameID() == 3 || sf.getFrameID() == 4)
-                CHECK(sf.getPageNum() == 0);
+                CHECK_EQUAL(0, sf.getPageNum());
             else
-                CHECK(sf.getPageNum() == 1);
+                CHECK_EQUAL(1, sf.getPageNum());
 
             // Geo: have same SOW for FraID 1-5
-            CHECK(sf.getSOW() == 345600);
+            CHECK_EQUAL(345600, sf.getSOW());
 
             ++i;
         }
-        CHECK(i == 5);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(5, i);
+        CHECK_EQUAL(0, paritycount);
         reader.close();
     }
 }
@@ -156,26 +156,26 @@ SUITE(testSubframe_SBF_OneFrame)
             if (sf.getFrameID() == 4)
             {
                 ++pnum_fra4;
-                CHECK(sf.getPageNum() == pnum_fra4);
+                CHECK_EQUAL(pnum_fra4, sf.getPageNum());
             }
             else if (sf.getFrameID() == 5)
             {
                 ++pnum_fra5;
-                CHECK(sf.getPageNum() == pnum_fra5);
+                CHECK_EQUAL(pnum_fra5, sf.getPageNum());
             }
             else
                 // non-Geo: FraID 1-3 have no Pnum
-                CHECK(sf.getPageNum() == 0);
+                CHECK_EQUAL(0, sf.getPageNum());
 
             // subframes come every 6s
-            CHECK(sf.getSOW() == sowfirst + i * 6);
+            CHECK_EQUAL(sowfirst + i * 6, sf.getSOW());
 
             ++i;
         }
-        CHECK(i == 24*5);
-        CHECK(pnum_fra4 == 24);
-        CHECK(pnum_fra5 == 24);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(24 * 5, i);
+        CHECK_EQUAL(24, pnum_fra4);
+        CHECK_EQUAL(24, pnum_fra5);
+        CHECK_EQUAL(0, paritycount);
         reader.close();
     }
 
@@ -202,8 +202,8 @@ SUITE(testSubframe_SBF_OneFrame)
             bnav::Subframe sf(sv, entry.getBits());
             paritycount += sf.getParityModifiedCount();
 
-            CHECK(sf.getFrameID() == (i % 5) + 1);
-            CHECK(sf.getSOW() == sow);
+            CHECK_EQUAL((i % 5) + 1, sf.getFrameID());
+            CHECK_EQUAL(sow, sf.getSOW());
 
             // check Pnum for frame 1, 2 and 5
             if (sf.getFrameID() == 1)
@@ -212,7 +212,7 @@ SUITE(testSubframe_SBF_OneFrame)
                 if (pnum_fra1 == 10)
                     pnum_fra1 = 0;
                 ++pnum_fra1;
-                CHECK(sf.getPageNum() == pnum_fra1);
+                CHECK_EQUAL(pnum_fra1, sf.getPageNum());
             }
             else if (sf.getFrameID() == 2)
             {
@@ -220,12 +220,12 @@ SUITE(testSubframe_SBF_OneFrame)
                 if (pnum_fra2 == 6)
                     pnum_fra2 = 0;
                 ++pnum_fra2;
-                CHECK(sf.getPageNum() == pnum_fra2);
+                CHECK_EQUAL(pnum_fra2, sf.getPageNum());
             }
             else if (sf.getFrameID() == 5)
             {
                 ++pnum_fra5;
-                CHECK(sf.getPageNum() == pnum_fra5);
+                CHECK_EQUAL(pnum_fra5, sf.getPageNum());
 
                 // increment SOW if we hit frame 5
                 // with D2 we have subframes every 0.6s which is 0.6s * 5 = 3s
@@ -234,16 +234,16 @@ SUITE(testSubframe_SBF_OneFrame)
             }
             else
                 // Geo: FraID 3 and 4 have no Pnum
-                CHECK(sf.getPageNum() == 0);
+                CHECK_EQUAL(0, sf.getPageNum());
 
             ++i;
         }
-        CHECK(i == 120*5);
-        CHECK(pnum_fra1 == 10);
-        CHECK(pnum_fra2 == 6);
-        CHECK(pnum_fra5 == 120);
-        CHECK(sow == 365397 + 3); // because we incremented one too much
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(120 * 5, i);
+        CHECK_EQUAL(10, pnum_fra1);
+        CHECK_EQUAL(6, pnum_fra2);
+        CHECK_EQUAL(120, pnum_fra5);
+        CHECK_EQUAL(365397 + 3, sow); // because we incremented one too much
+        CHECK_EQUAL(0, paritycount);
         reader.close();
     }
 }
