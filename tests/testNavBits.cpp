@@ -10,71 +10,71 @@ TEST(testNavBitsConstructor)
     // empty constructor
     {
         const bnav::NavBits<10> bits;
-        CHECK(bits.size() == 10);
-        CHECK(bits.to_string() == "0000000000");
+        CHECK_EQUAL(10, bits.size());
+        CHECK_EQUAL("0000000000", bits.to_string());
     }
 
     // numeric constructor
     {
         const bnav::NavBits<10> bits2(8);
-        CHECK(bits2.size() == 10);
-        CHECK(bits2.to_ulong() == 8);
+        CHECK_EQUAL(10, bits2.size());
+        CHECK_EQUAL(8, bits2.to_ulong());
 
         const bnav::NavBits<10> bits3(1023);
-        CHECK(bits3.size() == 10);
-        CHECK(bits3.to_string() == "1111111111");
+        CHECK_EQUAL(10, bits3.size());
+        CHECK_EQUAL("1111111111", bits3.to_string());
 
         // fill leading pos with zeros
         const bnav::NavBits<5> bits5(31);
         const bnav::NavBits<10> bits6(bits5);
-        CHECK(bits6.size() == 10);
-        CHECK(bits6.to_string() == "0000011111");
+        CHECK_EQUAL(10, bits6.size());
+        CHECK_EQUAL("0000011111", bits6.to_string());
     }
 
     // string constructor
     {
         // we reserve 10 bits, but only set the 6 lsb bits
         const bnav::NavBits<10> bits3("101000");
-        CHECK(bits3.size() == 10);
-        CHECK(bits3.to_string() == "0000101000");
+        CHECK_EQUAL(10, bits3.size());
+        CHECK_EQUAL("0000101000", bits3.to_string());
 
         const bnav::NavBits<5> bits4("10100");
-        CHECK(bits4.size() == 5);
-        CHECK(bits4.to_string() == "10100");
+        CHECK_EQUAL(5, bits4.size());
+        CHECK_EQUAL("10100", bits4.to_string());
     }
 
     // bitset constructor, same size
     {
         const std::bitset<5> bitset4(31);
         const bnav::NavBits<10> bits5(bitset4);
-        CHECK(bits5.size() == 10);
-        CHECK(bits5.to_string() == "0000011111");
+        CHECK_EQUAL(10, bits5.size());
+        CHECK_EQUAL("0000011111", bits5.to_string());
     }
 
     // bitest constructor
     {
         const std::bitset<10> bitset1("1111100001");
         const bnav::NavBits<10> bits2(bitset1);
-        CHECK(bits2.size() == 10);
-        CHECK(bits2.to_string() == "1111100001");
+        CHECK_EQUAL(10, bits2.size());
+        CHECK_EQUAL("1111100001", bits2.to_string());
 
         const std::bitset<10> bitset2(1023);
         const bnav::NavBits<10> bits3(bitset2);
-        CHECK(bits3.size() == 10);
-        CHECK(bits3.to_string() == "1111111111");
+        CHECK_EQUAL(10, bits3.size());
+        CHECK_EQUAL("1111111111", bits3.to_string());
     }
 
     // NavBits constructor, same size
     {
         const bnav::NavBits<10> bits1("1111100001");
         const bnav::NavBits<10> bits2(bits1);
-        CHECK(bits2.size() == 10);
-        CHECK(bits2.to_string() == "1111100001");
+        CHECK_EQUAL(10, bits2.size());
+        CHECK_EQUAL("1111100001", bits2.to_string());
 
         const bnav::NavBits<10> bits3(1023);
         const bnav::NavBits<10> bits4(bits3);
-        CHECK(bits4.size() == 10);
-        CHECK(bits4.to_string() == "1111111111");
+        CHECK_EQUAL(10, bits4.size());
+        CHECK_EQUAL("1111111111", bits4.to_string());
     }
 
     // NavBits constructor
@@ -82,14 +82,14 @@ TEST(testNavBitsConstructor)
         // init with smaller NavBits dim
         const bnav::NavBits<5> bits7("11111");
         const bnav::NavBits<10> bits8(bits7);
-        CHECK(bits8.size() == 10);
-        CHECK(bits8.to_string() == "0000011111");
+        CHECK_EQUAL(10, bits8.size());
+        CHECK_EQUAL("0000011111", bits8.to_string());
 
         // init with empty NavBits
         const bnav::NavBits<5> bits9;
         const bnav::NavBits<10> bits10(bits9);
-        CHECK(bits10.size() == 10);
-        CHECK(bits10.to_ulong() == 0);
+        CHECK_EQUAL(10, bits10.size());
+        CHECK_EQUAL(0, bits10.to_ulong());
     }
 }
 
@@ -101,18 +101,18 @@ SUITE(testNavBitsAccess)
     {
         bnav::NavBits<3> bits;
         bits[0] = true;
-        CHECK(bits[0] == true);
-        CHECK(bits[1] == false);
-        CHECK(bits[2] == false);
-        CHECK(bits.to_string() == "001");
+        CHECK_EQUAL(true, bits[0]);
+        CHECK_EQUAL(false, bits[1]);
+        CHECK_EQUAL(false, bits[2]);
+        CHECK_EQUAL("001", bits.to_string());
 
         bnav::NavBits<3> bits2;
         bits2[1] = true;
         bits2[2] = true;
-        CHECK(bits2[0] == false);
-        CHECK(bits2[1] == true);
-        CHECK(bits2[2] == true);
-        CHECK(bits2.to_string() == "110");
+        CHECK_EQUAL(false, bits2[0]);
+        CHECK_EQUAL(true, bits2[1]);
+        CHECK_EQUAL(true, bits2[2]);
+        CHECK_EQUAL("110", bits2.to_string());
     }
 
     // Access from left
@@ -121,20 +121,20 @@ SUITE(testNavBitsAccess)
     {
         bnav::NavBits<3> bits;
         bits.setLeft(0, true);
-        CHECK(bits.size() == 3);
-        CHECK(bits.atLeft(0) == true);
-        CHECK(bits.atLeft(1) == false);
-        CHECK(bits.atLeft(2) == false);
-        CHECK(bits.to_string() == "100");
+        CHECK_EQUAL(3, bits.size());
+        CHECK_EQUAL(true, bits.atLeft(0));
+        CHECK_EQUAL(false, bits.atLeft(1));
+        CHECK_EQUAL(false, bits.atLeft(2));
+        CHECK_EQUAL("100", bits.to_string());
 
         bnav::NavBits<3> bits2;
         bits2.setLeft(0, false);
         bits2.setLeft(1, true);
         bits2.setLeft(2);
-        CHECK(bits2.atLeft(0) == false);
-        CHECK(bits2.atLeft(1) == true);
-        CHECK(bits2.atLeft(2) == true);
-        CHECK(bits2.to_string() == "011");
+        CHECK_EQUAL(false, bits2.atLeft(0));
+        CHECK_EQUAL(true, bits2.atLeft(1));
+        CHECK_EQUAL(true, bits2.atLeft(2));
+        CHECK_EQUAL("011", bits2.to_string());
     }
 
     // Access from left, set a bunch of bits
@@ -143,28 +143,28 @@ SUITE(testNavBitsAccess)
         const bnav::NavBits<4> setter("1101");
         bnav::NavBits<10> bits;
         bits.setLeft(0, setter);
-        CHECK(bits.size() == 10);
-        CHECK(bits.to_string() == "1101000000");
+        CHECK_EQUAL(10, bits.size());
+        CHECK_EQUAL("1101000000", bits.to_string());
 
         bits = bnav::NavBits<10>(0);
-        CHECK(bits.to_ulong() == 0);
+        CHECK_EQUAL(0, bits.to_ulong());
         bits.setLeft(1, setter);
-        CHECK(bits.to_string() == "0110100000");
+        CHECK_EQUAL("0110100000", bits.to_string());
 
         bits = bnav::NavBits<10>(0);
-        CHECK(bits.to_ulong() == 0);
+        CHECK_EQUAL(0, bits.to_ulong());
         bits.setLeft(6, setter);
-        CHECK(bits.to_string() == "0000001101");
+        CHECK_EQUAL("0000001101", bits.to_string());
 
         bits = bnav::NavBits<10>(31);
-        CHECK(bits.to_string() == "0000011111");
+        CHECK_EQUAL("0000011111", bits.to_string());
         bits.setLeft(0, setter);
-        CHECK(bits.to_string() == "1101011111");
+        CHECK_EQUAL("1101011111", bits.to_string());
 
         bits = bnav::NavBits<10>(31);
-        CHECK(bits.to_string() == "0000011111");
+        CHECK_EQUAL("0000011111", bits.to_string());
         bits.setLeft(2, setter);
-        CHECK(bits.to_string() == "0011011111");
+        CHECK_EQUAL("0011011111", bits.to_string());
     }
 }
 
@@ -174,18 +174,18 @@ TEST(testNavBitsFlip)
     {
         bnav::NavBits<4> bits("0001");
         bits.flip(0);
-        CHECK(bits.to_string() == "0000");
+        CHECK_EQUAL("0000", bits.to_string());
         bits.flip(2);
-        CHECK(bits.to_string() == "0100");
+        CHECK_EQUAL("0100", bits.to_string());
     }
 
     // flip from left
     {
         bnav::NavBits<4> bits("0001");
         bits.flipLeft(0);
-        CHECK(bits.to_string() == "1001");
+        CHECK_EQUAL("1001", bits.to_string());
         bits.flipLeft(1);
-        CHECK(bits.to_string() == "1101");
+        CHECK_EQUAL("1101", bits.to_string());
     }
 
     // flip all
@@ -193,16 +193,16 @@ TEST(testNavBitsFlip)
         {
             bnav::NavBits<4> bits("0001");
             bits.flipAll();
-            CHECK(bits.to_string() == "1110");
+            CHECK_EQUAL("1110", bits.to_string());
             bits.flipAll();
-            CHECK(bits.to_string() == "0001");
+            CHECK_EQUAL("0001", bits.to_string());
         }
         {
             bnav::NavBits<4> bits("1010");
             bits.flipAll();
-            CHECK(bits.to_string() == "0101");
+            CHECK_EQUAL("0101", bits.to_string());
             bits.flipAll();
-            CHECK(bits.to_string() == "1010");
+            CHECK_EQUAL("1010", bits.to_string());
         }
     }
 }
@@ -214,17 +214,17 @@ TEST(testNavBitsXor)
         bnav::NavBits<4> bits("0000");
         const bnav::NavBits<4> bits2("1100");
         bits = bits ^ bits2;
-        CHECK(bits.to_string() == "1100");
+        CHECK_EQUAL("1100", bits.to_string());
         bits.flip(0);
-        CHECK(bits.to_string() == "1101");
+        CHECK_EQUAL("1101", bits.to_string());
         bits = bits ^ bits2;
-        CHECK(bits.to_string() == "0001");
+        CHECK_EQUAL("0001", bits.to_string());
 
         // differently sized
         bnav::NavBits<10> bits3;
         bnav::NavBits<5> bits4(31);
         bits3 = bits3 ^ bits4;
-        CHECK(bits3.to_string() == "0000011111");
+        CHECK_EQUAL("0000011111", bits3.to_string());
     }
 
     // operator^=
@@ -232,17 +232,17 @@ TEST(testNavBitsXor)
         bnav::NavBits<4> bits("0000");
         const bnav::NavBits<4> bits2("1100");
         bits ^= bits2;
-        CHECK(bits.to_string() == "1100");
+        CHECK_EQUAL("1100", bits.to_string());
         bits.flip(0);
-        CHECK(bits.to_string() == "1101");
+        CHECK_EQUAL("1101", bits.to_string());
         bits ^= bits2;
-        CHECK(bits.to_string() == "0001");
+        CHECK_EQUAL("0001", bits.to_string());
 
         // differently sized
         bnav::NavBits<10> bits3;
         bnav::NavBits<5> bits4(31);
         bits3 ^= bits4;
-        CHECK(bits3.to_string() == "0000011111");
+        CHECK_EQUAL("0000011111", bits3.to_string());
     }
 }
 
@@ -252,9 +252,9 @@ TEST(testNavBitsShift)
     {
         bnav::NavBits<4> bits("0001");
         bits <<= 3;
-        CHECK(bits.to_string() == "1000");
+        CHECK_EQUAL("1000", bits.to_string());
         bits <<= 1;
-        CHECK(bits.to_string() == "0000");
+        CHECK_EQUAL("0000", bits.to_string());
     }
 }
 
@@ -366,19 +366,19 @@ TEST(testNavBitsSlice)
         const bnav::NavBits<6> bTest("111001");
 
         std::string ret = bTest.getLeft<0, 6>().to_string();
-        CHECK(ret == "111001");
+        CHECK_EQUAL("111001", ret);
         ret = bTest.getLeft<1, 5>().to_string();
-        CHECK(ret == "11001");
+        CHECK_EQUAL("11001", ret);
         ret = bTest.getLeft<2, 4>().to_string();
-        CHECK(ret == "1001");
+        CHECK_EQUAL("1001", ret);
         ret = bTest.getLeft<3, 3>().to_string();
-        CHECK(ret == "001");
+        CHECK_EQUAL("001", ret);
         ret = bTest.getLeft<4, 2>().to_string();
-        CHECK(ret == "01");
+        CHECK_EQUAL("01", ret);
         ret = bTest.getLeft<5, 1>().to_string();
-        CHECK(ret == "1");
+        CHECK_EQUAL("1", ret);
         ret = bTest.getLeft<6, 0>().to_string();
-        CHECK(ret == "");
+        CHECK_EQUAL("", ret);
     }
 
     // Get bit slice from left (msb is index 0), check by assignment
@@ -386,12 +386,12 @@ TEST(testNavBitsSlice)
         const bnav::NavBits<6> bTest("111001");
 
         bnav::NavBits<6> ret6 = bTest.getLeft<0, 6>();
-        CHECK(ret6.to_string() == "111001");
+        CHECK_EQUAL("111001", ret6.to_string());
         bnav::NavBits<5> ret5 = bTest.getLeft<1, 5>();
-        CHECK(ret5.to_string() == "11001");
+        CHECK_EQUAL("11001", ret5.to_string());
         bnav::NavBits<1> ret1 = bTest.getLeft<5, 1>();
-        CHECK(ret1.to_string() == "1");
+        CHECK_EQUAL("1", ret1.to_string());
         bnav::NavBits<0> ret0 = bTest.getLeft<6, 0>();
-        CHECK(ret0.to_string() == "");
+        CHECK_EQUAL("", ret0.to_string());
     }
 }
