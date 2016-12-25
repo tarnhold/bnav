@@ -50,12 +50,12 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 
             ++msgcount;
         }
-        CHECK(msgcount == 150);
+        CHECK_EQUAL(150, msgcount);
         // we should have completed 30 ephemeris data sets
-        CHECK(ephcount == 30);
+        CHECK_EQUAL(30, ephcount);
         // and 1 almanac data set
-        CHECK(almcount == 1);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(1, almcount);
+        CHECK_EQUAL(0, paritycount);
         reader.close();
     }
 
@@ -96,12 +96,12 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 
             ++msgcount;
         }
-        CHECK(msgcount == 750);
-        // we should have completed 30 ephemeris data sets
-        CHECK(ephcount == 14);
+        CHECK_EQUAL(750, msgcount);
+        // we should have completed 14 ephemeris data sets
+        CHECK_EQUAL(14, ephcount);
         // and 1 almanac data set
-        CHECK(almcount == 1);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(1, almcount);
+        CHECK_EQUAL(0, paritycount);
         reader.close();
     }
 
@@ -139,11 +139,11 @@ SUITE(testSubframeBuffer_SBF_Superframe_OnePRN)
 
             ++msgcount;
         }
-        CHECK(msgcount == 52);
+        CHECK_EQUAL(52, msgcount);
         // we should have on complete data set
-        CHECK(ephcount == 1);
+        CHECK_EQUAL(1, ephcount);
         // one parity should be fixed!
-        CHECK(paritycount == 1);
+        CHECK_EQUAL(1, paritycount);
         reader.close();
     }
 }

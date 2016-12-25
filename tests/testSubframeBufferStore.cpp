@@ -53,13 +53,13 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
 
             ++msgcount;
         }
-        CHECK(msgcount == 150);
+        CHECK_EQUAL(150, msgcount);
         // we should have completed 30 ephemeris data sets
-        CHECK(ephcount == 30);
+        CHECK_EQUAL(30, ephcount);
         // and 1 almanac data set
-        CHECK(almcount == 1);
+        CHECK_EQUAL(1, almcount);
         // all parities should be fine
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(0, paritycount);
 
         // there should be incomplete data at EOF
         CHECK(sbstore.hasIncompleteData());
@@ -105,12 +105,12 @@ SUITE(testSubframeBufferStore_SBF_Superframe_OnePRN)
 
             ++msgcount;
         }
-        CHECK(msgcount == 750);
-        // we should have completed 30 ephemeris data sets
-        CHECK(ephcount == 14);
+        CHECK_EQUAL(750, msgcount);
+        // we should have completed 14 ephemeris data sets
+        CHECK_EQUAL(14, ephcount);
         // and 1 almanac data set
-        CHECK(almcount == 1);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(1, almcount);
+        CHECK_EQUAL(0, paritycount);
 
         // there should be incomplete data at EOF
         CHECK(sbstore.hasIncompleteData());
@@ -159,20 +159,20 @@ SUITE(testSubframeBufferStore_SBF)
 
             ++msgcount;
         }
-        CHECK(msgcount == 7500);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(7500, msgcount);
+        CHECK_EQUAL(0, paritycount);
 
         // we should have ephemeris data from 5 geos and 3 non-geos
-        CHECK(ephcount.size() == 8);
+        CHECK_EQUAL(8, ephcount.size());
         for (auto it = ephcount.begin(); it != ephcount.end(); ++it)
-            CHECK(it->second == 28);
+            CHECK_EQUAL(28, it->second);
 
         // we should only have a two complete data sets for GEOs
         // because non-GEOs should not be completed
         for (auto it = almcount.cbegin(); it != almcount.cend(); ++it)
         {
             CHECK(it->first.isGeo());
-            CHECK(it->second == 2);
+            CHECK_EQUAL(2, it->second);
         }
 
         // there should be incomplete data at EOF
@@ -219,14 +219,14 @@ SUITE(testSubframeBufferStore_SBF)
 
             ++msgcount;
         }
-        CHECK(msgcount == 10000);
-        CHECK(paritycount == 0);
+        CHECK_EQUAL(10000, msgcount);
+        CHECK_EQUAL(0, paritycount);
 
         // we should have ephemeris data from 5 geos and 3 non-geos
-        CHECK(ephcount.size() == 8);
+        CHECK_EQUAL(8, ephcount.size());
         for (auto it = ephcount.begin(); it != ephcount.end(); ++it)
         {
-            CHECK(it->second == 37);
+            CHECK_EQUAL(37, it->second);
         }
 
         // we should only have a three complete data sets for GEOs
@@ -234,9 +234,9 @@ SUITE(testSubframeBufferStore_SBF)
         for (auto it = almcount.cbegin(); it != almcount.cend(); ++it)
         {
             if (it->first.isGeo())
-                CHECK(it->second == 3);
+                CHECK_EQUAL(3, it->second);
             else
-                CHECK(it->second == 1);
+                CHECK_EQUAL(1, it->second);
         }
 
         // there should be incomplete data at EOF

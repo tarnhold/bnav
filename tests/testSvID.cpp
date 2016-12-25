@@ -12,14 +12,14 @@ SUITE(testSvID)
         bnav::SvID sv;
 
         // default should be not valid
-        CHECK(sv.getPRN() == 0);
+        CHECK_EQUAL(0, sv.getPRN());
         CHECK(!sv.isGeo());
 
         // check all possible PRNs
         for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
         {
             sv.setPRN(i);
-            CHECK(sv.getPRN() == i);
+            CHECK_EQUAL(i, sv.getPRN());
 
             if (i <= 5)
                 CHECK(sv.isGeo());
@@ -34,7 +34,7 @@ SUITE(testSvID)
         for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
         {
             bnav::SvID sv(i);
-            CHECK(sv.getPRN() == i);
+            CHECK_EQUAL(i, sv.getPRN());
 
             if (i <= 5)
                 CHECK(sv.isGeo());
