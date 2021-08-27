@@ -122,7 +122,7 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
 
         m_prn = std::stoul(extractData(line, "PRN "));
     }
-    catch (std::invalid_argument)
+    catch (std::invalid_argument &)
     {
         std::cerr << "Malformed data line. Wrong format?" << std::endl;
         exit(1);

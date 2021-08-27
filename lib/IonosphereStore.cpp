@@ -34,7 +34,7 @@ std::vector< SvID > IonosphereStore::getSvList() const
 {
     std::vector< SvID > svlist {};
 
-    for (const auto elem : m_store)
+    for (const auto & elem : m_store)
         svlist.push_back(elem.first);
 
     return svlist;
@@ -95,7 +95,7 @@ void IonosphereStore::dumpStoreStatistics(const std::string &name) const
         return;
     }
 
-    for (const auto item : m_store)
+    for (const auto & item : m_store)
     {
         std::cout << item.first.getPRN() << ": "
                   << item.second.size() << std::endl;
@@ -144,7 +144,7 @@ void IonosphereStore::dumpGridAvailability(const SvID &sv) const
         it->setVerticalDelay_TECU(0);
 
     // loop through each ionospheric model for SV in store
-    for (const auto elem : svitems)
+    for (const auto & elem : svitems)
     {
         const std::vector<IonoGridInfo> igp = elem.second.getGrid();
         std::size_t i = 0;
