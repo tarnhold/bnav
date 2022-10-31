@@ -1,5 +1,7 @@
 #include "IonexWriter.h"
 
+#include "BeiDou.h"
+
 #include <cassert>
 #include <iomanip>
 #include <iostream>

@@ -1,3 +1,4 @@
+#include "BeiDou.h"
 #include "SubframeBuffer.h"
 
 // TODO: this is D1 only at the moment

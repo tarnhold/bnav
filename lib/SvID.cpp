@@ -1,5 +1,7 @@
 #include "SvID.h"
 
+#include "BeiDou.h"
+
 #include <cassert>
 
 namespace bnav

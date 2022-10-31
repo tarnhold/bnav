@@ -1,7 +1,6 @@
 #ifndef ASCIIREADERENTRY_H
 #define ASCIIREADERENTRY_H
 
-#include "AsciiReader.h"
 #include "BeiDou.h"
 #include "DateTime.h"
 #include "NavBits.h"

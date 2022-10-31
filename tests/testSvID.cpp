@@ -1,6 +1,6 @@
 #include <UnitTest++/UnitTest++.h>
-#include "TestConfig.h"
 
+#include "BeiDou.h"
 #include "SvID.h"
 
 SUITE(testSvID)

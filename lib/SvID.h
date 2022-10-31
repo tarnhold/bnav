@@ -1,8 +1,6 @@
 #ifndef SVID_H
 #define SVID_H
 
-#include "BeiDou.h"
-
 #include <cstdint>
 
 namespace bnav

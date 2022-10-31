@@ -1,3 +1,4 @@
+#include "BeiDou.h"
 #include "SubframeBuffer.h"
 
 namespace bnav
