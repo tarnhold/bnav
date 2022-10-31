@@ -104,14 +104,14 @@ namespace bnav
 IonexWriter::IonexWriter()
     : m_outfile()
     , m_filename()
-    , m_interval(UINT32_MAX)
+    , m_interval(std::numeric_limits<uint32_t>::max())
     , m_isKlobuchar(false)
     , m_isHeaderWritten(false)
     , m_tecmapcount(0)
 {
 }
 
-IonexWriter::IonexWriter(const char *filename, const std::size_t interval, const bool klobuchar)
+IonexWriter::IonexWriter(const char *filename, const std::uint32_t interval, const bool klobuchar)
     : m_outfile()
     , m_filename(filename)
     , m_interval(interval)
@@ -123,7 +123,7 @@ IonexWriter::IonexWriter(const char *filename, const std::size_t interval, const
 }
 
 
-IonexWriter::IonexWriter(const std::string &filename, const std::size_t interval, const bool klobuchar)
+IonexWriter::IonexWriter(const std::string &filename, const std::uint32_t interval, const bool klobuchar)
     : IonexWriter(filename.c_str(), interval, klobuchar)
 {
 }
@@ -319,7 +319,7 @@ void IonexWriter::writeAll(const std::map<DateTime, Ionosphere> &data)
             const std::size_t fillcount = secdiff / m_interval;
             assert(secdiff % m_interval == 0);
             // fill one less, because we want to fill "fences" not "fence posts"
-            for (std::size_t i = 1; i < fillcount; ++i)
+            for (std::uint32_t i = 1; i < fillcount; ++i)
             {
                 std::cout << "IonexWriter: Inserting dummy entry" << std::endl;
 
@@ -349,8 +349,8 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
     const std::vector<IonoGridInfo> grid = data.second.getGrid();
     const DateTime dt = data.second.getDateOfIssue();
 
-    const std::size_t colcount = igd.getItemCountLongitude();
-    const std::size_t rowcount = igd.getItemCountLatitude();
+    const std::uint32_t colcount = igd.getItemCountLongitude();
+    const std::uint32_t rowcount = igd.getItemCountLatitude();
 
     // set an arbitrary limit
     assert(colcount < 360);
@@ -374,7 +374,7 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
               << std::endl;
 
     std::size_t index = 0;
-    for (std::size_t row = 0; row < rowcount; ++row)
+    for (std::uint32_t row = 0; row < rowcount; ++row)
     {
         bool lastwasnewline = false;
         // header of one latitude record
@@ -389,7 +389,7 @@ void IonexWriter::writeRecord(const std::pair<const DateTime, Ionosphere> &data)
                   << std::endl;
 
         // data
-        for (std::size_t col = 0; col < colcount; ++col)
+        for (std::uint32_t col = 0; col < colcount; ++col)
         {
             m_outfile << std::setw(5) << grid[index].getVerticalDelay_TECU();
 

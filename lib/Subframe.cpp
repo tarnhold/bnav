@@ -103,7 +103,7 @@ void Subframe::setSvID(const SvID &sv)
 
 void Subframe::setPageNum(const std::size_t pnum)
 {
-    m_pageNum = pnum;
+    m_pageNum = static_cast<uint32_t>(pnum);
 }
 
 uint32_t Subframe::getSOW() const
@@ -179,7 +179,7 @@ bool Subframe::isPreambleOk() const
     NavBits<11> pre { m_bits.getLeft<0, 11>() };
 
     // (11100010010)bin is (1810)dec
-    return pre.to_ulong() == BDS_PREABMLE;
+    return pre.to_uint32_t() == BDS_PREABMLE;
 }
 
 /**
@@ -192,7 +192,7 @@ void Subframe::parseFrameID()
     NavBits<3> fraID { m_bits.getLeft<15, 3>() };
 //    std::cout << m_bits.getLeft<15, 3>() << " fraID: " << fraID << " : " << fraID.to_ulong() << std::endl;
 
-    m_frameID = fraID.to_ulong();
+    m_frameID = fraID.to_uint32_t();
 
     // FraIDs between 1 and 5 are valid
     assert(m_frameID > 0 && m_frameID < 6);
@@ -213,7 +213,7 @@ void Subframe::parseSOW()
     sow <<= 12;
     sow ^= sow2;
 
-    m_sow = sow.to_ulong();
+    m_sow = sow.to_uint32_t();
 
     // SOW between 0 and 604800 are valid
     assert(m_sow < SECONDS_OF_A_WEEK);
@@ -241,7 +241,7 @@ void Subframe::parsePageNumD1()
         {
             // Pnum
             NavBits<7> pnum { m_bits.getLeft<43, 7>() };
-            m_pageNum = pnum.to_ulong();
+            m_pageNum = pnum.to_uint32_t();
             if (m_pageNum == 0 || m_pageNum > 24)
                 throw std::invalid_argument(std::to_string(m_pageNum));
         }
@@ -272,7 +272,7 @@ void Subframe::parsePageNumD2()
         {
             // Pnum1
             NavBits<4> pnum { m_bits.getLeft<42, 4>() };
-            m_pageNum = pnum.to_ulong();
+            m_pageNum = pnum.to_uint32_t();
             if (m_pageNum == 0 || m_pageNum > 10)
                 throw std::invalid_argument(std::to_string(m_pageNum));
         }
@@ -287,7 +287,7 @@ void Subframe::parsePageNumD2()
         {
             // Pnum2
             NavBits<4> pnum { m_bits.getLeft<43, 4>() };
-            m_pageNum = pnum.to_ulong();
+            m_pageNum = pnum.to_uint32_t();
             if (m_pageNum == 0 || m_pageNum > 6)
                 throw std::invalid_argument(std::to_string(m_pageNum));
         }
@@ -295,7 +295,7 @@ void Subframe::parsePageNumD2()
         {
             // Pnum
             NavBits<7> pnum { m_bits.getLeft<43, 7>() };
-            m_pageNum = pnum.to_ulong();
+            m_pageNum = pnum.to_uint32_t();
             if (m_pageNum == 0 || m_pageNum > 120)
                 throw std::invalid_argument(std::to_string(m_pageNum));
         }

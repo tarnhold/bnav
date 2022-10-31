@@ -37,8 +37,8 @@ bool KlobucharParam::operator==(const KlobucharParam &rhs) const
     // avoid floating point comparisons by using the raw bits
     // if rawbits are zero, assume this is a differenced set (operator-)
     // split up into two 32 bits block, because ulong is only 32 bit
-    return (rawbits.getLeft<0, 32>().to_ulong() != 0)
-            && (rawbits.getLeft<0, 32>().to_ulong() != 0)
+    return (rawbits.getLeft<0, 32>().to_uint32_t() != 0)
+            && (rawbits.getLeft<0, 32>().to_uint32_t() != 0)
             && (rawbits == rhs.rawbits);
 }
 
@@ -114,7 +114,7 @@ void Ephemeris::processD1Subframe1(const Subframe &sf)
     const NavBits<300> bits { sf.getBits() };
 
     m_sow = sf.getSOW();
-    m_weeknum = bits.getLeft<60, 13>().to_ulong();
+    m_weeknum = bits.getLeft<60, 13>().to_uint32_t();
     m_dateofissue = DateTime(TimeSystem::BDT, m_weeknum, m_sow);
 
     NavBits<64> allbits;
@@ -200,7 +200,7 @@ void Ephemeris::processD2Page1(const Subframe &sf)
     // we read this already, use it
     m_sow = sf.getSOW();
 
-    m_weeknum = bits.getLeft<64, 13>().to_ulong();
+    m_weeknum = bits.getLeft<64, 13>().to_uint32_t();
     m_dateofissue = DateTime(TimeSystem::BDT, m_weeknum, m_sow);
 
     // tgd1

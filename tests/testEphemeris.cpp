@@ -12,7 +12,7 @@ TEST(testKlobucharParam)
     // default constructor
     {
         bnav::KlobucharParam klob;
-        CHECK(klob.rawbits.to_ulong() == 0);
+        CHECK(klob.rawbits.to_uint32_t() == 0);
         CHECK_CLOSE(0.0, klob.alpha0, 0.0001);
         CHECK_CLOSE(0.0, klob.alpha1, 0.0001);
         CHECK_CLOSE(0.0, klob.alpha2, 0.0001);
@@ -29,7 +29,7 @@ TEST(testKlobucharParam)
         klob.alpha1 = 1.0;
         klob.beta0 = -1.0;
         klob.beta1 = -1.0;
-        CHECK_EQUAL(0, klob.rawbits.to_ulong());
+        CHECK_EQUAL(0, klob.rawbits.to_uint32_t());
         CHECK_CLOSE(1.0, klob.alpha0, 0.0001);
         CHECK_CLOSE(1.0, klob.alpha1, 0.0001);
         CHECK_CLOSE(0.0, klob.alpha2, 0.0001);
@@ -48,7 +48,7 @@ TEST(testKlobucharParam)
 
         // operator- is absolute difference
         bnav::KlobucharParam klobdiff = klob - klob2;
-        CHECK_EQUAL(0, klobdiff.rawbits.to_ulong());
+        CHECK_EQUAL(0, klobdiff.rawbits.to_uint32_t());
         CHECK_CLOSE(1.0, klobdiff.alpha0, 0.0001);
         CHECK_CLOSE(0.0, klobdiff.alpha1, 0.0001);
         CHECK_CLOSE(1.0, klobdiff.alpha2, 0.0001);
@@ -63,7 +63,7 @@ TEST(testKlobucharParam)
         bnav::KlobucharParam klob;
         klob.rawbits = bnav::NavBits<64>(UINT32_MAX);
         klob.alpha0 = 99.9;
-        CHECK(klob.rawbits.to_ulong() == UINT32_MAX);
+        CHECK(klob.rawbits.to_uint32_t() == UINT32_MAX);
         CHECK_CLOSE(99.9, klob.alpha0, 0.0001);
 
         bnav::KlobucharParam klob2;

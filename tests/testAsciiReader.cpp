@@ -102,7 +102,7 @@ TEST(testAsciiReaderSBFHexB1Prn2) {
         const uint32_t tow_last = 172949600;
         uint32_t cur_tow = 0;
 
-        std::size_t i = 0;
+        std::uint32_t i = 0;
         bnav::AsciiReaderEntry entry;
         while (reader.readLine(entry))
         {

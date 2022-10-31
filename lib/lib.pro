@@ -43,5 +43,6 @@ HEADERS += \
     DateTime.h \
     IonexWriter.h \
     MessageStatistic.h \
-    IonosphereGridInfo.h
+    IonosphereGridInfo.h \
+    Tools.h
 

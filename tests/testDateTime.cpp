@@ -218,7 +218,7 @@ SUITE(testDateTime_Strings)
         dt.setTimeSystem(bnav::TimeSystem::BDT);
         CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
 
-        for (std::size_t i = 0; i < 60; ++i)
+        for (std::uint32_t i = 0; i < 60; ++i)
         {
             std::stringstream seconds;
             seconds << std::setw(2) << std::setfill('0') << i;
@@ -239,7 +239,7 @@ SUITE(testDateTime_Strings)
         dt.setTimeSystem(bnav::TimeSystem::BDT);
         CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
 
-        for (std::size_t i = 0; i < 60; ++i)
+        for (std::uint32_t i = 0; i < 60; ++i)
         {
             std::stringstream minutes;
             minutes << std::setw(2) << std::setfill('0') << i;
@@ -260,7 +260,7 @@ SUITE(testDateTime_Strings)
         dt.setTimeSystem(bnav::TimeSystem::BDT);
         CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
 
-        for (std::size_t i = 0; i < 24; ++i)
+        for (std::uint32_t i = 0; i < 24; ++i)
         {
             std::stringstream hours;
             hours << std::setw(2) << std::setfill('0') << i;
@@ -282,7 +282,7 @@ SUITE(testDateTime_Strings)
         CHECK(dt.getTimeSystem() == bnav::TimeSystem::BDT);
 
         // days 1 to 31 of January 2006
-        for (std::size_t i = 1; i <= 31; ++i)
+        for (std::uint32_t i = 1; i <= 31; ++i)
         {
             std::stringstream days;
             days << std::setw(2) << std::setfill('0') << i;
@@ -362,7 +362,7 @@ SUITE(testDateTime_Increment)
 
         for (std::size_t i = 0; i < 30; ++i)
         {
-            dt.setWeekAndSOW(0, i*60*60*24);
+            dt.setWeekAndSOW(0, static_cast<uint32_t>(i)*60*60*24);
             CHECK_EQUAL(i + 1, dt.getDay());
             CHECK_EQUAL(1, dt.getMonth());
             CHECK_EQUAL(2006, dt.getYear());
@@ -383,7 +383,7 @@ SUITE(testDateTime_Increment)
             // internally SOW values greater than SECONDS_OF_A_WEEK are
             // reduced by this value and added to weeknum.
             // Test if weeknum increments.
-            dt.setWeekAndSOW(0, i * bnav::SECONDS_OF_A_WEEK);
+            dt.setWeekAndSOW(0, static_cast<uint32_t>(i) * bnav::SECONDS_OF_A_WEEK);
             CHECK_EQUAL(i, dt.getWeekNum());
             CHECK_EQUAL(0, dt.getSOW());
         }

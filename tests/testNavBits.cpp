@@ -18,7 +18,7 @@ TEST(testNavBitsConstructor)
     {
         const bnav::NavBits<10> bits2(8);
         CHECK_EQUAL(10, bits2.size());
-        CHECK_EQUAL(8, bits2.to_ulong());
+        CHECK_EQUAL(8, bits2.to_uint32_t());
 
         const bnav::NavBits<10> bits3(1023);
         CHECK_EQUAL(10, bits3.size());
@@ -89,7 +89,7 @@ TEST(testNavBitsConstructor)
         const bnav::NavBits<5> bits9;
         const bnav::NavBits<10> bits10(bits9);
         CHECK_EQUAL(10, bits10.size());
-        CHECK_EQUAL(0, bits10.to_ulong());
+        CHECK_EQUAL(0, bits10.to_uint32_t());
     }
 }
 
@@ -147,12 +147,12 @@ SUITE(testNavBitsAccess)
         CHECK_EQUAL("1101000000", bits.to_string());
 
         bits = bnav::NavBits<10>(0);
-        CHECK_EQUAL(0, bits.to_ulong());
+        CHECK_EQUAL(0, bits.to_uint32_t());
         bits.setLeft(1, setter);
         CHECK_EQUAL("0110100000", bits.to_string());
 
         bits = bnav::NavBits<10>(0);
-        CHECK_EQUAL(0, bits.to_ulong());
+        CHECK_EQUAL(0, bits.to_uint32_t());
         bits.setLeft(6, setter);
         CHECK_EQUAL("0000001101", bits.to_string());
 

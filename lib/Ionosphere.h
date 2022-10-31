@@ -26,8 +26,8 @@ struct IonoGridDimension
     IonoGridDimension(const double latnorth, const double latsouth, const double latspace,
                       const double longwest, const double longeast, const double longspace);
 
-    std::size_t getItemCountLatitude() const;
-    std::size_t getItemCountLongitude() const;
+    std::uint32_t getItemCountLatitude() const;
+    std::uint32_t getItemCountLongitude() const;
 };
 
 class Ionosphere

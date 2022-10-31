@@ -181,7 +181,7 @@ IonoGridDimension::IonoGridDimension(const double latnorth, const double latsout
     assert(longitude_spacing > 0.0);
 }
 
-std::size_t IonoGridDimension::getItemCountLatitude() const
+std::uint32_t IonoGridDimension::getItemCountLatitude() const
 {
     assert(latitude_spacing > 0.0 || latitude_spacing < 0.0);
 #if 0
@@ -192,10 +192,10 @@ std::size_t IonoGridDimension::getItemCountLatitude() const
 #endif
     // add 0.5 because the compiler will always truncate
     // +1 because latmin and latmax are counting, too
-    return static_cast<std::size_t>(std::fabs((latitude_north - latitude_south) / latitude_spacing) + 0.5) + 1;
+    return static_cast<std::uint32_t>(std::fabs((latitude_north - latitude_south) / latitude_spacing) + 0.5) + 1;
 }
 
-std::size_t IonoGridDimension::getItemCountLongitude() const
+std::uint32_t IonoGridDimension::getItemCountLongitude() const
 {
     assert(longitude_spacing > 0.0 || longitude_spacing < 0.0);
 #if 0
@@ -204,7 +204,7 @@ std::size_t IonoGridDimension::getItemCountLongitude() const
               << " min: " << longitude_east
               << " space: " << longitude_spacing << std::endl;
 #endif
-    return static_cast<std::size_t>(std::fabs((longitude_west - longitude_east) / longitude_spacing) + 0.5) + 1;
+    return static_cast<std::uint32_t>(std::fabs((longitude_west - longitude_east) / longitude_spacing) + 0.5) + 1;
 }
 
 /**
@@ -254,8 +254,8 @@ void Ionosphere::load(const KlobucharParam &klob, const DateTime &datetime, cons
         for (std::size_t col = 0; col < colcount; ++col)
         {
             /// 1.0, because we are east of Greenwich
-            double lambda { 1.0 * (m_griddim.longitude_west + col * 5.0) };
-            double phi { 1.0 * (m_griddim.latitude_north - row * 2.5) };
+            double lambda { 1.0 * (m_griddim.longitude_west + static_cast<double>(col) * 5.0) };
+            double phi { 1.0 * (m_griddim.latitude_north - static_cast<double>(row) * 2.5) };
             //std::cout << "phi: " << phi << std::endl;
             double corr { lcl_calcKlobucharCorrectionBDS(klob, secofday, phi, lambda) };
             IonoGridInfo info;

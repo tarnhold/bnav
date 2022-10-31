@@ -125,7 +125,7 @@ SUITE(testIonoGridInfo_Various)
         for (std::size_t i = 0; i <= 511; ++i)
         {
             // Vertical delay: steps are 7.55902e-01 TECU
-            double vertdelay = i * 7.55902;
+            double vertdelay = double(i) * 7.55902;
             if (i >= 510)
                 vertdelay = 9999.0;
 

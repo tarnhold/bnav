@@ -1,5 +1,5 @@
-#include "BeiDou.h"
 #include "DateTime.h"
+#include "BeiDou.h"
 
 #include <iostream>
 

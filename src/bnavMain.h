@@ -22,8 +22,8 @@ class bnavMain final: public boost::noncopyable
     std::string filenameIonexRegional;
 
     bool generateGlobalKlobuchar;
-    std::size_t limit_to_interval_regional;
-    std::size_t limit_to_interval_klobuchar;
+    std::uint32_t limit_to_interval_regional;
+    std::uint32_t limit_to_interval_klobuchar;
     boost::optional<SvID> limit_to_prn;
     boost::optional<DateTime> limit_to_date;
 
@@ -37,7 +37,7 @@ public:
     void readInputFile();
 
 private:
-    void writeIonexFile(const std::string &filename, const std::size_t interval, const bool klobuchar);
+    void writeIonexFile(const std::string &filename, const std::uint32_t interval, const bool klobuchar);
 };
 
 } // namespace bnav

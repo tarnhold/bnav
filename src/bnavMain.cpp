@@ -37,7 +37,7 @@ boost::optional<std::string> lcl_extractDateStringFromIGSFilename(const std::str
     // CUT12014071324.sbf_SBF_CMPRaw.txt
     boost::regex expr("^[A-Z]{3}[A-Z0-9]([0-9]{8})24\\.");
     // we want only group one
-    boost::sregex_token_iterator it(filename.begin(), filename.end(), expr, {1});
+    boost::sregex_token_iterator it(filename.begin(), filename.end(), expr, 1);
     boost::sregex_token_iterator end;
 
     if (it != end)
@@ -76,8 +76,8 @@ bnavMain::bnavMain(int argc, char *argv[])
             ("regional,r", boost::program_options::value<std::string>(&filenameIonexRegional), "save regional grid models to file")
             ("global", "generate global Klobuchar model")
             ("sv,s", boost::program_options::value< std::vector<std::size_t> >(), "proceed only specified PRN")
-            ("ir", boost::program_options::value<std::size_t>(&limit_to_interval_regional)->default_value(7200), "decimate Regional Ionex output to interval [s]")
-            ("ik", boost::program_options::value<std::size_t>(&limit_to_interval_klobuchar)->default_value(7200), "decimate Klobuchar Ionex output to interval [s]")
+            ("ir", boost::program_options::value<std::uint32_t>(&limit_to_interval_regional)->default_value(7200), "decimate Regional Ionex output to interval [s]")
+            ("ik", boost::program_options::value<std::uint32_t>(&limit_to_interval_klobuchar)->default_value(7200), "decimate Klobuchar Ionex output to interval [s]")
             ("date,d", boost::program_options::value<std::string>(&limit_to_date_str), "limit Ionex output to date")
             ("file", boost::program_options::value<std::string>(&filenameInput)->required(), "input file name");
 
@@ -111,7 +111,7 @@ bnavMain::bnavMain(int argc, char *argv[])
         }
         if (vm.count("sv"))
         {
-            std::vector<std::size_t> svlist = vm["sv"].as< std::vector<std::size_t> >();
+            std::vector<std::uint32_t> svlist = vm["sv"].as< std::vector<std::uint32_t> >();
             assert(svlist.size() == 1); // atm we can only choose one element
             limit_to_prn = SvID(svlist[0]);
         }
@@ -373,7 +373,7 @@ void bnavMain::readInputFile()
     }
 }
 
-void bnavMain::writeIonexFile(const std::string &filename, const std::size_t interval, const bool klobuchar)
+void bnavMain::writeIonexFile(const std::string &filename, const std::uint32_t interval, const bool klobuchar)
 {
     std::cout << "Writing Ionex file: " << filename << std::endl;
     assert(limit_to_prn); // atm we can only store data from one prn

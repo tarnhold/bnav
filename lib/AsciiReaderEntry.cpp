@@ -1,8 +1,6 @@
-#include "AsciiReader.h"
 #include "AsciiReaderEntry.h"
 #include "BeiDou.h"
-
-#include "Debug.h"
+#include "Tools.h"
 
 #include <algorithm>
 #include <cassert>
@@ -116,11 +114,11 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     // parse tow and prn fields
     try
     {
-        uint32_t tow { std::stoul(extractData(line, "tow ")) };
+        uint32_t tow { stoui32(extractData(line, "tow ")) };
         // FIXME: m_week has to be set, but jps doesn't contain this data
         m_datetime = DateTime(TimeSystem::GPST, 0, tow);
 
-        m_prn = std::stoul(extractData(line, "PRN "));
+        m_prn = stoui32(extractData(line, "PRN "));
     }
     catch (std::invalid_argument &)
     {
@@ -154,7 +152,7 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     NavBits<320> navbits320;
     for (std::size_t i = 0; i <= hexdata.length() - 2; i=i+2)
     {
-        const uint32_t hexval { std::stoul(hexdata.substr(i, 2), nullptr, 16) };
+        const uint32_t hexval { stoui32(hexdata.substr(i, 2), nullptr, 16) };
         const std::size_t bsize { 8 };
         const NavBits<bsize> bitblock { hexval };
 
@@ -168,7 +166,7 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
 
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
     NavBits<20> lastblock { navbits320.getLeft<300, 20>() };
-    assert(lastblock.to_ulong() == 0);
+    assert(lastblock.to_uint32_t() == 0);
 
     m_bits = navbits320.getLeft<0, 300>();
 
@@ -193,6 +191,8 @@ AsciiReaderEntrySBF::AsciiReaderEntrySBF(const std::string &line)
 void AsciiReaderEntrySBF::readLine(const std::string &line)
 {
     static const uint32_t SBF_SVID_OFFSET_BEIDOU { 140 };
+    // invalid sv ids will be set to 140
+    static const uint32_t SBF_SVID_INVALID { SBF_SVID_OFFSET_BEIDOU };
 
     // one line looks like:
     // 345605000,1801,145,1,28,3795932449 2099070704 0 0 0 0 0 0 0 1
@@ -233,17 +233,19 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
      * D1: 20s
      * D2: 14.4s + frameID * 0.6s
      */
-    uint32_t tow { std::stoul(splitline[0]) };
-    uint32_t week { std::stoul(splitline[1]) };
+    uint32_t tow { stoui32(splitline[0]) };
+    uint32_t week { stoui32(splitline[1]) };
     uint32_t millisec { tow % 1000 };
     tow = (tow - millisec) / 1000;
     m_datetime = DateTime(bnav::TimeSystem::GPST, week, tow, millisec);
 
     // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
-    m_prn = std::stoul(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
+    uint32_t offsetprn{ stoui32(splitline[2]) };
+    if (checked_sub(offsetprn, SBF_SVID_OFFSET_BEIDOU, m_prn))
+        m_prn = SBF_SVID_INVALID;
 
     // determine signal type - yes, Septentrio saves both B1 and B2
-    const uint32_t sigtype { std::stoul(splitline[4]) };
+    const uint32_t sigtype { stoui32(splitline[4]) };
 
     if (sigtype == 28)
         m_sigtype = SignalType::BDS_B1;
@@ -260,7 +262,7 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
     NavBits<320> navbits320;
     for (std::vector<std::string>::iterator it = splitbits.begin(); it < splitbits.end(); ++it)
     {
-        const uint32_t val { std::stoul(*it) };
+        const uint32_t val { stoui32(*it) };
         const std::size_t bsize { 32 };
         const NavBits<bsize> bitblock { val };
 
@@ -275,9 +277,9 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
     // For whatever reason the last bit inside the SBF data is set to one
     // ignore this bit, by removing it with -1 (from firmware 2.5-Beidou_patch).
-    NavBits<32> lastblock { std::stoul(splitbits[9]) - 1 };
+    NavBits<32> lastblock { stoui32(splitbits[9]) - 1 };
     lastblock <<= 12; // ignore the 12 msb which contain information
-    assert(lastblock.to_ulong() == 0);
+    assert(lastblock.to_uint32_t() == 0);
 
     m_bits = navbits320.getLeft<0, 300>();
 
@@ -307,6 +309,8 @@ AsciiReaderEntrySBFHex::AsciiReaderEntrySBFHex(const std::string &line)
 void AsciiReaderEntrySBFHex::readLine(const std::string &line)
 {
     static const uint32_t SBF_SVID_OFFSET_BEIDOU { 140 };
+    // invalid sv ids will be set to 140
+    static const uint32_t SBF_SVID_INVALID { SBF_SVID_OFFSET_BEIDOU };
 
     // one line looks like:
     // 345605000,1801,145,1,28,3795932449 2099070704 0 0 0 0 0 0 0 1
@@ -347,17 +351,19 @@ void AsciiReaderEntrySBFHex::readLine(const std::string &line)
      * D1: 20s
      * D2: 14.4s + frameID * 0.6s
      */
-    uint32_t tow { std::stoul(splitline[0]) };
-    uint32_t week { std::stoul(splitline[1]) };
+    uint32_t tow { stoui32(splitline[0]) };
+    uint32_t week { stoui32(splitline[1]) };
     uint32_t millisec { tow % 1000 };
     tow = (tow - millisec) / 1000;
     m_datetime = DateTime(bnav::TimeSystem::GPST, week, tow, millisec);
 
     // according to SBF Ref Guide BeiDou Sv IDs have an offset of 140
-    m_prn = std::stoul(splitline[2]) - SBF_SVID_OFFSET_BEIDOU;
+    uint32_t offsetprn{ stoui32(splitline[2]) };
+    if (checked_sub(offsetprn, SBF_SVID_OFFSET_BEIDOU, m_prn))
+        m_prn = SBF_SVID_INVALID;
 
     // determine signal type - yes, Septentrio saves both B1 and B2
-    const uint32_t sigtype { std::stoul(splitline[4]) };
+    const uint32_t sigtype { stoui32(splitline[4]) };
 
     if (sigtype == 28)
         m_sigtype = SignalType::BDS_B1;
@@ -405,7 +411,7 @@ void AsciiReaderEntrySBFHex::readLine(const std::string &line)
 
     NavBits<32> lastblock { val - 1 };
     lastblock <<= 12; // ignore the 12 msb which contain information
-    assert(lastblock.to_ulong() == 0);
+    assert(lastblock.to_uint32_t() == 0);
 
     m_bits = navbits320.getLeft<0, 300>();
 

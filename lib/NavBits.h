@@ -64,7 +64,7 @@ public:
 
     void dumpDifferingBits(const NavBits<dim> &rhs) const;
 
-    unsigned long to_ulong() const;
+    uint32_t to_uint32_t() const;
     double to_double(const int32_t scale_pow2 = 0) const;
     std::string to_string() const;
 };
@@ -143,8 +143,8 @@ NavBits<dim>::NavBits(const T val)
     // negative values work, but not the conversion back to long or string, so ignore them now
     assert(val >= 0);
     // warn if value won't fit dim, otherwise bits get lost
-    assert(val < std::pow(2, dim));
-    m_bitset = std::bitset<dim>(static_cast<unsigned long long>(val));
+    assert(static_cast<long double>(val) < std::pow(2, dim));
+    m_bitset = std::bitset<dim>(static_cast<uint32_t>(val));
 }
 
 /**
@@ -308,10 +308,11 @@ void NavBits<dim>::dumpDifferingBits(const NavBits<dim> &rhs) const
  *
  */
 // FIXME: be explicit: change to "uint32_t to_uint32_t() const"
+// TODO: wenn dim=300 zeichen, reicht dann uint32_t nicht
 template<std::size_t dim>
-unsigned long NavBits<dim>::to_ulong() const
+uint32_t NavBits<dim>::to_uint32_t() const
 {
- return m_bitset.to_ulong();
+    return static_cast<uint32_t>(m_bitset.to_ulong());
 }
 
 /**
@@ -331,16 +332,16 @@ double NavBits<dim>::to_double(const int32_t scale_pow2) const
     {
         value.flipAll();
 
-        return (-1.0 * static_cast<double>(value.to_ulong()) - 1.0) * scale;
+        return (-1.0 * static_cast<double>(value.to_uint32_t()) - 1.0) * scale;
     }
 
-    return 1.0 * static_cast<double>(value.to_ulong()) * scale;
+    return 1.0 * static_cast<double>(value.to_uint32_t()) * scale;
 }
 
 template<std::size_t dim>
 std::string NavBits<dim>::to_string() const
 {
- return m_bitset.to_string();
+    return m_bitset.to_string();
 }
 
 // non-members

@@ -16,7 +16,7 @@ SUITE(testSvID)
         CHECK(!sv.isGeo());
 
         // check all possible PRNs
-        for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
+        for (std::uint32_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
         {
             sv.setPRN(i);
             CHECK_EQUAL(i, sv.getPRN());
@@ -31,7 +31,7 @@ SUITE(testSvID)
     TEST(testSvID_Constructor2)
     {
         // check all possible PRNs
-        for (std::size_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
+        for (std::uint32_t i = 1; i <= bnav::BDS_MAX_PRN; ++i)
         {
             bnav::SvID sv(i);
             CHECK_EQUAL(i, sv.getPRN());

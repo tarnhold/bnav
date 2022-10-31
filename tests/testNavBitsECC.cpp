@@ -109,12 +109,12 @@ TEST(testNavBitsECCParity15)
 {
     // set an arbitrary bit message, which parity check would succeed
     bnav::NavBits<15> bits("110110010010101");
-    const uint32_t initialbitval = bits.to_ulong();
+    const uint32_t initialbitval = bits.to_uint32_t();
 
     bnav::NavBitsECCWord<15> ecc(bits);
     // ensure nothing was modified, because the bits are ok
     CHECK(!ecc.isModified());
-    CHECK_EQUAL(initialbitval, ecc.getBits().to_ulong());
+    CHECK_EQUAL(initialbitval, ecc.getBits().to_uint32_t());
 
     // now manipulate every single bit of that message (only one once!)
     // so we can see, that the error correction works for every bit
@@ -126,11 +126,11 @@ TEST(testNavBitsECCParity15)
         bnav::NavBitsECCWord<15> ecc3(bits);
         CHECK(ecc3.isModified());
         // ensure we recovered the original state
-        CHECK_EQUAL(initialbitval, ecc3.getBits().to_ulong());
+        CHECK_EQUAL(initialbitval, ecc3.getBits().to_uint32_t());
 
         // restore originial state
         bits.flip(i);
-        CHECK_EQUAL(initialbitval, bits.to_ulong());
+        CHECK_EQUAL(initialbitval, bits.to_uint32_t());
     }
 }
 
