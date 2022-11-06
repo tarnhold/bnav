@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <limits>
 
 // check parity for one word, boilerplate code. we can only use a macro here,
 // because bitset expects a fixed value at compile time
@@ -28,9 +29,9 @@ namespace bnav
 
 Subframe::Subframe()
     : m_bits()
-    , m_sow(UINT32_MAX)
-    , m_frameID(UINT32_MAX)
-    , m_pageNum(UINT32_MAX)
+    , m_sow(std::numeric_limits<uint32_t>::max())
+    , m_frameID(std::numeric_limits<uint32_t>::max())
+    , m_pageNum(std::numeric_limits<uint32_t>::max())
     , m_isGeo(false)
     , m_isParityFixed(false)
     , m_ParityModifiedCount(0)
@@ -40,9 +41,9 @@ Subframe::Subframe()
 
 Subframe::Subframe(const SvID &sv, const NavBits<300> &bits)
     : m_bits(bits)
-    , m_sow(UINT32_MAX)
-    , m_frameID(UINT32_MAX)
-    , m_pageNum(UINT32_MAX)
+    , m_sow(std::numeric_limits<uint32_t>::max())
+    , m_frameID(std::numeric_limits<uint32_t>::max())
+    , m_pageNum(std::numeric_limits<uint32_t>::max())
     , m_isGeo(sv.isGeo())
     , m_isParityFixed(false)
     , m_ParityModifiedCount(0)
@@ -249,7 +250,7 @@ void Subframe::parsePageNumD1()
     catch (const std::invalid_argument &e)
     {
         std::cout << "SubframeD1: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
-        m_pageNum = UINT32_MAX;
+        m_pageNum = std::numeric_limits<uint32_t>::max();
     }
 
 //    std::cout << "D1: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
@@ -303,7 +304,7 @@ void Subframe::parsePageNumD2()
     catch (const std::invalid_argument &e)
     {
         std::cout << "SubframeD2: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
-        m_pageNum = UINT32_MAX;
+        m_pageNum = std::numeric_limits<uint32_t>::max();
     }
 
 //    std::cout << "D2: frame: " << m_frameID << " page: " << m_pageNum << std::endl;

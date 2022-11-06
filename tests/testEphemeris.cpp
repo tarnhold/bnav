@@ -61,9 +61,9 @@ TEST(testKlobucharParam)
     // operator== and operator!=
     {
         bnav::KlobucharParam klob;
-        klob.rawbits = bnav::NavBits<64>(UINT32_MAX);
+        klob.rawbits = bnav::NavBits<64>(std::numeric_limits<uint32_t>::max());
         klob.alpha0 = 99.9;
-        CHECK(klob.rawbits.to_uint32_t() == UINT32_MAX);
+        CHECK(klob.rawbits.to_uint32_t() == std::numeric_limits<uint32_t>::max());
         CHECK_CLOSE(99.9, klob.alpha0, 0.0001);
 
         bnav::KlobucharParam klob2;

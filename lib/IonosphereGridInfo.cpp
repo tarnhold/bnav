@@ -2,6 +2,8 @@
 
 #include "BeiDou.h"
 
+#include <limits>
+
 namespace
 {
 
@@ -53,8 +55,8 @@ namespace bnav
  * [1]. 5.3.3.8 Ionospheric Grid Information (Ion)
  */
 IonoGridInfo::IonoGridInfo()
-    : m_dtTECU(UINT32_MAX)
-    , m_giveTECU(UINT32_MAX)
+    : m_dtTECU(std::numeric_limits<uint32_t>::max())
+    , m_giveTECU(std::numeric_limits<uint32_t>::max())
     , m_isValid(false)
 {
 }

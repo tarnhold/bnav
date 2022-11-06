@@ -2,6 +2,7 @@
 #include "BeiDou.h"
 
 #include <iostream>
+#include <limits>
 
 namespace bnav
 {
@@ -12,8 +13,8 @@ namespace bnav
 DateTime::DateTime()
     : m_tsys(TimeSystem::NONE)
     , m_time(boost::posix_time::ptime())
-    , m_weeknum(UINT32_MAX)
-    , m_sow(UINT32_MAX)
+    , m_weeknum(std::numeric_limits<uint32_t>::max())
+    , m_sow(std::numeric_limits<uint32_t>::max())
 {
 }
 
@@ -23,8 +24,8 @@ DateTime::DateTime()
 DateTime::DateTime(const TimeSystem ts, const std::string &isostr)
     : m_tsys(ts)
     , m_time(boost::posix_time::ptime())
-    , m_weeknum(UINT32_MAX)
-    , m_sow(UINT32_MAX)
+    , m_weeknum(std::numeric_limits<uint32_t>::max())
+    , m_sow(std::numeric_limits<uint32_t>::max())
 {
     setISODateTime(isostr);
 }
@@ -39,8 +40,8 @@ DateTime::DateTime(const TimeSystem ts, const std::string &isostr)
 DateTime::DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
     : m_tsys(ts)
     , m_time()
-    , m_weeknum(UINT32_MAX)
-    , m_sow(UINT32_MAX)
+    , m_weeknum(std::numeric_limits<uint32_t>::max())
+    , m_sow(std::numeric_limits<uint32_t>::max())
 {
     setWeekAndSOW(weeknum, sow, millisec);
 }
@@ -68,8 +69,8 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
     // lets allow SOW values greater than SECONDS_OF_A_WEEK to give some comfort
     // use int32 max instead, because we cast down to int. This means we could
     // increment weeks only by SOW for 7101 weeks. This should be enough.
-    assert(sow < INT32_MAX);
-    assert(millisec < INT32_MAX);
+    assert(sow < std::numeric_limits<uint32_t>::max());
+    assert(millisec < std::numeric_limits<uint32_t>::max());
 
     // safe original values, but if SOW is greater than one week, put this
     // part into weeknum.
@@ -150,7 +151,7 @@ uint32_t DateTime::getWeekNum() const
 {
     // at the moment it's possible that there is no weeknum set
     // see: setCurrentDateTimeUTC and setISODateTime
-    assert(m_weeknum != UINT32_MAX);
+    assert(m_weeknum != std::numeric_limits<uint32_t>::max());
     return m_weeknum;
 }
 
@@ -158,7 +159,7 @@ uint32_t DateTime::getSOW() const
 {
     // at the moment it's possible that there is no sow set
     // see: setCurrentDateTimeUTC and setISODateTime
-    assert(m_sow != UINT32_MAX);
+    assert(m_sow != std::numeric_limits<uint32_t>::max());
     return m_sow;
 }
 

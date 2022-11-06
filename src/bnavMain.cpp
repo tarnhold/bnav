@@ -11,6 +11,7 @@
 #include "DateTime.h"
 
 #include <cstdlib>
+#include <limits>
 
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
@@ -213,7 +214,7 @@ void bnavMain::readInputFile()
         std::perror(("Error: Could not open file: " + filenameInput).c_str());
 
     uint32_t weeknum {0};
-    uint32_t intervalCountOld = UINT32_MAX;
+    uint32_t intervalCountOld = std::numeric_limits<uint32_t>::max();
     bnav::Ionosphere iono_old;
     bnav::KlobucharParam klob_old;
     bnav::MessageStatistic msgstat;
