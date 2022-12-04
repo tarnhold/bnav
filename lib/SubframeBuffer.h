@@ -75,36 +75,36 @@ class SubframeBufferD1 final : public SubframeBuffer
 {
 public:
     SubframeBufferD1();
-    ~SubframeBufferD1();
+    ~SubframeBufferD1() override;
 
-    void addSubframe(const Subframe &sf);
+    void addSubframe(const Subframe &sf) override;
 
-    bool isEphemerisComplete() const;
-    bool isAlmanacComplete() const;
+    bool isEphemerisComplete() const override;
+    bool isAlmanacComplete() const override;
 
-    SubframeBufferParam flushEphemerisData();
-    SubframeBufferParam flushAlmanacData();
+    SubframeBufferParam flushEphemerisData() override;
+    SubframeBufferParam flushAlmanacData() override;
 
-    void clearEphemerisData();
-    void clearAlmanacData();
+    void clearEphemerisData() override;
+    void clearAlmanacData() override;
 };
 
 class SubframeBufferD2 final : public SubframeBuffer
 {
 public:
     SubframeBufferD2();
-    ~SubframeBufferD2();
+    ~SubframeBufferD2() override;
 
-    void addSubframe(const Subframe &sf);
+    void addSubframe(const Subframe &sf) override;
 
-    bool isEphemerisComplete() const;
-    bool isAlmanacComplete() const;
+    bool isEphemerisComplete() const override;
+    bool isAlmanacComplete() const override;
 
-    SubframeBufferParam flushEphemerisData();
-    SubframeBufferParam flushAlmanacData();
+    SubframeBufferParam flushEphemerisData() override;
+    SubframeBufferParam flushAlmanacData() override;
 
-    void clearEphemerisData();
-    void clearAlmanacData();
+    void clearEphemerisData() override;
+    void clearAlmanacData() override;
 };
 
 } // namespace bnav
