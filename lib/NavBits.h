@@ -143,7 +143,7 @@ NavBits<dim>::NavBits(const T val)
     // negative values work, but not the conversion back to long or string, so ignore them now
     assert(val >= 0);
     // warn if value won't fit dim, otherwise bits get lost
-    assert(static_cast<long double>(val) < std::pow(2, dim));
+    assert(static_cast<double>(val) < std::pow(2, dim));
     m_bitset = std::bitset<dim>(static_cast<uint32_t>(val));
 }
 
