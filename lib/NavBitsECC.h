@@ -184,8 +184,6 @@ void NavBitsECCWord<len>::splitWordToSubword()
             submessage[15-11 - k - 1] = m_bits[len-1 - startpar - k];
 
         m_msglist[i] = submessage;
-
-        //std::cout << i << ":" << submessage << std::endl;
     }
 }
 

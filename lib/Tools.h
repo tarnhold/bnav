@@ -2,6 +2,7 @@
 #define TOOLS_H
 
 #include <cassert>
+#include <cstdint>
 #include <string>
 #include <limits>
 

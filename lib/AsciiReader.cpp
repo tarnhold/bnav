@@ -99,8 +99,6 @@ bool AsciiReader::readLine(AsciiReaderEntry &data)
     if (line.empty())
         return false;
 
-    //DEBUG("line: " << line);
-
     if (m_filetype == AsciiReaderType::TEXT_CONVERTED_JPS)
         data = AsciiReaderEntryJPS(line);
     else if (m_filetype == AsciiReaderType::TEXT_CONVERTED_SBF)

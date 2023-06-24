@@ -297,10 +297,7 @@ void NavBits<dim>::dumpDifferingBits(const NavBits<dim> &rhs) const
     {
         if (atLeft(i) != rhs.atLeft(i))
             std::cout << std::setw(3) << i << ": " << atLeft(i) << ":" << rhs.atLeft(i) << std::endl;
-        // save first bit into bTest[0]:
-        //bTest.setLeft(i - start, atLeft(i));
     }
-    //return bTest;
 }
 
 /**

@@ -177,8 +177,6 @@ void Ephemeris::loadD2(const SubframeBufferParam &sfbuf)
     // ensure there are all pages
     assert(vfra.size() == 10);
 
-    //std::cout << "loadD2" << std::endl;
-
     processD2Page1(vfra[0]);
     processD2Page2(vfra[1]);
 }

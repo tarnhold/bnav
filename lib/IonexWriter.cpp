@@ -68,16 +68,6 @@ std::string lcl_justifyRight(const double num, const std::string::size_type leng
     return lcl_justifyRight(ss.str(), length, padding);
 }
 
-#if 0
-std::string lcl_justifyLeft(const double num, const std::string::size_type length, const int32_t precision, const char padding = ' ')
-{
-    std::stringstream ss;
-    ss << std::setprecision(precision) << std::fixed << num;
-
-    return lcl_justifyLeft(ss.str(), length, padding);
-}
-#endif
-
 static const bnav::Ionosphere lcl_dummyModel(const bnav::Ionosphere &data, const bnav::DateTime &dt)
 {
     const bnav::IonoGridDimension dim = data.getGridDimension();

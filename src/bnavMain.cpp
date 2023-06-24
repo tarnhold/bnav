@@ -222,12 +222,6 @@ void bnavMain::readInputFile()
     bnav::AsciiReaderEntry data;
     while (reader.readLine(data))
     {
-#if 0
-        // skip B2 signals, the differences are not in our interest
-        if (data.getSignalType() != bnav::SignalType::BDS_B1)
-            continue;
-#endif
-
         const bnav::SvID sv(data.getPRN());
 
         if (limit_to_prn && sv != limit_to_prn.get())
@@ -241,15 +235,6 @@ void bnavMain::readInputFile()
             const bnav::DateTime bdt = bnav::DateTime(bnav::TimeSystem::BDT, weeknum, sf.getSOW());
             msgstat.add(sv, bdt);
         }
-
-#if 0
-        // debug
-        std::cout << "prn: " << std::setw(2) << data.getPRN()
-                  << " wn: " << std::setw(4) << data.getDateTime().getWeekNum()
-                  << " tow: " << data.getDateTime().getSOW() << " sow: " << sf.getSOW()
-                  << " fra: " << sf.getFrameID() << " pnum: "
-                  << sf.getPageNum() << std::endl;
-#endif
 
         sbstore.addSubframe(sv, sf);
 
@@ -320,11 +305,6 @@ void bnavMain::readInputFile()
                 // diff only for one single prn
                 if (limit_to_prn && sv == limit_to_prn.get() && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
                 {
-//                  if (iono_old.hasData())
-//                      iono.diffToModel(iono_old).dump();
-
-                    //iono.dump();
-
                     if (limit_to_date && limit_to_date->isSameIonexDay(iono.getDateOfIssue()))
                     {
                         std::cout << "add Regional Grid to store for SV: " << sv.getPRN() << " at " << iono.getDateOfIssue().getDateTimeString() << std::endl;

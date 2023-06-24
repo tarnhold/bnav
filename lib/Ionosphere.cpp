@@ -33,12 +33,8 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
     double semiphi { phi / 180.0 };
     double semilambda { lambda / 180.0 };
 
-//    std::cout << "phi: " << semiphi << std::endl;
-
     // chinese don't do geomagnetic latitude
     double absphim { std::fabs(semiphi) };
-
-//    std::cout << "phim: " << phim << std::endl;
 
     int32_t localtime { static_cast<int32_t>(std::lround(4.32e4 * semilambda)) + static_cast<int32_t>(time) };
 
@@ -46,8 +42,6 @@ double lcl_calcKlobucharCorrectionBDS(const bnav::KlobucharParam &klob, const ui
         localtime = localtime - 86400;
     if (localtime < 0)
         localtime = localtime + 86400;
-
-//    std::cout << "time: " << time2 << std::endl;
 
     double amplitude { klob.alpha0 + absphim * (klob.alpha1 + absphim * (klob.alpha2 + absphim * klob.alpha3)) };
     double period { klob.beta0 + absphim * (klob.beta1 + absphim * (klob.beta2 + absphim * klob.beta3)) };
@@ -184,12 +178,6 @@ IonoGridDimension::IonoGridDimension(const double latnorth, const double latsout
 std::uint32_t IonoGridDimension::getItemCountLatitude() const
 {
     assert(latitude_spacing > 0.0 || latitude_spacing < 0.0);
-#if 0
-    std::cout << std::setprecision(1) << std::fixed
-              << "lat max: " << latitude_north
-              << " min: " << latitude_south
-              << " space: " << latitude_spacing << std::endl;
-#endif
     // add 0.5 because the compiler will always truncate
     // +1 because latmin and latmax are counting, too
     return static_cast<std::uint32_t>(std::fabs((latitude_north - latitude_south) / latitude_spacing) + 0.5) + 1;
@@ -198,12 +186,6 @@ std::uint32_t IonoGridDimension::getItemCountLatitude() const
 std::uint32_t IonoGridDimension::getItemCountLongitude() const
 {
     assert(longitude_spacing > 0.0 || longitude_spacing < 0.0);
-#if 0
-    std::cout << std::setprecision(1) << std::fixed
-              << "long max: " << longitude_west
-              << " min: " << longitude_east
-              << " space: " << longitude_spacing << std::endl;
-#endif
     return static_cast<std::uint32_t>(std::fabs((longitude_west - longitude_east) / longitude_spacing) + 0.5) + 1;
 }
 
@@ -266,7 +248,6 @@ void Ionosphere::load(const KlobucharParam &klob, const DateTime &datetime, cons
 
     if (global)
         assert(m_grid.size() == 5183);
-        //std::cout << "size: " << m_grid.size() << std::endl;
     else
         assert(m_grid.size() == 320);
 }
@@ -326,8 +307,6 @@ void Ionosphere::processPageBlock(const SubframeVector &vfra5, const std::size_t
 
         // page 13 ash 73 have reserved bits at the end of message
         parseIonospherePage(bits, pnum == 13 || pnum == 73, grid_chinese);
-
-        //std::cout << "pnum: " << pnum << std::endl;
     }
 }
 
@@ -369,11 +348,6 @@ void Ionosphere::parseIonospherePage(const NavBits<300> &bits, const bool lastpa
     grid_chinese.push_back(IonoGridInfo(bits.getLeft<249, 13>()));
     // Ion13
     grid_chinese.push_back(IonoGridInfo(bits.getLeft<270, 13>()));
-
-    //std::cout << "iono: " << iono << std::endl;
-    //std::cout << "dt: " << grid_chinese.back().get_dt()
-    //          << " givei: " << grid_chinese.back().get_give_index()
-    //          << " give: " << grid_chinese.back().get_give() << std::endl;
 }
 
 bool Ionosphere::hasData() const

@@ -252,8 +252,6 @@ void Subframe::parsePageNumD1()
         std::cout << "SubframeD1: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
         m_pageNum = std::numeric_limits<uint32_t>::max();
     }
-
-//    std::cout << "D1: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
 }
 
 /**
@@ -306,8 +304,6 @@ void Subframe::parsePageNumD2()
         std::cout << "SubframeD2: FraID: " << m_frameID << " Pnum (" << e.what() << ") not in range!" << std::endl;
         m_pageNum = std::numeric_limits<uint32_t>::max();
     }
-
-//    std::cout << "D2: frame: " << m_frameID << " page: " << m_pageNum << std::endl;
 }
 
 } // namespace bnav

@@ -160,8 +160,6 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
         navbits320 <<= bsize;
         for (std::size_t k = 0; k < bsize; ++k)
             navbits320[k] = bitblock[k];
-
-        //std::cout << i << ": " << bitblock << std::endl;
     }
 
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
@@ -169,8 +167,6 @@ void AsciiReaderEntryJPS::readLine(const std::string &line)
     assert(lastblock.to_uint32_t() == 0);
 
     m_bits = navbits320.getLeft<0, 300>();
-
-    //std::cout << m_bits << std::endl;
 }
 
 /*
@@ -270,8 +266,6 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
         navbits320 <<= bsize;
         for (std::size_t k = 0; k < bsize; ++k)
             navbits320[k] = bitblock[k];
-
-        //std::cout << ": " << bitblock << std::endl;
     }
 
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
@@ -282,8 +276,6 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
     assert(lastblock.to_uint32_t() == 0);
 
     m_bits = navbits320.getLeft<0, 300>();
-
-    //std::cout << m_bits << std::endl;
 }
 
 /*
@@ -396,8 +388,6 @@ void AsciiReaderEntrySBFHex::readLine(const std::string &line)
         navbits320 <<= bsize;
         for (std::size_t k = 0; k < bsize; ++k)
             navbits320[k] = bitblock[k];
-
-        //std::cout << ": " << bitblock << std::endl;
     }
 
     // The last 20 bits have to be zero, because we have only 300 bits nav msg.
@@ -414,8 +404,6 @@ void AsciiReaderEntrySBFHex::readLine(const std::string &line)
     assert(lastblock.to_uint32_t() == 0);
 
     m_bits = navbits320.getLeft<0, 300>();
-
-    //std::cout << m_bits << std::endl;
 }
 
 } // namespace bnav

@@ -38,7 +38,6 @@ public:
 
     void open(const char *filename);
     void open(const std::string &filename);
-    //void open(const std::string &filename, const AsciiReaderType &filetype);
     bool isOpen() const;
 
     void setType(const AsciiReaderType &filetype);
