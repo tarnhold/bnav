@@ -14,6 +14,8 @@ int main(int argc, char **argv)
     try
     {
         bnav::bnavMain om(argc, argv);
+        if (om.helpRequested())
+            return EXIT_SUCCESS;
         om.readInputFile();
     }
     catch (const std::runtime_error &e)

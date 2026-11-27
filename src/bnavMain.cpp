@@ -59,6 +59,7 @@ bnavMain::bnavMain(int argc, char *argv[])
     , filenameIonexKlobuchar()
     , filenameIonexRegional()
     , generateGlobalKlobuchar(false)
+    , m_showHelp(false)
     , limit_to_interval_regional(0)
     , limit_to_interval_klobuchar(0)
     , limit_to_prn(boost::optional<SvID>())
@@ -76,11 +77,11 @@ bnavMain::bnavMain(int argc, char *argv[])
             ("klobuchar,k", boost::program_options::value<std::string>(&filenameIonexKlobuchar), "save Klobuchar models to file")
             ("regional,r", boost::program_options::value<std::string>(&filenameIonexRegional), "save regional grid models to file")
             ("global", "generate global Klobuchar model")
-            ("sv,s", boost::program_options::value< std::vector<std::size_t> >(), "proceed only specified PRN")
+            ("sv,s", boost::program_options::value< std::vector<std::uint32_t> >(), "proceed only specified PRN")
             ("ir", boost::program_options::value<std::uint32_t>(&limit_to_interval_regional)->default_value(7200), "decimate Regional Ionex output to interval [s]")
             ("ik", boost::program_options::value<std::uint32_t>(&limit_to_interval_klobuchar)->default_value(7200), "decimate Klobuchar Ionex output to interval [s]")
             ("date,d", boost::program_options::value<std::string>(&limit_to_date_str), "limit Ionex output to date")
-            ("file", boost::program_options::value<std::string>(&filenameInput)->required(), "input file name");
+            ("file", boost::program_options::value<std::string>(&filenameInput), "input file name");
 
     boost::program_options::positional_options_description positionalopts;
     positionalopts.add("file", 1);
@@ -89,14 +90,21 @@ bnavMain::bnavMain(int argc, char *argv[])
     try
     {
         boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(positionalopts).run(), vm);
-        boost::program_options::notify(vm);
 
+        // Handle --help before notify(). notify() would reject -h when --file
+        // is absent, and throwing the help text was swallowed by catch (...).
         if (vm.count("help"))
         {
-            std::stringstream msg;
-            msg << desc;
-            throw std::runtime_error(msg.str());
+            std::cout << desc << std::endl;
+            m_showHelp = true;
+            return;
         }
+
+        boost::program_options::notify(vm);
+
+        if (!vm.count("file"))
+            throw boost::program_options::error("the option '--file' is required but missing");
+
         if (vm.count("format"))
         {
             std::string arg = vm["format"].as<std::string>();
@@ -204,6 +212,11 @@ bnavMain::bnavMain(int argc, char *argv[])
 
     limit_to_date = bnav::DateTime(bnav::TimeSystem::BDT, limit_to_date_str + "T000000");
     std::cout << "Limiting date to: " << limit_to_date->getISODate() << std::endl;
+}
+
+bool bnavMain::helpRequested() const
+{
+    return m_showHelp;
 }
 
 void bnavMain::readInputFile()

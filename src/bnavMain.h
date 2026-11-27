@@ -22,6 +22,7 @@ class bnavMain final: public boost::noncopyable
     std::string filenameIonexRegional;
 
     bool generateGlobalKlobuchar;
+    bool m_showHelp;
     std::uint32_t limit_to_interval_regional;
     std::uint32_t limit_to_interval_klobuchar;
     boost::optional<SvID> limit_to_prn;
@@ -34,6 +35,7 @@ class bnavMain final: public boost::noncopyable
 public:
     bnavMain(int argc, char *argv[]);
 
+    bool helpRequested() const;
     void readInputFile();
 
 private:
