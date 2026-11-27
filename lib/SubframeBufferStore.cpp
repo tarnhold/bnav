@@ -1,5 +1,9 @@
 #include "SubframeBufferStore.h"
 
+#include <cassert>
+#include <memory>
+#include <utility>
+
 namespace bnav
 {
 
@@ -15,17 +19,6 @@ SubframeBufferStore::SubframeBufferStore()
 }
 
 /**
- * @brief SubframeBufferStore::~SubframeBufferStore
- *
- * Clean up underlying SubframeBuffers if store gets destroyed.
- */
-SubframeBufferStore::~SubframeBufferStore()
-{
-    for (auto elem : m_store)
-        delete elem.second;
-}
-
-/**
  * @brief SubframeBufferStore::addSvID Add SubframeBuffer to the storage.
  *
  * Determines the type of storage by SvID.
@@ -34,14 +27,11 @@ SubframeBufferStore::~SubframeBufferStore()
  */
 void SubframeBufferStore::addSvID(const SvID &sv)
 {
-    SubframeBuffer* sfbuf;
+    std::unique_ptr<SubframeBuffer> sfbuf = sv.isGeo()
+            ? std::unique_ptr<SubframeBuffer>{std::make_unique<SubframeBufferD2>()}
+            : std::unique_ptr<SubframeBuffer>{std::make_unique<SubframeBufferD1>()};
 
-    if (sv.isGeo())
-        sfbuf = new SubframeBufferD2();
-    else
-        sfbuf = new SubframeBufferD1();
-
-    m_store.emplace(sv, sfbuf);
+    m_store.emplace(sv, std::move(sfbuf));
 }
 
 /**
@@ -70,14 +60,14 @@ void SubframeBufferStore::addSubframe(const SvID &sv, const Subframe &sf)
 /**
  * @brief SubframeBufferStore::getSubframeBuffer Get the SubframeBuffer object.
  * @param sv The SvID.
- * @return Pointer to SubframeBuffer for SV.
+ * @return Non-owning pointer to SubframeBuffer for SV.
  */
 SubframeBuffer* SubframeBufferStore::getSubframeBuffer(const SvID &sv)
 {
-    auto it = m_store.find(sv);
+    const auto it = m_store.find(sv);
 
     if (it != m_store.end())
-        return it->second;
+        return it->second.get();
 
     assert(false); // who called this before adding the data?!
     return nullptr;
@@ -91,7 +81,7 @@ SubframeBuffer* SubframeBufferStore::getSubframeBuffer(const SvID &sv)
  */
 bool SubframeBufferStore::hasIncompleteData() const
 {
-    for (const auto elem : m_store)
+    for (const auto &elem : m_store)
     {
         if (elem.second->hasIncompleteData())
             return true;

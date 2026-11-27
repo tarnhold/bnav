@@ -5,8 +5,6 @@
 TEMPLATE = lib
 TARGET = bnav
 
-LIBS += -lboost_date_time
-
 SOURCES += \
     AsciiReader.cpp \
     Subframe.cpp \
@@ -45,4 +43,3 @@ HEADERS += \
     MessageStatistic.h \
     IonosphereGridInfo.h \
     Tools.h
-

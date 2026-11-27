@@ -1,6 +1,7 @@
 #ifndef BEIDOU_H
 #define BEIDOU_H
 
+#include <array>
 #include <cstdint>
 #include <iostream>
 
@@ -22,11 +23,11 @@ constexpr double BDS_B2I_FREQ = 1207.140e6;
 constexpr uint32_t BDS_MAX_PRN = 37;
 constexpr uint32_t BDS_MAX_PRN_GEO = 5;
 
-constexpr std::size_t D1_FRAME_SIZE[] = {1, 1, 1, 24, 24};
+constexpr std::array<std::size_t, 5> D1_FRAME_SIZE{1, 1, 1, 24, 24};
 // one subframe has a duration of 6s
 constexpr uint32_t D1_SUBFRAME_DURATION = 6;
 
-constexpr std::size_t D2_FRAME_SIZE[] = {10, 6, 6, 6, 120};
+constexpr std::array<std::size_t, 5> D2_FRAME_SIZE{10, 6, 6, 6, 120};
 // one frame has a duration of 3s (0.6s * 5)
 // D2 has the same SOW for all subframes of one frame
 constexpr uint32_t D2_FRAME_DURATION = 3;

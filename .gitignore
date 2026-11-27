@@ -1,0 +1,32 @@
+# Qt Creator / qmake user files
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+.qmake.stash
+*.autosave
+
+# Generated build files (in-source or shadow)
+Makefile
+Makefile.*
+*.o
+*.obj
+*.so
+*.so.*
+*.a
+*.dll
+*.exe
+moc_*
+object_script.*
+*.Debug
+*.Release
+
+# Local build directories
+build/
+build-*/
+
+# Editor / tooling
+.vscode/
+.idea/
+*~
+*.swp
+.cache/

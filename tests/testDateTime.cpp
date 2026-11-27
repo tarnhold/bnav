@@ -4,7 +4,9 @@
 #include "DateTime.h"
 #include "BeiDou.h"
 
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 
 SUITE(testDateTime)
 {

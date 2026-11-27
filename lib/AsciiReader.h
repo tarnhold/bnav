@@ -3,10 +3,8 @@
 
 #include "AsciiReaderEntry.h"
 
-#include <string>
 #include <fstream>
-
-#include <boost/noncopyable.hpp>
+#include <string>
 
 namespace bnav
 {
@@ -22,8 +20,11 @@ enum class AsciiReaderType
 /**
 Class for handling the input file stream by line.
 */
-class AsciiReader : private boost::noncopyable
+class AsciiReader
 {
+    AsciiReader(const AsciiReader &) = delete;
+    AsciiReader &operator=(const AsciiReader &) = delete;
+
 private:
     std::ifstream m_infile; ///< Input file stream
     std::string m_filename; ///< File name
@@ -38,14 +39,14 @@ public:
 
     void open(const char *filename);
     void open(const std::string &filename);
-    bool isOpen() const;
+    [[nodiscard]] bool isOpen() const;
 
     void setType(const AsciiReaderType &filetype);
-    AsciiReaderType getType() const;
+    [[nodiscard]] AsciiReaderType getType() const;
 
     /// Read current line, return data by reference
-    bool readLine(AsciiReaderEntry &data);
-    bool isEof() const;
+    [[nodiscard]] bool readLine(AsciiReaderEntry &data);
+    [[nodiscard]] bool isEof() const;
     void close();
 };
 

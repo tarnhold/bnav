@@ -8,6 +8,13 @@ CONFIG -= app_bundle
 
 LIBS += -lUnitTest++ -L../lib -lbnav
 
+unix:!macx {
+    QMAKE_LFLAGS += -Wl,-rpath,\'\$\$ORIGIN/../lib\'
+}
+
+# Absolute path to tests/data, independent of the process working directory.
+DEFINES += "BNAV_PATH_TESTDATA=\\\"$$PWD/data\\\""
+
 SOURCES += main.cpp \
     testNavBits.cpp \
     testAsciiReader.cpp \

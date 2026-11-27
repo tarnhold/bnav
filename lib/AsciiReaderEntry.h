@@ -5,6 +5,9 @@
 #include "DateTime.h"
 #include "NavBits.h"
 
+#include <string>
+#include <string_view>
+
 namespace bnav
 {
 
@@ -19,9 +22,9 @@ protected:
 
 public:
     AsciiReaderEntry();
-    AsciiReaderEntry(const std::string &);
+    AsciiReaderEntry(std::string_view);
 
-    void readLine(const std::string &line);
+    void readLine(std::string_view line);
 
     uint32_t getPRN() const;
     DateTime getDateTime() const;
@@ -34,9 +37,9 @@ class AsciiReaderEntryJPS final : public AsciiReaderEntry
 {
 public:
     AsciiReaderEntryJPS();
-    AsciiReaderEntryJPS(const std::string &line);
+    AsciiReaderEntryJPS(std::string_view line);
 
-    void readLine(const std::string &line);
+    void readLine(std::string_view line);
 };
 
 // Type for SBF style files
@@ -44,9 +47,9 @@ class AsciiReaderEntrySBF final : public AsciiReaderEntry
 {
 public:
     AsciiReaderEntrySBF();
-    AsciiReaderEntrySBF(const std::string &line);
+    AsciiReaderEntrySBF(std::string_view line);
 
-    void readLine(const std::string &line);
+    void readLine(std::string_view line);
 };
 
 // Type for SBF style files
@@ -54,9 +57,9 @@ class AsciiReaderEntrySBFHex final : public AsciiReaderEntry
 {
 public:
     AsciiReaderEntrySBFHex();
-    AsciiReaderEntrySBFHex(const std::string &line);
+    AsciiReaderEntrySBFHex(std::string_view line);
 
-    void readLine(const std::string &line);
+    void readLine(std::string_view line);
 };
 
 } // namespace bnav

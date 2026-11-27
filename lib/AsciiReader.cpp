@@ -10,8 +10,6 @@
 #include <cstdio>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
-
 namespace bnav
 {
 
@@ -119,8 +117,12 @@ bool AsciiReader::isEof() const
 
 void AsciiReader::close()
 {
-    // ensure file stream is opened
-    assert(isOpen());
+    // Closing a stream that was never opened (missing file, default
+    // constructed reader) is a no-op. The destructor already guards on
+    // isOpen(); asserting here aborted the test suite when a fixture was
+    // absent.
+    if (!isOpen())
+        return;
     m_infile.close();
 }
 

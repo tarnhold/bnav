@@ -34,15 +34,15 @@ std::vector< SvID > IonosphereStore::getSvList() const
 {
     std::vector< SvID > svlist {};
 
-    for (const auto & elem : m_store)
-        svlist.push_back(elem.first);
+    for (const auto &entry : m_store)
+        svlist.push_back(entry.first);
 
     return svlist;
 }
 
-boost::optional< std::map<DateTime, Ionosphere> > IonosphereStore::getItemsBySv(const SvID &sv) const
+std::optional< std::map<DateTime, Ionosphere> > IonosphereStore::getItemsBySv(const SvID &sv) const
 {
-    boost::optional< std::map<DateTime, Ionosphere> > items;
+    std::optional< std::map<DateTime, Ionosphere> > items;
 
     const auto it = m_store.find(sv);
     if (it != m_store.end())
@@ -67,9 +67,9 @@ bool IonosphereStore::hasDataForSv(const SvID &sv) const
  * @param datetime Date of specific Ionosphere.
  * @return Pointer to Ionosphere for SV.
  */
-boost::optional<Ionosphere> IonosphereStore::getIonosphere(const SvID &sv, const DateTime &datetime) const
+std::optional<Ionosphere> IonosphereStore::getIonosphere(const SvID &sv, const DateTime &datetime) const
 {
-    boost::optional<Ionosphere> ion;
+    std::optional<Ionosphere> ion;
     std::map<DateTime, Ionosphere> dateion;
 
     // find sv
@@ -95,10 +95,10 @@ void IonosphereStore::dumpStoreStatistics(const std::string &name) const
         return;
     }
 
-    for (const auto & item : m_store)
+    for (const auto &[sv, models] : m_store)
     {
-        std::cout << item.first.getPRN() << ": "
-                  << item.second.size() << std::endl;
+        std::cout << sv.getPRN() << ": "
+                  << models.size() << std::endl;
     }
 }
 
@@ -149,7 +149,7 @@ void IonosphereStore::dumpGridAvailability(const SvID &sv) const
         const std::vector<IonoGridInfo> igp = elem.second.getGrid();
         std::size_t i = 0;
 
-        for (auto igpelem : igp)
+        for (const auto &igpelem : igp)
         {
             // increment if real IGP point has data
             if (igpelem.getVerticalDelay_TECU() != 9999)

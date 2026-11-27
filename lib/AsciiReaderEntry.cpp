@@ -9,8 +9,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
-#include <boost/algorithm/string.hpp>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace
 {
@@ -26,24 +27,45 @@ namespace
 /*
  * extract data by keyword from line
  */
-static std::string extractData(const std::string &line, const std::string &keyword)
+std::string extractData(const std::string_view line, const std::string_view keyword)
 {
     // example: tow 310190 PRN 5 len 10 [data 09e345e3 ...]
     const std::size_t pos { line.find(keyword) };
 
     // keyword not found
-    if (pos == std::string::npos)
-        throw std::invalid_argument("keyword \"" + keyword + "\" not found");
+    if (pos == std::string_view::npos)
+        throw std::invalid_argument("keyword \"" + std::string(keyword) + "\" not found");
 
     // start of 310190
     const std::size_t pos_start { pos + keyword.length() };
     // find next whitespace after 310190
     const std::size_t pos_end { line.find(' ', pos_start) };
 
-    if (pos_start == std::string::npos || pos_end == std::string::npos)
+    if (pos_start == std::string_view::npos || pos_end == std::string_view::npos)
         throw std::invalid_argument("invalid data line");
 
-    return line.substr(pos_start, pos_end - pos_start);
+    return std::string(line.substr(pos_start, pos_end - pos_start));
+}
+
+// Same tokenisation as boost::split(..., token_compress_off): every delimiter
+// starts a new field, including empty fields at either end.
+void splitOn(const std::string_view input, const char delimiter, std::vector<std::string> &out)
+{
+    out.clear();
+    std::string token;
+    for (const char ch : input)
+    {
+        if (ch == delimiter)
+        {
+            out.push_back(std::move(token));
+            token.clear();
+        }
+        else
+        {
+            token.push_back(ch);
+        }
+    }
+    out.push_back(std::move(token));
 }
 
 } // namespace anonymous
@@ -59,7 +81,7 @@ AsciiReaderEntry::AsciiReaderEntry()
 {
 }
 
-AsciiReaderEntry::AsciiReaderEntry(const std::string &/*line*/)
+AsciiReaderEntry::AsciiReaderEntry(const std::string_view /*line*/)
     : m_prn(0)
     , m_datetime()
     , m_sigtype(SignalType::NONE)
@@ -87,7 +109,7 @@ NavBits<300> AsciiReaderEntry::getBits() const
     return m_bits;
 }
 
-void AsciiReaderEntry::readLine(const std::string &)
+void AsciiReaderEntry::readLine(const std::string_view)
 {
     // should not be called
     assert(false);
@@ -104,12 +126,12 @@ AsciiReaderEntryJPS::AsciiReaderEntryJPS()
 {
 }
 
-AsciiReaderEntryJPS::AsciiReaderEntryJPS(const std::string &line)
+AsciiReaderEntryJPS::AsciiReaderEntryJPS(const std::string_view line)
 {
     readLine(line);
 }
 
-void AsciiReaderEntryJPS::readLine(const std::string &line)
+void AsciiReaderEntryJPS::readLine(const std::string_view line)
 {
     // parse tow and prn fields
     try
@@ -179,12 +201,12 @@ AsciiReaderEntrySBF::AsciiReaderEntrySBF()
 {
 }
 
-AsciiReaderEntrySBF::AsciiReaderEntrySBF(const std::string &line)
+AsciiReaderEntrySBF::AsciiReaderEntrySBF(const std::string_view line)
 {
     readLine(line);
 }
 
-void AsciiReaderEntrySBF::readLine(const std::string &line)
+void AsciiReaderEntrySBF::readLine(const std::string_view line)
 {
     static const uint32_t SBF_SVID_OFFSET_BEIDOU { 140 };
     // invalid sv ids will be set to 140
@@ -205,7 +227,7 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
 
     // split fields, delimited by comma
     std::vector<std::string> splitline;
-    boost::split(splitline, line, boost::is_any_of(","));
+    splitOn(line, ',', splitline);
 
     // ensure we have all elements
     assert(splitline.size() == 6);
@@ -250,15 +272,15 @@ void AsciiReaderEntrySBF::readLine(const std::string &line)
 
     // parse last field, which contains 10 numeric values, separated by whitespace
     std::vector<std::string> splitbits;
-    boost::split(splitbits, splitline[5], boost::is_any_of(" "));
+    splitOn(splitline[5], ' ', splitbits);
 
     // ensure we have 10 values
     assert(splitbits.size() == 10);
 
     NavBits<320> navbits320;
-    for (std::vector<std::string>::iterator it = splitbits.begin(); it < splitbits.end(); ++it)
+    for (const std::string &field : splitbits)
     {
-        const uint32_t val { stoui32(*it) };
+        const uint32_t val { stoui32(field) };
         const std::size_t bsize { 32 };
         const NavBits<bsize> bitblock { val };
 
@@ -293,12 +315,12 @@ AsciiReaderEntrySBFHex::AsciiReaderEntrySBFHex()
 {
 }
 
-AsciiReaderEntrySBFHex::AsciiReaderEntrySBFHex(const std::string &line)
+AsciiReaderEntrySBFHex::AsciiReaderEntrySBFHex(const std::string_view line)
 {
     readLine(line);
 }
 
-void AsciiReaderEntrySBFHex::readLine(const std::string &line)
+void AsciiReaderEntrySBFHex::readLine(const std::string_view line)
 {
     static const uint32_t SBF_SVID_OFFSET_BEIDOU { 140 };
     // invalid sv ids will be set to 140
@@ -319,7 +341,7 @@ void AsciiReaderEntrySBFHex::readLine(const std::string &line)
 
     // split fields, delimited by comma
     std::vector<std::string> splitline;
-    boost::split(splitline, line, boost::is_any_of(","));
+    splitOn(line, ',', splitline);
 
     // ensure we have all elements
     assert(splitline.size() == 7);
@@ -366,18 +388,18 @@ void AsciiReaderEntrySBFHex::readLine(const std::string &line)
 
     // parse last field, which contains 10 numeric values, separated by whitespace
     std::vector<std::string> splitbits;
-    boost::split(splitbits, splitline[6], boost::is_any_of(" "));
+    splitOn(splitline[6], ' ', splitbits);
 
     // ensure we have 10 values
     assert(splitbits.size() == 10);
 
     NavBits<320> navbits320;
-    for (std::vector<std::string>::iterator it = splitbits.begin(); it < splitbits.end(); ++it)
+    for (const std::string &field : splitbits)
     {
         // convert hex string to unsigned integer
         uint32_t val { 0 };
         std::stringstream ss;
-        ss << std::hex << *it;
+        ss << std::hex << field;
         ss >> val;
 
         //const uint32_t val { std::stoul(*it) };

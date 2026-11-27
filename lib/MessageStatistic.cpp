@@ -1,5 +1,10 @@
 #include "MessageStatistic.h"
 
+#include <cassert>
+#include <iomanip>
+#include <iostream>
+#include <utility>
+
 namespace bnav
 {
 
@@ -43,13 +48,13 @@ void MessageStatistic::dump() const
 {
     std::cout << "Message statistic:" << std::endl;
 
-    for (const auto elem : m_count)
+    for (const auto &[sv, count] : m_count)
     {
-        const auto it = m_firstlast.find(elem.first);
+        const auto it = m_firstlast.find(sv);
         assert(it != m_firstlast.end());
 
-        std::cout << std::setw(2) << elem.first.getPRN() << ": "
-                  << std::setw(6) << elem.second
+        std::cout << std::setw(2) << sv.getPRN() << ": "
+                  << std::setw(6) << count
                   << " first: "
                   << it->second.first.getDateTimeString()
                   << " last: "
