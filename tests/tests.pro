@@ -8,6 +8,10 @@ CONFIG -= app_bundle
 
 LIBS += -lUnitTest++ -L../lib -lbnav
 
+unix:!macx {
+    QMAKE_LFLAGS += -Wl,-rpath,\'\$\$ORIGIN/../lib\'
+}
+
 SOURCES += main.cpp \
     testNavBits.cpp \
     testAsciiReader.cpp \
