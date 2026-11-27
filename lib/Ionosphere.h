@@ -8,6 +8,7 @@
 #include "Ephemeris.h"
 #include "IonosphereGridInfo.h"
 
+#include <span>
 #include <vector>
 
 namespace bnav
@@ -44,15 +45,15 @@ public:
     void load(const SubframeBufferParam &sfbuf, const uint32_t weeknum);
     void load(const KlobucharParam &klob, const DateTime &datetime, const bool global = false);
 
-    bool hasData() const;
+    [[nodiscard]] bool hasData() const;
     void setDateOfIssue(const DateTime &datetime);
-    DateTime getDateOfIssue() const;
+    [[nodiscard]] DateTime getDateOfIssue() const;
 
-    void setGrid(const std::vector<IonoGridInfo> &rhs);
-    std::vector<IonoGridInfo> getGrid() const;
+    void setGrid(std::span<const IonoGridInfo> rhs);
+    [[nodiscard]] std::vector<IonoGridInfo> getGrid() const;
 
     void setGridDimension(const IonoGridDimension &igd);
-    IonoGridDimension getGridDimension() const;
+    [[nodiscard]] IonoGridDimension getGridDimension() const;
 
     Ionosphere diffToModel(const Ionosphere &rhs);
 

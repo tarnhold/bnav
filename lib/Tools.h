@@ -2,9 +2,10 @@
 #define TOOLS_H
 
 #include <cassert>
+#include <concepts>
 #include <cstdint>
-#include <string>
 #include <limits>
+#include <string>
 
 namespace bnav
 {
@@ -16,7 +17,8 @@ inline uint32_t stoui32(const std::string& s, std::size_t* idx = nullptr, const 
     return std::uint32_t(val);
 }
 
-template<typename T> inline typename std::enable_if<std::is_unsigned<T>::value, bool>::type checked_sub(T a, T b, T& result)
+template<typename T>
+constexpr bool checked_sub(T a, T b, T& result) requires std::unsigned_integral<T>
 {
     if (a < b) {
         return true;

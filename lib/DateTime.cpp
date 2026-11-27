@@ -1,8 +1,62 @@
 #include "DateTime.h"
 #include "BeiDou.h"
 
-#include <iostream>
+#include <array>
+#include <cassert>
+#include <charconv>
+#include <chrono>
+#include <iomanip>
 #include <limits>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+
+namespace
+{
+
+int parseDigits(const std::string_view text, const std::size_t pos, const std::size_t len)
+{
+    int value = 0;
+    const char *first = text.data() + pos;
+    const char *last = first + len;
+    const std::from_chars_result result = std::from_chars(first, last, value);
+    if (result.ec != std::errc{} || result.ptr != last)
+        throw std::invalid_argument("Invalid ISO date");
+    return value;
+}
+
+struct Civil
+{
+    int year;
+    unsigned month;
+    unsigned day;
+    int hour;
+    int minute;
+    int second;
+};
+
+Civil civilFrom(const std::chrono::sys_time<std::chrono::milliseconds> tp)
+{
+    const auto daypoint = std::chrono::floor<std::chrono::days>(tp);
+    const std::chrono::year_month_day ymd{daypoint};
+    const std::chrono::hh_mm_ss<std::chrono::milliseconds> hms{tp - daypoint};
+    return Civil{
+        static_cast<int>(ymd.year()),
+        static_cast<unsigned>(ymd.month()),
+        static_cast<unsigned>(ymd.day()),
+        static_cast<int>(hms.hours().count()),
+        static_cast<int>(hms.minutes().count()),
+        static_cast<int>(hms.seconds().count())
+    };
+}
+
+// English abbreviations, matching boost::gregorian::greg_month::as_short_string().
+constexpr std::array<const char *, 12> kMonthNames{
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+
+} // namespace
 
 namespace bnav
 {
@@ -12,7 +66,7 @@ namespace bnav
  */
 DateTime::DateTime()
     : m_tsys(TimeSystem::NONE)
-    , m_time(boost::posix_time::ptime())
+    , m_time(std::nullopt)
     , m_weeknum(std::numeric_limits<uint32_t>::max())
     , m_sow(std::numeric_limits<uint32_t>::max())
 {
@@ -21,9 +75,9 @@ DateTime::DateTime()
 /**
  * @brief DateTime::DateTime Construct from ISO date string.
  */
-DateTime::DateTime(const TimeSystem ts, const std::string &isostr)
+DateTime::DateTime(const TimeSystem ts, const std::string_view isostr)
     : m_tsys(ts)
-    , m_time(boost::posix_time::ptime())
+    , m_time(std::nullopt)
     , m_weeknum(std::numeric_limits<uint32_t>::max())
     , m_sow(std::numeric_limits<uint32_t>::max())
 {
@@ -39,7 +93,7 @@ DateTime::DateTime(const TimeSystem ts, const std::string &isostr)
  */
 DateTime::DateTime(const TimeSystem ts, const uint32_t weeknum, const uint32_t sow, const uint32_t millisec)
     : m_tsys(ts)
-    , m_time()
+    , m_time(std::nullopt)
     , m_weeknum(std::numeric_limits<uint32_t>::max())
     , m_sow(std::numeric_limits<uint32_t>::max())
 {
@@ -79,42 +133,61 @@ void DateTime::setWeekAndSOW(const uint32_t weeknum, const uint32_t sow, const u
     assert(m_sow < SECONDS_OF_A_WEEK);
     assert(m_weeknum <= WEEKNUM_MAX);
 
-    boost::gregorian::date d0;
+    std::chrono::sys_days epoch;
     if (m_tsys == TimeSystem::BDT)
     {
         // Weeknum starts on 00:00:00 Jan, 1, 2006 BDT
-        d0 = boost::gregorian::date(2006, 1, 1);
+        epoch = std::chrono::sys_days{std::chrono::year{2006}/std::chrono::January/1};
     }
     else if (m_tsys == TimeSystem::GPST)
     {
         // Weeknum stars on 00:00:00 Jan, 6, 1980 for GPS
-        d0 = boost::gregorian::date(1980, 1, 6);
+        epoch = std::chrono::sys_days{std::chrono::year{1980}/std::chrono::January/6};
     }
     else
     {
         assert(false); // not implemented
+        epoch = std::chrono::sys_days{};
     }
 
-    const boost::posix_time::ptime t0(d0, boost::posix_time::hours(0));
-
-    m_time = t0 + boost::gregorian::weeks(static_cast<int>(weeknum))
-            + boost::posix_time::seconds(static_cast<int>(sow))
-            + boost::posix_time::milliseconds(static_cast<int>(millisec));
+    // Cast through int, as the previous Boost implementation did, so values
+    // that fit in int land on the same instant.
+    m_time = epoch
+            + std::chrono::weeks{static_cast<int>(weeknum)}
+            + std::chrono::seconds{static_cast<int>(sow)}
+            + std::chrono::milliseconds{static_cast<int>(millisec)};
 }
 
 /**
  * @brief DateTime::setISODateTime Set date and time from ISO string.
  * @param isostr String in format YYYYMMDDTHHMMSS.
  */
-void DateTime::setISODateTime(const std::string &isostr)
+void DateTime::setISODateTime(const std::string_view isostr)
 {
     assert(m_tsys != TimeSystem::NONE);
     // ensure ISO date YYYYMMDDTHHMMSS
     assert(isostr.length() == 15);
     assert(isostr[8] == 'T');
-    const boost::posix_time::ptime date { boost::posix_time::from_iso_string(isostr) };
 
-    m_time = date;
+    const int year = parseDigits(isostr, 0, 4);
+    const int month = parseDigits(isostr, 4, 2);
+    const int day = parseDigits(isostr, 6, 2);
+    const int hour = parseDigits(isostr, 9, 2);
+    const int minute = parseDigits(isostr, 11, 2);
+    const int second = parseDigits(isostr, 13, 2);
+
+    const std::chrono::year_month_day ymd{
+        std::chrono::year{year},
+        std::chrono::month{static_cast<unsigned>(month)},
+        std::chrono::day{static_cast<unsigned>(day)}
+    };
+    if (!ymd.ok())
+        throw std::invalid_argument("Invalid ISO date");
+
+    m_time = std::chrono::sys_days{ymd}
+            + std::chrono::hours{hour}
+            + std::chrono::minutes{minute}
+            + std::chrono::seconds{second};
 }
 
 /**
@@ -122,11 +195,11 @@ void DateTime::setISODateTime(const std::string &isostr)
  */
 void DateTime::setToCurrentDateTimeUTC()
 {
-   // get the current time from the clock -- one second resolution
-   const boost::posix_time::ptime now { boost::posix_time::second_clock::universal_time() };
+   // one second resolution, same as boost::posix_time::second_clock
+   const auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 
    m_tsys = TimeSystem::UTC;
-   m_time = now;
+   m_time = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
 }
 
 /**
@@ -138,13 +211,10 @@ TimeSystem DateTime::getTimeSystem() const
     return m_tsys;
 }
 
-/**
- * @brief DateTime::get_ptime Return raw ptime object.
- * @return ptime.
- */
-boost::posix_time::ptime DateTime::get_ptime() const
+std::chrono::sys_time<std::chrono::milliseconds> DateTime::timePoint() const
 {
-    return m_time;
+    assert(m_time.has_value());
+    return *m_time;
 }
 
 uint32_t DateTime::getWeekNum() const
@@ -169,8 +239,7 @@ uint32_t DateTime::getSOW() const
  */
 uint32_t DateTime::getDay() const
 {
-    const boost::gregorian::date d { m_time.date() };
-    return d.day();
+    return civilFrom(timePoint()).day;
 }
 
 /**
@@ -179,8 +248,7 @@ uint32_t DateTime::getDay() const
  */
 uint32_t DateTime::getMonth() const
 {
-    const boost::gregorian::date d { m_time.date() };
-    return d.month();
+    return civilFrom(timePoint()).month;
 }
 
 /**
@@ -189,8 +257,7 @@ uint32_t DateTime::getMonth() const
  */
 uint32_t DateTime::getYear() const
 {
-    const boost::gregorian::date d { m_time.date() };
-    return d.year();
+    return static_cast<uint32_t>(civilFrom(timePoint()).year);
 }
 
 /**
@@ -237,9 +304,9 @@ std::string DateTime::getISODate() const
 
 uint32_t DateTime::getHour() const
 {
-    const boost::posix_time::time_duration t { m_time.time_of_day() };
-    assert(t.hours() >= 0 && t.hours() <= 24);
-    return static_cast<uint32_t>(t.hours());
+    const int hours = civilFrom(timePoint()).hour;
+    assert(hours >= 0 && hours <= 24);
+    return static_cast<uint32_t>(hours);
 }
 
 /**
@@ -255,9 +322,9 @@ std::string DateTime::getHourString() const
 
 uint32_t DateTime::getMinute() const
 {
-    const boost::posix_time::time_duration t { m_time.time_of_day() };
-    assert(t.minutes() >= 0 && t.minutes() <= 60);
-    return static_cast<uint32_t>(t.minutes());
+    const int minutes = civilFrom(timePoint()).minute;
+    assert(minutes >= 0 && minutes <= 60);
+    return static_cast<uint32_t>(minutes);
 }
 
 /**
@@ -273,9 +340,9 @@ std::string DateTime::getMinuteString() const
 
 uint32_t DateTime::getSecond() const
 {
-    const boost::posix_time::time_duration t { m_time.time_of_day() };
-    assert(t.seconds() >= 0 && t.seconds() <= 60);
-    return static_cast<uint32_t>(t.seconds());
+    const int seconds = civilFrom(timePoint()).second;
+    assert(seconds >= 0 && seconds <= 60);
+    return static_cast<uint32_t>(seconds);
 }
 
 /**
@@ -295,8 +362,9 @@ std::string DateTime::getSecondString() const
  */
 std::string DateTime::getMonthNameShort() const
 {
-    const boost::gregorian::date d { m_time.date() };
-    return d.month().as_short_string();
+    const uint32_t month = getMonth();
+    assert(month >= 1 && month <= 12);
+    return kMonthNames[month - 1];
 }
 
 std::string DateTime::getDateTimeString() const
@@ -335,9 +403,12 @@ bool DateTime::isSameIonexDay(const DateTime &rhs) const
         return true;
 
     // rhs is next day 00:00, we count this to the same day, because Ionex needs
-    const boost::gregorian::date nextday = m_time.date() + boost::gregorian::days(1);
+    const std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(timePoint())};
+    const std::chrono::year_month_day nextday{std::chrono::sys_days{ymd} + std::chrono::days{1}};
 
-    if (rhs.getYear() == nextday.year() && rhs.getMonth() == nextday.month() && rhs.getDay() == nextday.day())
+    if (rhs.getYear() == static_cast<uint32_t>(static_cast<int>(nextday.year()))
+            && rhs.getMonth() == static_cast<unsigned>(nextday.month())
+            && rhs.getDay() == static_cast<unsigned>(nextday.day()))
     {
         if (rhs.getHour() == 0 && rhs.getMinute() == 0 && rhs.getSecond() == 0)
             return true;
@@ -355,33 +426,28 @@ bool DateTime::isSameIonexDay(const DateTime &rhs) const
  */
 bool DateTime::operator==(const DateTime &rhs) const
 {
-    return (m_tsys == rhs.getTimeSystem()) && (m_time == rhs.get_ptime());
+    return (m_tsys == rhs.getTimeSystem()) && (m_time == rhs.m_time);
 }
 
 bool DateTime::operator<(const DateTime &rhs) const
 {
     assert(m_tsys == rhs.getTimeSystem());
-    return m_time < rhs.get_ptime();
+    return timePoint() < rhs.timePoint();
 }
 
 bool DateTime::operator>(const DateTime &rhs) const
 {
     assert(m_tsys == rhs.getTimeSystem());
-    return m_time > rhs.get_ptime();
+    return timePoint() > rhs.timePoint();
 }
 
-boost::posix_time::time_duration DateTime::operator-(const DateTime &rhs) const
+std::chrono::seconds DateTime::operator-(const DateTime &rhs) const
 {
     assert(m_tsys == rhs.getTimeSystem());
-    boost::posix_time::time_duration td;
-
-    // avoid negative time duration
-    if (m_time < rhs.get_ptime())
-        td = rhs.get_ptime() - m_time;
-    else
-        td = m_time - rhs.get_ptime();
-
-    return td;
+    const auto lhsTime = timePoint();
+    const auto rhsTime = rhs.timePoint();
+    const auto diff = lhsTime < rhsTime ? (rhsTime - lhsTime) : (lhsTime - rhsTime);
+    return std::chrono::duration_cast<std::chrono::seconds>(diff);
 }
 
 } // namespace bnav

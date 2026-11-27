@@ -5,10 +5,11 @@
 #include "DateTime.h"
 #include "SvID.h"
 
-#include <map>
 #include <cstdint>
-
-#include <boost/optional.hpp>
+#include <map>
+#include <optional>
+#include <string>
+#include <vector>
 
 namespace bnav
 {
@@ -23,11 +24,11 @@ public:
 
     void addIonosphere(const SvID &sv, const Ionosphere &iono);
 
-    bool hasDataForSv(const SvID &sv) const;
+    [[nodiscard]] bool hasDataForSv(const SvID &sv) const;
 
-    std::vector< SvID > getSvList() const;
-    boost::optional< std::map<DateTime, Ionosphere> > getItemsBySv(const SvID &sv) const;
-    boost::optional< Ionosphere > getIonosphere(const SvID &sv, const DateTime &datetime) const;
+    [[nodiscard]] std::vector< SvID > getSvList() const;
+    [[nodiscard]] std::optional< std::map<DateTime, Ionosphere> > getItemsBySv(const SvID &sv) const;
+    [[nodiscard]] std::optional< Ionosphere > getIonosphere(const SvID &sv, const DateTime &datetime) const;
 
     void dumpStoreStatistics(const std::string &name) const;
     void dumpGridAvailability(const SvID &sv) const;

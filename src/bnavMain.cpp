@@ -10,11 +10,18 @@
 
 #include "DateTime.h"
 
+#include <cassert>
+#include <cstdint>
 #include <cstdlib>
+#include <iostream>
 #include <limits>
+#include <optional>
+#include <regex>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include <boost/program_options.hpp>
-#include <boost/regex.hpp>
 
 namespace
 {
@@ -25,9 +32,8 @@ namespace
  * @param fullfilename Full filename.
  * @return Date as string.
  */
-boost::optional<std::string> lcl_extractDateStringFromIGSFilename(const std::string &fullfilename)
+std::optional<std::string> lcl_extractDateStringFromIGSFilename(const std::string &fullfilename)
 {
-    boost::optional<std::string> datestring;
     std::string filename = fullfilename;
     const std::size_t lastslash = fullfilename.find_last_of('/');
 
@@ -36,16 +42,15 @@ boost::optional<std::string> lcl_extractDateStringFromIGSFilename(const std::str
         filename = fullfilename.substr(lastslash + 1);
 
     // CUT12014071324.sbf_SBF_CMPRaw.txt
-    boost::regex expr("^[A-Z]{3}[A-Z0-9]([0-9]{8})24\\.");
+    const std::regex expr("^[A-Z]{3}[A-Z0-9]([0-9]{8})24\\.");
     // we want only group one
-    boost::sregex_token_iterator it(filename.begin(), filename.end(), expr, 1);
-    boost::sregex_token_iterator end;
+    std::sregex_token_iterator it(filename.begin(), filename.end(), expr, 1);
+    const std::sregex_token_iterator end;
 
     if (it != end)
-        datestring = it->str();
+        return std::string(*it);
 
-    // if nothing matched, optional is null
-    return datestring;
+    return std::nullopt;
 }
 
 }
@@ -62,8 +67,8 @@ bnavMain::bnavMain(int argc, char *argv[])
     , m_showHelp(false)
     , limit_to_interval_regional(0)
     , limit_to_interval_klobuchar(0)
-    , limit_to_prn(boost::optional<SvID>())
-    , limit_to_date(boost::optional<DateTime>())
+    , limit_to_prn(std::nullopt)
+    , limit_to_date(std::nullopt)
     , sbstore()
     , ionostore()
     , ionostoreKlobuchar()
@@ -91,8 +96,9 @@ bnavMain::bnavMain(int argc, char *argv[])
     {
         boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(positionalopts).run(), vm);
 
-        // Handle --help before notify(). notify() would reject -h when --file
-        // is absent, and throwing the help text was swallowed by catch (...).
+        // Handle --help before notify(). notify() applies required options and
+        // would reject -h when --file is absent; a later throw was also swallowed
+        // by the catch-all below ("Unknown exception!").
         if (vm.count("help"))
         {
             std::cout << desc << std::endl;
@@ -196,10 +202,10 @@ bnavMain::bnavMain(int argc, char *argv[])
         // extract date from filename, so we have a clue which data we want
         // to extract from the file (it's possible that there is more than
         // one day data inside the file.
-        boost::optional<std::string> igsdate = lcl_extractDateStringFromIGSFilename(filenameInput);
+        const std::optional<std::string> igsdate = lcl_extractDateStringFromIGSFilename(filenameInput);
         if (igsdate)
         {
-            limit_to_date_str = igsdate.get();
+            limit_to_date_str = *igsdate;
             std::cout << "Date limit from IGS filename: " << limit_to_date_str << std::endl;
         }
     }
@@ -237,7 +243,7 @@ void bnavMain::readInputFile()
     {
         const bnav::SvID sv(data.getPRN());
 
-        if (limit_to_prn && sv != limit_to_prn.get())
+        if (limit_to_prn && sv != *limit_to_prn)
             continue;
 
         bnav::Subframe sf(sv, data.getBits());
@@ -271,7 +277,7 @@ void bnavMain::readInputFile()
             // FIXME: we take only PRN 2 data here, if we would like to
             // replace missing data of prn 2 with other geos we have to
             // think about IonosphereStore, which stores in depending on SvID!
-            if (limit_to_prn && sv == limit_to_prn.get() && intervalCount != intervalCountOld)
+            if (limit_to_prn && sv == *limit_to_prn && intervalCount != intervalCountOld)
             {
                 intervalCountOld = intervalCount;
                 bnav::KlobucharParam klob = eph.getKlobucharParam();
@@ -316,7 +322,7 @@ void bnavMain::readInputFile()
                 bnav::Ionosphere iono(bdata, weeknum);
 
                 // diff only for one single prn
-                if (limit_to_prn && sv == limit_to_prn.get() && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
+                if (limit_to_prn && sv == *limit_to_prn && iono.getDateOfIssue().getSOW() % limit_to_interval_regional == 0)
                 {
                     if (limit_to_date && limit_to_date->isSameIonexDay(iono.getDateOfIssue()))
                     {
@@ -343,9 +349,9 @@ void bnavMain::readInputFile()
     // works only with one sv selected at the moment
     if (limit_to_prn)
     {
-        if (ionostore.hasDataForSv(limit_to_prn.get()))
+        if (ionostore.hasDataForSv(*limit_to_prn))
         {
-            ionostore.dumpGridAvailability(limit_to_prn.get());
+            ionostore.dumpGridAvailability(*limit_to_prn);
 
             if (!filenameIonexRegional.empty())
                 writeIonexFile(filenameIonexRegional, limit_to_interval_regional, false);
@@ -355,7 +361,7 @@ void bnavMain::readInputFile()
             std::cout << "No data in Regional Grid store. No Ionex output." << std::endl;
         }
 
-        if (ionostoreKlobuchar.hasDataForSv(limit_to_prn.get()))
+        if (ionostoreKlobuchar.hasDataForSv(*limit_to_prn))
         {
             if (!filenameIonexKlobuchar.empty())
                 writeIonexFile(filenameIonexKlobuchar, limit_to_interval_klobuchar, true);
@@ -377,9 +383,9 @@ void bnavMain::writeIonexFile(const std::string &filename, const std::uint32_t i
         std::perror(("Error: Could not open file: " + filename).c_str());
 
     // write all models from prn
-    const auto prn2data = klobuchar ? ionostoreKlobuchar.getItemsBySv(limit_to_prn.get()) : ionostore.getItemsBySv(limit_to_prn.get());
+    const auto prn2data = klobuchar ? ionostoreKlobuchar.getItemsBySv(*limit_to_prn) : ionostore.getItemsBySv(*limit_to_prn);
     if (prn2data)
-        writer.writeAll(prn2data.get());
+        writer.writeAll(*prn2data);
     else
         std::cerr << "writeIonexFile: no data for getItemsBySv!" << std::endl;
     writer.close();

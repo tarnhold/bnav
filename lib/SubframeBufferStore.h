@@ -6,23 +6,25 @@
 #include "SvID.h"
 
 #include <map>
+#include <memory>
 
 namespace bnav
 {
 
 class SubframeBufferStore
 {
-    std::map<SvID, SubframeBuffer*> m_store;
+    // Owns one D1 or D2 buffer per satellite. getSubframeBuffer() returns
+    // a non-owning pointer that stays valid until the store is destroyed.
+    std::map<SvID, std::unique_ptr<SubframeBuffer>> m_store;
 
 public:
     SubframeBufferStore();
-    ~SubframeBufferStore();
 
     void addSubframe(const SvID &sv, const Subframe &sf);
 
-    SubframeBuffer* getSubframeBuffer(const SvID &sv);
+    [[nodiscard]] SubframeBuffer* getSubframeBuffer(const SvID &sv);
 
-    bool hasIncompleteData() const;
+    [[nodiscard]] bool hasIncompleteData() const;
 
 private:
     void addSvID(const SvID &sv);

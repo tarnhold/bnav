@@ -5,16 +5,17 @@
 #include "Ionosphere.h"
 
 #include <fstream>
-#include <string>
 #include <map>
-
-#include <boost/noncopyable.hpp>
+#include <string>
 
 namespace bnav
 {
 
-class IonexWriter : private boost::noncopyable
+class IonexWriter
 {
+    IonexWriter(const IonexWriter &) = delete;
+    IonexWriter &operator=(const IonexWriter &) = delete;
+
     std::ofstream m_outfile; ///< Output file stream
     std::string m_filename; ///< File name
     std::uint32_t m_interval;
@@ -31,9 +32,9 @@ public:
     void open(const char *filename);
     void open(const std::string &filename);
 
-    bool isOpen() const;
+    [[nodiscard]] bool isOpen() const;
 
-    bool isKlobuchar() const;
+    [[nodiscard]] bool isKlobuchar() const;
     void setKlobuchar(const bool klobuchar = true);
 
     void writeAll(const std::map<DateTime, Ionosphere> &data);

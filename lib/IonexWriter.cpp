@@ -3,6 +3,7 @@
 #include "BeiDou.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -181,8 +182,8 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
               << "PGM / RUN BY / DATE" << std::endl;
 
     const std::vector<std::string> description { m_isKlobuchar ? description_klobuchar : description_regional };
-    for (auto it = description.cbegin(); it != description.end(); ++it)
-        m_outfile << lcl_justifyLeft(*it, 60)
+    for (const std::string &line : description)
+        m_outfile << lcl_justifyLeft(line, 60)
                   << lcl_justifyLeft("DESCRIPTION", 20) << std::endl;
 
     const DateTime dtfirst = firstion.getDateOfIssue();
@@ -212,7 +213,8 @@ void IonexWriter::writeHeader(const Ionosphere &firstion, const Ionosphere &last
 
     // calculate total map count from interval, because we fill non existing
     // data records with dummies (9999).
-    const uint32_t totalsec = static_cast<uint32_t>(std::abs((lastion.getDateOfIssue() - firstion.getDateOfIssue()).total_seconds()));
+    const auto delta = lastion.getDateOfIssue() - firstion.getDateOfIssue();
+    const uint32_t totalsec = static_cast<uint32_t>(std::abs(delta.count()));
     const uint32_t mapcount = totalsec / m_interval + 1; // fence posts
     m_outfile << lcl_justifyRight(std::to_string(mapcount), 6) << lcl_justifyLeft("", 54)
               << lcl_justifyLeft("# OF MAPS IN FILE", 20) << std::endl;

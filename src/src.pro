@@ -8,7 +8,7 @@ TARGET = bapp
 CONFIG += console
 CONFIG -= app_bundle
 
-LIBS += -L../lib -lbnav -lboost_program_options -lboost_regex
+LIBS += -L../lib -lbnav -lboost_program_options
 
 # libbnav lives in ../lib relative to this binary. $ORIGIN keeps that
 # working without LD_LIBRARY_PATH, including after the build tree is moved.
@@ -21,6 +21,3 @@ SOURCES += main.cpp \
 
 HEADERS += \
     bnavMain.h
-
-OTHER_FILES +=
-

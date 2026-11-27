@@ -20,13 +20,13 @@ public:
     SvID(const uint32_t prn);
 
     void setPRN(const uint32_t prn);
-    uint32_t getPRN() const;
+    [[nodiscard]] uint32_t getPRN() const;
 
-    bool operator<(const SvID &rhs) const;
-    bool operator==(const SvID &rhs) const;
-    bool operator!=(const SvID &rhs) const;
+    [[nodiscard]] bool operator<(const SvID &rhs) const;
+    [[nodiscard]] bool operator==(const SvID &rhs) const;
+    [[nodiscard]] bool operator!=(const SvID &rhs) const;
 
-    bool isGeo() const;
+    [[nodiscard]] bool isGeo() const;
     // maybe implement:
     // bool isMEO() const;
     // bool isIGSO() const;

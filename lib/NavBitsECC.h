@@ -3,13 +3,13 @@
 
 #include "NavBits.h"
 
+#include <array>
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 
-#include <iostream>
-
-typedef bnav::NavBits<15> subword;
+using subword = bnav::NavBits<15>;
 
 namespace
 {
@@ -17,7 +17,7 @@ namespace
 /*
  * [1] Table 5-2 ROM table list for error correction
  */
-constexpr uint16_t cROMTable[] {
+constexpr std::array<uint16_t, 16> cROMTable{
     0x0000, 0x0001, 0x0002, 0x0010, // 0 - 3
     0x0004, 0x0100, 0x0020, 0x0400, // 4 - 7
     0x0008, 0x4000, 0x0200, 0x0080, // 8 - 11

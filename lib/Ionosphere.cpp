@@ -5,6 +5,9 @@
 
 #include <cmath>
 #include <iostream>
+#include <iterator>
+#include <ranges>
+#include <span>
 
 namespace
 {
@@ -382,14 +385,14 @@ std::vector<IonoGridInfo> Ionosphere::getGrid() const
     return m_grid;
 }
 
-void Ionosphere::setGrid(const std::vector<IonoGridInfo> &rhs)
+void Ionosphere::setGrid(const std::span<const IonoGridInfo> rhs)
 {
     // regional grid has 320 cells, global 5183
     assert(rhs.size() == 320 || rhs.size() == 5183);
     // FIXME: should set m_griddim, too - or at least fit to it
     m_grid.clear();
-    for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
-        m_grid.push_back(*it);
+    m_grid.reserve(rhs.size());
+    std::ranges::copy(rhs, std::back_inserter(m_grid));
 }
 
 void Ionosphere::setGridDimension(const IonoGridDimension &igd)

@@ -2,20 +2,23 @@
 #define BNAVMAIN_H
 
 #include "AsciiReader.h"
+#include "DateTime.h"
 #include "IonosphereStore.h"
 #include "SubframeBufferStore.h"
 #include "SvID.h"
 
+#include <cstdint>
+#include <optional>
 #include <string>
-
-#include <boost/noncopyable.hpp>
-#include <boost/optional.hpp>
 
 namespace bnav
 {
 
-class bnavMain final: public boost::noncopyable
+class bnavMain final
 {
+    bnavMain(const bnavMain &) = delete;
+    bnavMain &operator=(const bnavMain &) = delete;
+
     std::string filenameInput;
     bnav::AsciiReaderType filetypeInput;
     std::string filenameIonexKlobuchar;
@@ -25,8 +28,8 @@ class bnavMain final: public boost::noncopyable
     bool m_showHelp;
     std::uint32_t limit_to_interval_regional;
     std::uint32_t limit_to_interval_klobuchar;
-    boost::optional<SvID> limit_to_prn;
-    boost::optional<DateTime> limit_to_date;
+    std::optional<SvID> limit_to_prn;
+    std::optional<DateTime> limit_to_date;
 
     bnav::SubframeBufferStore sbstore;
     bnav::IonosphereStore ionostore;
@@ -35,7 +38,7 @@ class bnavMain final: public boost::noncopyable
 public:
     bnavMain(int argc, char *argv[]);
 
-    bool helpRequested() const;
+    [[nodiscard]] bool helpRequested() const;
     void readInputFile();
 
 private:

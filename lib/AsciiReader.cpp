@@ -10,8 +10,6 @@
 #include <cstdio>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
-
 namespace bnav
 {
 
